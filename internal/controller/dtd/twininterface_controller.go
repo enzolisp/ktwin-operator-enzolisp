@@ -51,6 +51,8 @@ func (r *TwinInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	// TODO(user): your logic here
 
+	// Create Mew Schema in Event Store
+
 	return ctrl.Result{}, nil
 }
 
