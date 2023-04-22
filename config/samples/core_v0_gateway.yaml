@@ -1,0 +1,12 @@
+apiVersion: core.ktwin/v0
+kind: Gateway
+metadata:
+  labels:
+    app.kubernetes.io/name: gateway
+    app.kubernetes.io/instance: gateway-sample
+    app.kubernetes.io/part-of: dt-operator-v4
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: dt-operator-v4
+  name: gateway-sample
+spec:
+  # TODO(user): Add fields here

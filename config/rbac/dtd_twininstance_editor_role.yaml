@@ -1,0 +1,31 @@
+# permissions for end users to edit twininstances.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: twininstance-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dt-operator-v4
+    app.kubernetes.io/part-of: dt-operator-v4
+    app.kubernetes.io/managed-by: kustomize
+  name: twininstance-editor-role
+rules:
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininstances
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininstances/status
+  verbs:
+  - get

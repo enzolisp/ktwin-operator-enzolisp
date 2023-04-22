@@ -1,0 +1,85 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - core.ktwin
+  resources:
+  - gateways
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - gateways/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
+  - gateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininstances
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininstances/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininstances/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininterfaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininterfaces/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - dtd.ktwin
+  resources:
+  - twininterfaces/status
+  verbs:
+  - get
+  - patch
+  - update

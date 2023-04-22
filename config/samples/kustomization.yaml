@@ -1,0 +1,6 @@
+## Append samples of your project ##
+resources:
+- dtd_v0_twininterface.yaml
+- dtd_v0_twininstance.yaml
+- core_v0_gateway.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
