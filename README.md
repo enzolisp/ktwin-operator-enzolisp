@@ -1,5 +1,6 @@
-# dt-operator-v4
-// TODO(user): Add simple overview of use/purpose
+# KTWIN - Kubernetes-based Platform for Digital Twins
+
+KTWIN Operator implementation.
 
 ## Description
 // TODO(user): An in-depth paragraph about your project and overview of use
