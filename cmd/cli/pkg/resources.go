@@ -57,7 +57,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 	twinInterface := apiv0.TwinInterface{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "TwinInterface",
-			APIVersion: "dtd.digitaltwin/v0",
+			APIVersion: "dtd.ktwin/v0",
 		},
 		ObjectMeta: v1.ObjectMeta{
 			Name:      r.parseHostName(string(tInterface.Id)),
@@ -83,7 +83,7 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 	twinInstance := apiv0.TwinInstance{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "TwinInstance",
-			APIVersion: "dtd.digitaltwin/v0",
+			APIVersion: "dtd.ktwin/v0",
 		},
 		ObjectMeta: v1.ObjectMeta{
 			Name:      r.parseHostName(string(twinInterface.Spec.Id)),
