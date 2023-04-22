@@ -3,7 +3,7 @@ kind: Broker
 metadata:
   annotations:
     eventing.knative.dev/broker.class: RabbitMQBroker
-  name: event-broker
+  name: twin-event
 spec:
   config:
     apiVersion: eventing.knative.dev/v1alpha1

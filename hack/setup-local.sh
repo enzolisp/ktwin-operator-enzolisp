@@ -63,12 +63,12 @@ kubectl wait --for=condition=available --timeout=200s --all deployments --namesp
 kubectl apply -f ${SCRIPT_PATH}/rabbitmq-cluster -n twin-core
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace twin-core
-kubectl wait --for=condition=available --timeout=200s --all pods --namespace twin-core
+kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace twin-core
 
 # RabbitMQ Broker
 kubectl apply -f ${SCRIPT_PATH}/rabbitmq-broker -n twin-core
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace twin-core
-kubectl wait --for=condition=available --timeout=200s --all pods --namespace twin-core
+kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace twin-core
 
 echo "Local setup script has finished"
