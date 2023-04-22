@@ -92,3 +92,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+## Create Project Steps
+
+```sh
+go mod init ktwin/operator
+kubebuilder init --domain ktwin --plugins=go/v4
+kubebuilder edit --multigroup=true
+kubebuilder create api --group dtd --version v0 --kind TwinInterface
+kubebuilder create api --group dtd --version v0 --kind TwinInstance
+kubebuilder create api --group core --version v0 --kind Gateway
+```
