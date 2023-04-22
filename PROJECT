@@ -6,7 +6,7 @@ domain: ktwin
 layout:
 - go.kubebuilder.io/v4
 multigroup: true
-projectName: dt-operator-v4
+projectName: ktwin-operator
 repo: ktwin/operator
 resources:
 - api:
