@@ -5,7 +5,7 @@ metadata:
 spec:
   rabbitmqClusterReference:
     # Configure name if a RabbitMQ Cluster Operator is being used.
-    name: rabbitmq-cluster
+    name: rabbitmq
     # Configure connectionSecret if an external RabbitMQ cluster is being used.
     # connectionSecret:
     #   name: rabbitmq-secret-credentials
