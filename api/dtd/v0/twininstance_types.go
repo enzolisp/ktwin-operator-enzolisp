@@ -17,25 +17,56 @@ limitations under the License.
 package v0
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type TwinInstancePhase string
+
+const (
+	TwinInstancePhasePending TwinInstancePhase = "Pending"
+	TwinInstancePhaseUnknown TwinInstancePhase = "Unknown"
+	TwinInstancePhaseRunning TwinInstancePhase = "Running"
+	TwinInstancePhaseFailed  TwinInstancePhase = "Failed"
+)
 
 // TwinInstanceSpec defines the desired state of TwinInstance
 type TwinInstanceSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Id             string                 `json:"id,omitempty"`
+	ParentInstance string                 `json:"parentInstance,omitempty"`
+	Interface      TwinInterfaceSpec      `json:"interface,omitempty"`
+	Events         []TwinInstanceEvents   `json:"events,omitempty"`
+	Template       corev1.PodTemplateSpec `json:"template,omitempty"`
+}
 
-	// Foo is an example field of TwinInstance. Edit twininstance_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+type TwinInstanceEvents struct {
+	Filters TwinInstanceEventsFilters `json:"filters,omitempty"`
+	Sink    TwinInterfaceEventsSink   `json:"sink,omitempty"`
+}
+
+// Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters
+// TODO: build complex filtering criteria
+type TwinInstanceEventsFilters struct {
+	Exact TwinInstanceEventsFiltersProperties `json:"exact,omitempty"`
+	// Prefix TwinInstanceEventsFiltersProperties `json:"prefix,omitempty"` // Unsupported
+	// Suffix TwinInstanceEventsFiltersProperties `json:"suffix,omitempty"` // Unsupported
+	// All    TwinInstanceEventsFiltersProperties `json:"all,omitempty"` // Unsupported
+	// Any    TwinInstanceEventsFiltersProperties `json:"any,omitempty"` // Unsupported
+	// Not    TwinInstanceEventsFiltersProperties `json:"not,omitempty"` // Unsupported
+}
+
+type TwinInstanceEventsFiltersProperties struct {
+	Type    string `json:"type,omitempty"`
+	Subject string `json:"subject,omitempty"`
+}
+
+type TwinInterfaceEventsSink struct {
+	InstanceId string `json:"instanceId,omitempty"`
 }
 
 // TwinInstanceStatus defines the observed state of TwinInstance
 type TwinInstanceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Status TwinInstancePhase `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

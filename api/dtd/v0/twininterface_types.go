@@ -20,22 +20,116 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+// TODO: review if component is a good name because DTDL has a component too
+
+type TwinInterfacePhase string
+
+const (
+	TwinInterfacePhasePending TwinInterfacePhase = "Pending"
+	TwinInterfacePhaseUnknown TwinInterfacePhase = "Unknown"
+	TwinInterfacePhaseRunning TwinInterfacePhase = "Running"
+	TwinInterfacePhaseFailed  TwinInterfacePhase = "Failed"
+)
+
+type PrimitiveType string
+type Multiplicity string
+
+const (
+	Integer PrimitiveType = "integer"
+	String  PrimitiveType = "string"
+	Boolean PrimitiveType = "boolean"
+	Double  PrimitiveType = "double"
+)
+
+const (
+	ONE  Multiplicity = "one"
+	MANY Multiplicity = "many"
+)
 
 // TwinInterfaceSpec defines the desired state of TwinInterface
 type TwinInterfaceSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of TwinInterface. Edit twininterface_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Id            string                   `json:"id,omitempty"`
+	DisplayName   string                   `json:"displayName,omitempty"`
+	Description   string                   `json:"description,omitempty"`
+	Comment       string                   `json:"comment,omitempty"`
+	Properties    []TwinProperty           `json:"properties,omitempty"`
+	Commands      []TwinCommand            `json:"commands,omitempty"`
+	Relationships []TwinRelationship       `json:"relationships,omitempty"`
+	Telemetries   []TwinTelemetry          `json:"telemetries,omitempty"`
+	Extends       TwinInterfaceExtendsSpec `json:"extends"`
 }
+
+type TwinInterfaceExtendsSpec struct {
+	Id string `json:"id,omitempty"`
+}
+
+type TwinProperty struct {
+	Id          string     `json:"id,omitempty"`
+	Comment     string     `json:"comment,omitempty"`
+	Description string     `json:"description,omitempty"`
+	DisplayName string     `json:"displayName,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	Schema      TwinSchema `json:"schema,omitempty"`
+	Writeable   bool       `json:"writable,omitempty"`
+}
+
+type TwinCommand struct {
+	Id          string `json:"id,omitempty"`
+	Comment     string `json:"comment,omitempty"`
+	Description string `json:"description,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	Name        string `json:"name,omitempty"`
+	// Request     CommandRequest  `json:"request"`
+	// Response    CommandResponse `json:"response"`
+}
+
+type TwinRelationship struct {
+	Id              string         `json:"id,omitempty"`
+	Comment         string         `json:"comment,omitempty"`
+	Description     string         `json:"description,omitempty"`
+	DisplayName     string         `json:"displayName,omitempty"`
+	MaxMultiplicity int            `json:"maxMultiplicity,omitempty"`
+	MinMultiplicity int            `json:"minMultiplicity,omitempty"`
+	Name            string         `json:"name,omitempty"`
+	Properties      []TwinProperty `json:"properties,omitempty"`
+	Target          string         `json:"target,omitempty"`
+	Schema          TwinSchema     `json:"schema,omitempty"`
+	Writeable       bool           `json:"writeable,omitempty"`
+}
+
+type TwinTelemetry struct {
+	Id          string     `json:"id,omitempty"`
+	Comment     string     `json:"comment,omitempty"`
+	Description string     `json:"description,omitempty"`
+	DisplayName string     `json:"displayName,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	Schema      TwinSchema `json:"schema,omitempty"`
+}
+
+type TwinSchema struct {
+	PrimitiveType PrimitiveType  `json:"primitiveType,omitempty"`
+	EnumType      TwinEnumSchema `json:"enumType,omitempty"`
+}
+
+type TwinEnumSchema struct {
+	ValueSchema PrimitiveType          `json:"valueSchema,omitempty"`
+	EnumValues  []TwinEnumSchemaValues `json:"enumValues,omitempty"`
+}
+
+type TwinEnumSchemaValues struct {
+	Name        string `json:"name,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	EnumValue   string `json:"enumValue,omitempty"`
+}
+
+// TODO: review this definition: rename TwinInterface to TwinInterface
+// TODO: TwinInstance instantiate the TwinInterface
+// type Component struct {
+// }
 
 // TwinInterfaceStatus defines the observed state of TwinInterface
 type TwinInterfaceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Status TwinInterfacePhase `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

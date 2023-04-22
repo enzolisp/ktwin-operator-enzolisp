@@ -35,13 +35,198 @@ spec:
           spec:
             description: TwinInterfaceSpec defines the desired state of TwinInterface
             properties:
-              foo:
-                description: Foo is an example field of TwinInterface. Edit twininterface_types.go
-                  to remove/update
+              commands:
+                items:
+                  properties:
+                    comment:
+                      type: string
+                    description:
+                      type: string
+                    displayName:
+                      type: string
+                    id:
+                      type: string
+                    name:
+                      type: string
+                  type: object
+                type: array
+              comment:
                 type: string
+              description:
+                type: string
+              displayName:
+                type: string
+              extends:
+                properties:
+                  id:
+                    type: string
+                type: object
+              id:
+                type: string
+              properties:
+                items:
+                  properties:
+                    comment:
+                      type: string
+                    description:
+                      type: string
+                    displayName:
+                      type: string
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    schema:
+                      properties:
+                        enumType:
+                          properties:
+                            enumValues:
+                              items:
+                                properties:
+                                  displayName:
+                                    type: string
+                                  enumValue:
+                                    type: string
+                                  name:
+                                    type: string
+                                type: object
+                              type: array
+                            valueSchema:
+                              type: string
+                          type: object
+                        primitiveType:
+                          type: string
+                      type: object
+                    writable:
+                      type: boolean
+                  type: object
+                type: array
+              relationships:
+                items:
+                  properties:
+                    comment:
+                      type: string
+                    description:
+                      type: string
+                    displayName:
+                      type: string
+                    id:
+                      type: string
+                    maxMultiplicity:
+                      type: integer
+                    minMultiplicity:
+                      type: integer
+                    name:
+                      type: string
+                    properties:
+                      items:
+                        properties:
+                          comment:
+                            type: string
+                          description:
+                            type: string
+                          displayName:
+                            type: string
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          schema:
+                            properties:
+                              enumType:
+                                properties:
+                                  enumValues:
+                                    items:
+                                      properties:
+                                        displayName:
+                                          type: string
+                                        enumValue:
+                                          type: string
+                                        name:
+                                          type: string
+                                      type: object
+                                    type: array
+                                  valueSchema:
+                                    type: string
+                                type: object
+                              primitiveType:
+                                type: string
+                            type: object
+                          writable:
+                            type: boolean
+                        type: object
+                      type: array
+                    schema:
+                      properties:
+                        enumType:
+                          properties:
+                            enumValues:
+                              items:
+                                properties:
+                                  displayName:
+                                    type: string
+                                  enumValue:
+                                    type: string
+                                  name:
+                                    type: string
+                                type: object
+                              type: array
+                            valueSchema:
+                              type: string
+                          type: object
+                        primitiveType:
+                          type: string
+                      type: object
+                    target:
+                      type: string
+                    writeable:
+                      type: boolean
+                  type: object
+                type: array
+              telemetries:
+                items:
+                  properties:
+                    comment:
+                      type: string
+                    description:
+                      type: string
+                    displayName:
+                      type: string
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    schema:
+                      properties:
+                        enumType:
+                          properties:
+                            enumValues:
+                              items:
+                                properties:
+                                  displayName:
+                                    type: string
+                                  enumValue:
+                                    type: string
+                                  name:
+                                    type: string
+                                type: object
+                              type: array
+                            valueSchema:
+                              type: string
+                          type: object
+                        primitiveType:
+                          type: string
+                      type: object
+                  type: object
+                type: array
+            required:
+            - extends
             type: object
           status:
             description: TwinInterfaceStatus defines the observed state of TwinInterface
+            properties:
+              status:
+                type: string
             type: object
         type: object
     served: true
