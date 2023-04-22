@@ -18,8 +18,13 @@ package dtd
 
 import (
 	"context"
+	"fmt"
 
+	twinservice "ktwin/operator/internal/resources/service"
+
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -30,7 +35,8 @@ import (
 // TwinInstanceReconciler reconciles a TwinInstance object
 type TwinInstanceReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme      *runtime.Scheme
+	TwinService twinservice.TwinService
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete
@@ -47,9 +53,53 @@ type TwinInstanceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.4/pkg/reconcile
 func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
+
+	twinInstance := &dtdv0.TwinInstance{}
+	err := r.Get(ctx, types.NamespacedName{Name: req.Name, Namespace: req.Namespace}, twinInstance)
+
+	// Delete scenario
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return r.deleteTwinInstance(ctx, req, req.NamespacedName)
+		}
+		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
+		return ctrl.Result{}, err
+	}
+
+	return r.createUpdateTwinInstance(ctx, req, twinInstance)
+}
+
+func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
 
 	// Create Service Instance
+	kService := r.TwinService.GetService(twinInstance)
+	err := r.Create(ctx, kService, &client.CreateOptions{})
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstance.Spec.Id))
+		return ctrl.Result{}, err
+	}
+
+	// Create MQTT Integrators
+
+	// Create Triggers
+
+	return ctrl.Result{}, nil
+}
+
+func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctrl.Request, namespacedName types.NamespacedName) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	// Create Service Instance
+	kService := r.TwinService.GetDeletionService(namespacedName)
+	err := r.Delete(ctx, kService, &client.DeleteOptions{})
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while deleting TwinInstance %s", namespacedName.Name))
+		return ctrl.Result{}, err
+	}
 
 	// Create MQTT Integrators
 
