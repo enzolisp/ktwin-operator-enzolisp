@@ -1,15 +1,13 @@
 package pkg
 
 import (
-	"log"
-	"regexp"
-	"strings"
-
 	apiv0 "ktwin/operator/api/dtd/v0"
 	dtdl "ktwin/operator/cmd/cli/dtdl"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"ktwin/operator/cmd/cli/utils"
 )
 
 type ResourceBuilder interface {
@@ -18,10 +16,13 @@ type ResourceBuilder interface {
 }
 
 func NewResourceBuilder() ResourceBuilder {
-	return &resourceBuilder{}
+	return &resourceBuilder{
+		hostUtils: utils.NewHostUtils(),
+	}
 }
 
 type resourceBuilder struct {
+	hostUtils utils.HostUtils
 }
 
 // TODO: renew TwinInterface to TwinInstance
@@ -50,9 +51,11 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 	// Only supports one parent interface
 	if len(tInterface.Extends) > 0 {
 		extendedComponent = apiv0.TwinInterfaceExtendsSpec{
-			Id: tInterface.Extends[0],
+			Id: r.hostUtils.ParseHostName(tInterface.Extends[0]),
 		}
 	}
+
+	normalizedInterfaceId := r.hostUtils.ParseHostName(string(tInterface.Id))
 
 	twinInterface := apiv0.TwinInterface{
 		TypeMeta: v1.TypeMeta{
@@ -60,7 +63,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 			APIVersion: "dtd.ktwin/v0",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name:      r.parseHostName(string(tInterface.Id)),
+			Name:      normalizedInterfaceId,
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInterfaceSpec{
@@ -80,25 +83,27 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 }
 
 func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) apiv0.TwinInstance {
+	normalizeTwinInterfacedId := r.hostUtils.ParseHostName(string(twinInterface.Spec.Id))
+
 	twinInstance := apiv0.TwinInstance{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "TwinInstance",
 			APIVersion: "dtd.ktwin/v0",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name:      r.parseHostName(string(twinInterface.Spec.Id)),
+			Name:      normalizeTwinInterfacedId,
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInstanceSpec{
-			Id: twinInterface.Spec.Id + "-instance",
+			Id: normalizeTwinInterfacedId + "-instance",
 			Interface: apiv0.TwinInterfaceSpec{
-				Id: twinInterface.Spec.Id,
+				Id: normalizeTwinInterfacedId,
 			},
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{Containers: []corev1.Container{
 					{
-						Name:            "ktwin/" + twinInterface.Spec.Id,
-						Image:           "ktwin/" + twinInterface.Spec.Id + ":0.0.1",
+						Name:            "ktwin/" + normalizeTwinInterfacedId,
+						Image:           "ktwin/" + normalizeTwinInterfacedId + ":0.0.1",
 						ImagePullPolicy: corev1.PullIfNotPresent,
 						Args:            []string{"http://mqtt-response-handler", "80"},
 					},
@@ -108,24 +113,6 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 	}
 
 	return twinInstance
-}
-
-// Parse the string and make it compliant with RFC 1123 host names, by removing invalid characters
-func (r *resourceBuilder) parseHostName(name string) string {
-	newName := strings.ToLower(name)
-	invalidCharacters := []string{":", ";", "_"}
-
-	for _, invalidString := range invalidCharacters {
-		newName = strings.Replace(newName, invalidString, "-", -1)
-	}
-
-	_, err := regexp.MatchString("[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*", newName)
-
-	if err != nil {
-		log.Fatal("Error matching host name:", err.Error())
-	}
-
-	return newName
 }
 
 func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.TwinCommand) []apiv0.TwinCommand {
