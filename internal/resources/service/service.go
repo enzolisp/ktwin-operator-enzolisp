@@ -32,14 +32,16 @@ type twinService struct{}
 func (*twinService) GetService(twinInstance *dtdv0.TwinInstance) *kserving.Service {
 	serviceId := twinInstance.Spec.Id
 	podSpec := twinInstance.Spec.Template.Spec
-	objectData := twinInstance.ObjectMeta
 
 	service := &kserving.Service{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Service",
 			APIVersion: "serving.knative.dev/v1",
 		},
-		ObjectMeta: objectData,
+		ObjectMeta: v1.ObjectMeta{
+			Name:      twinInstance.ObjectMeta.Name,
+			Namespace: twinInstance.ObjectMeta.Namespace,
+		},
 		Spec: kserving.ServiceSpec{
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
