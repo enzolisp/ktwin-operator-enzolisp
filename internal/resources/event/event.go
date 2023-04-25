@@ -87,7 +87,18 @@ func (e *twinEvent) GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Tr
 	twinTriggers = append(twinTriggers, trigger)
 
 	// Virtual to virtual
-	// TODO
+	// TODO: refactor event routing
+	for _, relationship := range twinInstance.Spec.Interface.Relationships {
+		trigger = e.createTrigger(triggerParameters{
+			triggerName: twinInstance.Name + "-to-" + relationship.Target,
+			namespace:   twinInstance.Namespace,
+			brokerName:  broker.EVENT_BROKER_NAME,
+			eventType:   EVENT_VIRTUAL_TO_VIRTUAL + "-" + relationship.Target,
+			eventSource: twinInstance.Name,
+			subscriber:  eventStore.EVENT_STORE_SERVICE,
+		})
+		twinTriggers = append(twinTriggers, trigger)
+	}
 
 	return twinTriggers
 }

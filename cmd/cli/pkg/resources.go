@@ -67,7 +67,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInterfaceSpec{
-			Id:            string(tInterface.Id),
+			Id:            normalizedInterfaceId,
 			DisplayName:   string(tInterface.DisplayName),
 			Description:   string(tInterface.Description),
 			Comment:       string(tInterface.Comment),
@@ -163,7 +163,7 @@ func (r *resourceBuilder) processRelationship(relationship dtdl.Relationship, re
 		MinMultiplicity: relationship.MinMultiplicity,
 		Schema:          twinSchema,
 		Properties:      relationshipProperties,
-		Target:          string(relationship.Target),
+		Target:          r.hostUtils.ParseHostName(string(relationship.Target)),
 	}
 	relationships = append(relationships, newRelationship)
 	return relationships
