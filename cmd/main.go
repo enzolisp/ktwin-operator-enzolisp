@@ -35,8 +35,10 @@ import (
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	corecontroller "ktwin/operator/internal/controller/core"
 	dtdcontroller "ktwin/operator/internal/controller/dtd"
+	"ktwin/operator/internal/resources/event"
 	"ktwin/operator/internal/resources/service"
 
+	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 	//+kubebuilder:scaffold:imports
 )
@@ -54,6 +56,7 @@ func init() {
 
 	// Third party
 	utilruntime.Must(kserving.AddToScheme(scheme))
+	utilruntime.Must(keventing.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -109,6 +112,7 @@ func main() {
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		TwinService: service.NewTwinService(),
+		TwinEvent:   event.NewTwinEvent(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInstance")
 		os.Exit(1)

@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	twinevent "ktwin/operator/internal/resources/event"
 	twinservice "ktwin/operator/internal/resources/service"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -37,6 +38,7 @@ type TwinInstanceReconciler struct {
 	client.Client
 	Scheme      *runtime.Scheme
 	TwinService twinservice.TwinService
+	TwinEvent   twinevent.TwinEvent
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete
@@ -85,6 +87,15 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	// Create MQTT Integrators
 
 	// Create Triggers
+	triggers := r.TwinEvent.GetTriggers(twinInstance)
+
+	for _, trigger := range triggers {
+		err := r.Create(ctx, &trigger, &client.CreateOptions{})
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInstance.Spec.Id))
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
 }
