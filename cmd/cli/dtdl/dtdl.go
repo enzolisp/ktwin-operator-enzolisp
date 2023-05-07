@@ -66,6 +66,7 @@ type Command struct {
 	Type        IRI             `json:"@type"`
 	Id          DTMI            `json:"@id,omitempty"`
 	Comment     string          `json:"comment,omitempty"`
+	CommandType string          `json:"commandType,omitempty"`
 	Description LocalizedString `json:"description,omitempty"`
 	DisplayName LocalizedString `json:"displayName,omitempty"`
 	Name        string          `json:"name"`

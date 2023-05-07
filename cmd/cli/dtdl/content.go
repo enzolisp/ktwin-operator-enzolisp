@@ -50,7 +50,8 @@ func (c *Content) UnmarshalJSON(data []byte) error {
 		c.Relationship = c.newRelationship(objectMap)
 		return nil
 	case ContentCommandType:
-		return ErrContentUnmarshalTypeNotSupported(objectType)
+		c.Command = c.newCommand(objectMap)
+		return nil
 	case ContentComponentType:
 		return ErrContentUnmarshalTypeNotSupported(objectType)
 	case ContentTelemetryType:
@@ -118,4 +119,22 @@ func (s *Content) newRelationship(data interface{}) *Relationship {
 	}
 
 	return &relationship
+}
+
+func (s *Content) newCommand(data interface{}) *Command {
+	command := Command{}
+
+	dataByte, err := json.Marshal(data)
+
+	if err != nil {
+		log.Fatal("Error in marshaling")
+	}
+
+	err = json.Unmarshal(dataByte, &command)
+
+	if err != nil {
+		log.Fatal("Error in unmarshaling")
+	}
+
+	return &command
 }

@@ -74,13 +74,28 @@ type TwinProperty struct {
 }
 
 type TwinCommand struct {
-	Id          string `json:"id,omitempty"`
-	Comment     string `json:"comment,omitempty"`
-	Description string `json:"description,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
-	Name        string `json:"name,omitempty"`
-	// Request     CommandRequest  `json:"request"`
-	// Response    CommandResponse `json:"response"`
+	Id          string          `json:"id,omitempty"`
+	Comment     string          `json:"comment,omitempty"`
+	Description string          `json:"description,omitempty"`
+	DisplayName string          `json:"displayName,omitempty"`
+	Name        string          `json:"name,omitempty"`
+	CommandType string          `json:"commandType,omitempty"` // async, sync
+	Request     CommandRequest  `json:"request"`
+	Response    CommandResponse `json:"response"`
+}
+
+type CommandRequest struct {
+	Name        string     `json:"name,omitempty"`
+	DisplayName string     `json:"displayName,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Schema      TwinSchema `json:"schema,omitempty"`
+}
+
+type CommandResponse struct {
+	Name        string     `json:"name,omitempty"`
+	DisplayName string     `json:"displayName,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Schema      TwinSchema `json:"schema,omitempty"`
 }
 
 type TwinRelationship struct {

@@ -122,6 +122,19 @@ func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.
 		Description: string(command.Description),
 		DisplayName: string(command.DisplayName),
 		Name:        command.Name,
+		CommandType: command.CommandType,
+		Request: apiv0.CommandRequest{
+			Name:        command.Request.Name,
+			DisplayName: string(command.Request.DisplayName),
+			Description: string(command.Request.Comment),
+			//Schema:      command.Request.Schema,
+		},
+		Response: apiv0.CommandResponse{
+			Name:        command.Response.Name,
+			DisplayName: string(command.Response.DisplayName),
+			Description: string(command.Response.Comment),
+			//Schema:      command.Response.Schema,
+		},
 	}
 	commands = append(commands, newCommand)
 	return commands
