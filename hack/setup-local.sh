@@ -41,9 +41,9 @@ kubectl get pods --namespace knative-eventing
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 
 # MQTT Deployment
-kubectl create namespace twin-core
-kubectl apply -f ${SCRIPT_PATH}/mosquitto --namespace twin-core
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace twin-core
+kubectl create namespace default
+kubectl apply -f ${SCRIPT_PATH}/mosquitto --namespace default
+kubectl wait --for=condition=available --timeout=200s --all deployments --namespace default
 
 # RabbitMQ Cluster
 kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/download/${RABBITMQ_VERSION}/cluster-operator.yml
@@ -60,15 +60,15 @@ kubectl apply -f https://github.com/knative-sandbox/eventing-rabbitmq/releases/d
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 
 # RabbitMQ Cluster
-kubectl apply -f ${SCRIPT_PATH}/rabbitmq-cluster -n twin-core
+kubectl apply -f ${SCRIPT_PATH}/rabbitmq-cluster -n default
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace twin-core
-kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace twin-core
+kubectl wait --for=condition=available --timeout=200s --all deployments --namespace default
+kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace default
 
 # RabbitMQ Broker
-kubectl apply -f ${SCRIPT_PATH}/rabbitmq-broker -n twin-core
+kubectl apply -f ${SCRIPT_PATH}/rabbitmq-broker -n default
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace twin-core
-kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace twin-core
+kubectl wait --for=condition=available --timeout=200s --all deployments --namespace default
+kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace default
 
 echo "Local setup script has finished"
