@@ -1,0 +1,32 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: test-trigger
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: CE-Type
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: edge-service
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: test-trigger-to-real
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: CE-Type-To-Real
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: mqtt-integrator-template-to-real
+
+# Trigger tá bugado (como acknowledgement funciona?)
+# Solução: não pode ter body na resposta de eventos

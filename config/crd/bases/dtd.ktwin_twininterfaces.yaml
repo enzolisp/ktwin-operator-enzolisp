@@ -38,6 +38,8 @@ spec:
               commands:
                 items:
                   properties:
+                    commandType:
+                      type: string
                     comment:
                       type: string
                     description:
@@ -48,6 +50,69 @@ spec:
                       type: string
                     name:
                       type: string
+                    request:
+                      properties:
+                        description:
+                          type: string
+                        displayName:
+                          type: string
+                        name:
+                          type: string
+                        schema:
+                          properties:
+                            enumType:
+                              properties:
+                                enumValues:
+                                  items:
+                                    properties:
+                                      displayName:
+                                        type: string
+                                      enumValue:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  type: array
+                                valueSchema:
+                                  type: string
+                              type: object
+                            primitiveType:
+                              type: string
+                          type: object
+                      type: object
+                    response:
+                      properties:
+                        description:
+                          type: string
+                        displayName:
+                          type: string
+                        name:
+                          type: string
+                        schema:
+                          properties:
+                            enumType:
+                              properties:
+                                enumValues:
+                                  items:
+                                    properties:
+                                      displayName:
+                                        type: string
+                                      enumValue:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  type: array
+                                valueSchema:
+                                  type: string
+                              type: object
+                            primitiveType:
+                              type: string
+                          type: object
+                      type: object
+                  required:
+                  - request
+                  - response
                   type: object
                 type: array
               comment:

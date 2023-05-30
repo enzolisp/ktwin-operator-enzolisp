@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	twinevent "ktwin/operator/internal/resources/event"
+	twinintegrator "ktwin/operator/internal/resources/integrator"
 	twinservice "ktwin/operator/internal/resources/service"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,9 +37,10 @@ import (
 // TwinInstanceReconciler reconciles a TwinInstance object
 type TwinInstanceReconciler struct {
 	client.Client
-	Scheme      *runtime.Scheme
-	TwinService twinservice.TwinService
-	TwinEvent   twinevent.TwinEvent
+	Scheme             *runtime.Scheme
+	TwinService        twinservice.TwinService
+	TwinEvent          twinevent.TwinEvent
+	TwinMqttIntegrator twinintegrator.TwinIntegrator
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete
@@ -85,6 +87,19 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	}
 
 	// Create MQTT Integrators
+	mqttIntegrators := r.TwinMqttIntegrator.GetIntegrators(twinInstance)
+	for _, integrator := range *mqttIntegrators {
+		err = r.Create(ctx, &integrator, &client.CreateOptions{})
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Integrators %s", twinInstance.Spec.Id))
+			return ctrl.Result{}, err
+		}
+	}
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstance.Spec.Id))
+		return ctrl.Result{}, err
+	}
 
 	// Create Triggers
 	triggers := r.TwinEvent.GetTriggers(twinInstance)
@@ -112,7 +127,14 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 		return ctrl.Result{}, err
 	}
 
-	// Create MQTT Integrators
+	// Delete MQTT Integrators
+	integrator := r.TwinMqttIntegrator.GetDeletionIntegrator(namespacedName)
+	err = r.Delete(ctx, integrator, &client.DeleteOptions{})
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while deleting Mqtt Integrator %s", namespacedName.Name))
+		return ctrl.Result{}, err
+	}
 
 	// Create Triggers
 

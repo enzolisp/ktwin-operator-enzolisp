@@ -1,0 +1,11 @@
+from:
+  uri: paho:mytopic
+  parameters:
+    brokerUrl: tcp://mosquitto:1883
+    clientId: mqtt-knative-bridge
+  steps:
+    - set-header:
+        name: ce-type
+        constant: mqtt
+    - log:
+        message: "Forwarding: ${body}"

@@ -36,8 +36,10 @@ import (
 	corecontroller "ktwin/operator/internal/controller/core"
 	dtdcontroller "ktwin/operator/internal/controller/dtd"
 	"ktwin/operator/internal/resources/event"
+	"ktwin/operator/internal/resources/integrator"
 	"ktwin/operator/internal/resources/service"
 
+	camelv1 "github.com/apache/camel-k/pkg/apis/camel/v1"
 	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 	//+kubebuilder:scaffold:imports
@@ -57,6 +59,7 @@ func init() {
 	// Third party
 	utilruntime.Must(kserving.AddToScheme(scheme))
 	utilruntime.Must(keventing.AddToScheme(scheme))
+	utilruntime.Must(camelv1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -109,10 +112,11 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&dtdcontroller.TwinInstanceReconciler{
-		Client:      mgr.GetClient(),
-		Scheme:      mgr.GetScheme(),
-		TwinService: service.NewTwinService(),
-		TwinEvent:   event.NewTwinEvent(),
+		Client:             mgr.GetClient(),
+		Scheme:             mgr.GetScheme(),
+		TwinService:        service.NewTwinService(),
+		TwinEvent:          event.NewTwinEvent(),
+		TwinMqttIntegrator: integrator.NewTwinIntegrator(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInstance")
 		os.Exit(1)
