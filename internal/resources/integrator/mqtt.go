@@ -24,7 +24,7 @@ func NewTwinIntegrator() TwinIntegrator {
 // - `ktwin.virtual.<instance_id>.generated`: Event generated from Virtual Twin and sent to Real Twin.
 type TwinIntegrator interface {
 	GetIntegrators(twinInstance *dtdv0.TwinInstance) *[]camelv1.Integration
-	GetDeletionIntegrator(namespacedName types.NamespacedName) *camelv1.Integration
+	GetDeletionIntegrator(namespacedName types.NamespacedName) *[]camelv1.Integration
 }
 
 type twinIntegrator struct{}
@@ -57,9 +57,13 @@ func (*twinIntegrator) getRealToVirtualIntegratorSource(twinInstance *dtdv0.Twin
 	return content
 }
 
+func (t *twinIntegrator) getRealToVirtualIntegratorName(twinInstanceName string) string {
+	return twinInstanceName + "-int-real-virtual"
+}
+
 func (t *twinIntegrator) getRealToVirtualIntegrator(twinInstance *dtdv0.TwinInstance) camelv1.Integration {
 	// TODO: Truncate 63 characters
-	integratorName := twinInstance.Name + "-int-real-virtual"
+	integratorName := t.getRealToVirtualIntegratorName(twinInstance.Name)
 	return camelv1.Integration{
 		TypeMeta: v1.TypeMeta{
 			APIVersion: "camel.apache.org/v1",
@@ -81,9 +85,13 @@ func (t *twinIntegrator) getRealToVirtualIntegrator(twinInstance *dtdv0.TwinInst
 	}
 }
 
+func (t *twinIntegrator) getVirtualToRealIntegratorName(twinInstanceName string) string {
+	return twinInstanceName + "-int-virtual-real"
+}
+
 func (t *twinIntegrator) getVirtualToRealIntegrator(twinInstance *dtdv0.TwinInstance) camelv1.Integration {
 	// TODO: Truncate 63 characters
-	integratorName := twinInstance.Name + "-int-virtual-real"
+	integratorName := t.getVirtualToRealIntegratorName(twinInstance.Name)
 	return camelv1.Integration{
 		TypeMeta: v1.TypeMeta{
 			APIVersion: "camel.apache.org/v1",
@@ -117,15 +125,32 @@ func (t *twinIntegrator) GetIntegrators(twinInstance *dtdv0.TwinInstance) *[]cam
 	return &mqttIntegrators
 }
 
-func (*twinIntegrator) GetDeletionIntegrator(namespacedName types.NamespacedName) *camelv1.Integration {
-	return &camelv1.Integration{
+func (t *twinIntegrator) GetDeletionIntegrator(namespacedName types.NamespacedName) *[]camelv1.Integration {
+	var integrators []camelv1.Integration
+
+	realToVirtualIntegrator := camelv1.Integration{
 		TypeMeta: v1.TypeMeta{
 			APIVersion: "camel.apache.org/v1",
 			Kind:       "Integration",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      namespacedName.Name,
-			Namespace: "default",
+			Name:      t.getRealToVirtualIntegratorName(namespacedName.Name),
+			Namespace: namespacedName.Namespace,
 		},
 	}
+	virtualToRealIntegrator := camelv1.Integration{
+		TypeMeta: v1.TypeMeta{
+			APIVersion: "camel.apache.org/v1",
+			Kind:       "Integration",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      t.getVirtualToRealIntegratorName(namespacedName.Name),
+			Namespace: namespacedName.Namespace,
+		},
+	}
+
+	integrators = append(integrators, realToVirtualIntegrator)
+	integrators = append(integrators, virtualToRealIntegrator)
+
+	return &integrators
 }
