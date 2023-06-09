@@ -132,7 +132,7 @@ func (s *Schema) processSchemaInterface(jsonObject interface{}) (EnumSchema, err
 			return enumSchema, nil
 		}
 
-		log.Fatal("It was not able to process schema. Schema type is invalid.")
+		log.Fatal("It was not able to process schema. Schema type is invalid: ", schemaType)
 		return EnumSchema{}, ErrInvalidSchemaType
 	}
 
@@ -152,15 +152,22 @@ func (s *Schema) processSchemaEnumValues(enumValuesMap interface{}) []EnumSchema
 	for _, enumValue := range enumValues {
 		enumMap := enumValue.(map[string]interface{})
 		enumSchemaValue := EnumSchemaValues{
-			Name:        enumMap["name"].(string),
-			DisplayName: enumMap["displayName"].(string),
-			EnumValue:   enumMap["enumValue"].(string),
+			Name:        s.getStringNotNull(enumMap["name"]),
+			DisplayName: s.getStringNotNull(enumMap["displayName"]),
+			EnumValue:   s.getStringNotNull(enumMap["enumValue"]),
 		}
 		enumSchemaValues = append(enumSchemaValues, enumSchemaValue)
 	}
 
 	return enumSchemaValues
 
+}
+
+func (s *Schema) getStringNotNull(value interface{}) string {
+	if value == nil {
+		return ""
+	}
+	return value.(string)
 }
 
 func (s *Schema) isValidSchemaType(schemaType string) bool {

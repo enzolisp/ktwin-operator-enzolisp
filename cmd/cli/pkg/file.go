@@ -19,7 +19,7 @@ func PrepareOutputFolder(dirname string) error {
 		fmt.Println("Output directory " + dirname + " was created")
 		return nil
 	} else {
-		fmt.Println("Output directory "+dirname+" was not created", err)
+		log.Fatal("Output directory "+dirname+" was not created", err)
 	}
 
 	if os.IsExist(err) {

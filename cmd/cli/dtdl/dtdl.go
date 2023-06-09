@@ -1,5 +1,7 @@
 package dtdl
 
+import "ktwin/operator/cmd/cli/types"
+
 // This file stores the `Digital Twins Definition Language` Models in JSON Format
 // https://github.com/Azure/opendigitaltwins-dtdl
 
@@ -30,15 +32,15 @@ type TwinDefinitionContent struct {
 // DTDL Types
 
 type Interface struct {
-	Context     IRI             `json:"@context"`
-	Type        IRI             `json:"@type"`
-	Id          DTMI            `json:"@id"`
-	Comment     string          `json:"comment,omitempty"`
-	Contents    []Content       `json:"contents,omitempty"`
-	Description LocalizedString `json:"description,omitempty"`
-	DisplayName LocalizedString `json:"displayName,omitempty"`
-	Extends     []string        `json:"extends,omitempty"` // Error: it must be Interface according to the definition
-	Schemas     []Schema        `json:"schemas"`
+	Context     IRI               `json:"@context"`
+	Type        IRI               `json:"@type"`
+	Id          DTMI              `json:"@id"`
+	Comment     string            `json:"comment,omitempty"`
+	Contents    []Content         `json:"contents,omitempty"`
+	Description LocalizedString   `json:"description,omitempty"`
+	DisplayName LocalizedString   `json:"displayName,omitempty"`
+	Extends     types.StringArray `json:"extends,omitempty"` // Error: it must be Interface according to the definition
+	Schemas     []Schema          `json:"schemas"`
 }
 
 type Telemetry struct {
@@ -116,5 +118,5 @@ type Component struct {
 	Description LocalizedString `json:"description,omitempty"`
 	DisplayName LocalizedString `json:"displayName,omitempty"`
 	Name        string          `json:"name"`
-	Schema      Interface       `json:"schema"`
+	Schema      Schema          `json:"schema"`
 }

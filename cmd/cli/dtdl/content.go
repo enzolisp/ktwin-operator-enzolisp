@@ -53,11 +53,13 @@ func (c *Content) UnmarshalJSON(data []byte) error {
 		c.Command = c.newCommand(objectMap)
 		return nil
 	case ContentComponentType:
-		return ErrContentUnmarshalTypeNotSupported(objectType)
+		c.Component = c.newComponent(objectMap)
+		return nil
 	case ContentTelemetryType:
-		return ErrContentUnmarshalTypeNotSupported(objectType)
+		c.Telemetry = c.newTelemetry(objectMap)
+		return nil
 	default:
-		return ErrContentUnmarshalInvalidType
+		return ErrContentUnmarshalTypeNotSupported(objectType)
 	}
 }
 
@@ -91,13 +93,13 @@ func (s *Content) newProperty(data interface{}) *Property {
 	dataByte, err := json.Marshal(data)
 
 	if err != nil {
-		log.Fatal("Error in marshaling")
+		log.Fatal("Error in marshaling property ", err)
 	}
 
 	err = json.Unmarshal(dataByte, &property)
 
 	if err != nil {
-		log.Fatal("Error in unmarshaling")
+		log.Fatal("Error in unmarshaling property ", err)
 	}
 
 	return &property
@@ -109,13 +111,13 @@ func (s *Content) newRelationship(data interface{}) *Relationship {
 	dataByte, err := json.Marshal(data)
 
 	if err != nil {
-		log.Fatal("Error in marshaling")
+		log.Fatal("Error in marshaling relationship ", err)
 	}
 
 	err = json.Unmarshal(dataByte, &relationship)
 
 	if err != nil {
-		log.Fatal("Error in unmarshaling")
+		log.Fatal("Error in unmarshaling relationship ", err)
 	}
 
 	return &relationship
@@ -127,14 +129,50 @@ func (s *Content) newCommand(data interface{}) *Command {
 	dataByte, err := json.Marshal(data)
 
 	if err != nil {
-		log.Fatal("Error in marshaling")
+		log.Fatal("Error in marshaling command", err)
 	}
 
 	err = json.Unmarshal(dataByte, &command)
 
 	if err != nil {
-		log.Fatal("Error in unmarshaling")
+		log.Fatal("Error in unmarshaling command", err)
 	}
 
 	return &command
+}
+
+func (s *Content) newTelemetry(data interface{}) *Telemetry {
+	telemetry := Telemetry{}
+
+	dataByte, err := json.Marshal(data)
+
+	if err != nil {
+		log.Fatal("Error in marshaling telemetry ", err)
+	}
+
+	err = json.Unmarshal(dataByte, &telemetry)
+
+	if err != nil {
+		log.Fatal("Error in unmarshaling telemetry ", err)
+	}
+
+	return &telemetry
+}
+
+func (s *Content) newComponent(data interface{}) *Component {
+	component := Component{}
+
+	dataByte, err := json.Marshal(data)
+
+	if err != nil {
+		log.Fatal("Error in marshaling component ", err)
+	}
+
+	err = json.Unmarshal(dataByte, &component)
+
+	if err != nil {
+		log.Fatal("Error in unmarshaling component ", err)
+	}
+
+	return &component
 }
