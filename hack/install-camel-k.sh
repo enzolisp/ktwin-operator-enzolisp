@@ -1,0 +1,2 @@
+kubectl -n default create secret docker-registry external-registry-secret --docker-username DOCKER_USERNAME --docker-password DOCKER_PASSWORD
+kamel install --operator-image=docker.io/apache/camel-k:1.10.3 --olm=false --global --registry docker.io --organization DOCKER_USERNAME --registry-secret external-registry-secret --force
