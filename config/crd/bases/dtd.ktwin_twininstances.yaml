@@ -35,6 +35,35 @@ spec:
           spec:
             description: TwinInstanceSpec defines the desired state of TwinInstance
             properties:
+              endpointSettings:
+                description: 'TODO: Configure as read-only'
+                properties:
+                  amqpEndpoint:
+                    properties:
+                      publisherTopic:
+                        type: string
+                      subscriberTopic:
+                        type: string
+                      url:
+                        type: string
+                    type: object
+                  httpEndpoint:
+                    description: 'TODO: Configure as read-only'
+                    properties:
+                      url:
+                        type: string
+                    type: object
+                  mqttEndpoint:
+                    description: 'TODO: Configure as read-only'
+                    properties:
+                      publisherTopic:
+                        type: string
+                      subscriberTopic:
+                        type: string
+                      url:
+                        type: string
+                    type: object
+                type: object
               events:
                 items:
                   properties:

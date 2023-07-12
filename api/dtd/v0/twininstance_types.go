@@ -32,11 +32,37 @@ const (
 
 // TwinInstanceSpec defines the desired state of TwinInstance
 type TwinInstanceSpec struct {
-	Id             string                 `json:"id,omitempty"`
-	ParentInstance string                 `json:"parentInstance,omitempty"`
-	Interface      TwinInterfaceSpec      `json:"interface,omitempty"`
-	Events         []TwinInstanceEvents   `json:"events,omitempty"`
-	Template       corev1.PodTemplateSpec `json:"template,omitempty"`
+	Id               string                       `json:"id,omitempty"`
+	ParentInstance   string                       `json:"parentInstance,omitempty"`
+	Interface        TwinInterfaceSpec            `json:"interface,omitempty"`
+	Events           []TwinInstanceEvents         `json:"events,omitempty"`
+	Template         corev1.PodTemplateSpec       `json:"template,omitempty"`
+	EndpointSettings TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
+}
+
+// TODO: Configure as read-only
+type TwinInstanceEndpointSettings struct {
+	HttpEndpoint TwinInstanceHttpEndpointSettings `json:"httpEndpoint,omitempty"`
+	MqttEndpoint TwinInstanceMqttEndpointSettings `json:"mqttEndpoint,omitempty"`
+	AmqpEndpoint TwinInstanceAmqpEndpointSettings `json:"amqpEndpoint,omitempty"`
+}
+
+// TODO: Configure as read-only
+type TwinInstanceHttpEndpointSettings struct {
+	Url string `json:"url,omitempty"`
+}
+
+// TODO: Configure as read-only
+type TwinInstanceMqttEndpointSettings struct {
+	Url             string `json:"url,omitempty"`
+	PublisherTopic  string `json:"publisherTopic,omitempty"`
+	SubscriberTopic string `json:"subscriberTopic,omitempty"`
+}
+
+type TwinInstanceAmqpEndpointSettings struct {
+	Url             string `json:"url,omitempty"`
+	PublisherTopic  string `json:"publisherTopic,omitempty"`
+	SubscriberTopic string `json:"subscriberTopic,omitempty"`
 }
 
 type TwinInstanceEvents struct {
