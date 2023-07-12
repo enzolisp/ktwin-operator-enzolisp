@@ -20,8 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TODO: review if component is a good name because DTDL has a component too
-
 type TwinInterfacePhase string
 
 const (
