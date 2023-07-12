@@ -32,19 +32,19 @@ const (
 
 // TwinInstanceSpec defines the desired state of TwinInstance
 type TwinInstanceSpec struct {
-	Id               string                       `json:"id,omitempty"`
-	ParentInstance   string                       `json:"parentInstance,omitempty"`
-	Interface        TwinInterfaceSpec            `json:"interface,omitempty"`
-	Events           []TwinInstanceEvents         `json:"events,omitempty"`
-	Template         corev1.PodTemplateSpec       `json:"template,omitempty"`
-	EndpointSettings TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
+	Id               string                        `json:"id,omitempty"`
+	ParentInstance   string                        `json:"parentInstance,omitempty"`
+	Interface        TwinInterfaceSpec             `json:"interface,omitempty"`
+	Events           []TwinInstanceEvents          `json:"events,omitempty"`
+	Template         corev1.PodTemplateSpec        `json:"template,omitempty"`
+	EndpointSettings *TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
 }
 
 // TODO: Configure as read-only
 type TwinInstanceEndpointSettings struct {
-	HttpEndpoint TwinInstanceHttpEndpointSettings `json:"httpEndpoint,omitempty"`
-	MqttEndpoint TwinInstanceMqttEndpointSettings `json:"mqttEndpoint,omitempty"`
-	AmqpEndpoint TwinInstanceAmqpEndpointSettings `json:"amqpEndpoint,omitempty"`
+	HttpEndpoint *TwinInstanceHttpEndpointSettings `json:"httpEndpoint,omitempty"`
+	MqttEndpoint *TwinInstanceMqttEndpointSettings `json:"mqttEndpoint,omitempty"`
+	AmqpEndpoint *TwinInstanceAmqpEndpointSettings `json:"amqpEndpoint,omitempty"`
 }
 
 // TODO: Configure as read-only
@@ -71,7 +71,6 @@ type TwinInstanceEvents struct {
 }
 
 // Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters
-// TODO: build complex filtering criteria
 type TwinInstanceEventsFilters struct {
 	Exact TwinInstanceEventsFiltersProperties `json:"exact,omitempty"`
 	// Prefix TwinInstanceEventsFiltersProperties `json:"prefix,omitempty"` // Unsupported
