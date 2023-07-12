@@ -3,6 +3,7 @@ package pkg
 import (
 	apiv0 "ktwin/operator/api/dtd/v0"
 	dtdl "ktwin/operator/cmd/cli/dtdl"
+	"reflect"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -273,9 +274,14 @@ func (r *resourceBuilder) processProperty(property dtdl.Property, properties []a
 	return properties
 }
 
-func (r *resourceBuilder) createTwinSchema(schema dtdl.Schema) apiv0.TwinSchema {
+func (r *resourceBuilder) createTwinSchema(schema dtdl.Schema) *apiv0.TwinSchema {
+
+	if reflect.DeepEqual(schema, dtdl.Schema{}) {
+		return nil
+	}
+
 	var twinEnumSchemaValues []apiv0.TwinEnumSchemaValues
-	var twinEnumSchema apiv0.TwinEnumSchema
+	var twinEnumSchema *apiv0.TwinEnumSchema
 
 	for _, enumValue := range schema.EnumSchema.EnumValues {
 		twinEnumValue := apiv0.TwinEnumSchemaValues{
@@ -286,12 +292,14 @@ func (r *resourceBuilder) createTwinSchema(schema dtdl.Schema) apiv0.TwinSchema 
 		twinEnumSchemaValues = append(twinEnumSchemaValues, twinEnumValue)
 	}
 
-	twinEnumSchema = apiv0.TwinEnumSchema{
-		ValueSchema: apiv0.PrimitiveType(schema.EnumSchema.ValueSchema),
-		EnumValues:  twinEnumSchemaValues,
+	if len(twinEnumSchemaValues) > 1 || schema.EnumSchema.ValueSchema != "" {
+		twinEnumSchema = &apiv0.TwinEnumSchema{
+			ValueSchema: apiv0.PrimitiveType(schema.EnumSchema.ValueSchema),
+			EnumValues:  twinEnumSchemaValues,
+		}
 	}
 
-	twinSchema := apiv0.TwinSchema{
+	twinSchema := &apiv0.TwinSchema{
 		PrimitiveType: apiv0.PrimitiveType(schema.DefaultSchemaValue),
 		EnumType:      twinEnumSchema,
 	}

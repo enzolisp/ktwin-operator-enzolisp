@@ -64,13 +64,13 @@ type TwinInterfaceExtendsSpec struct {
 }
 
 type TwinProperty struct {
-	Id          string     `json:"id,omitempty"`
-	Comment     string     `json:"comment,omitempty"`
-	Description string     `json:"description,omitempty"`
-	DisplayName string     `json:"displayName,omitempty"`
-	Name        string     `json:"name,omitempty"`
-	Schema      TwinSchema `json:"schema,omitempty"`
-	Writeable   bool       `json:"writable,omitempty"`
+	Id          string      `json:"id,omitempty"`
+	Comment     string      `json:"comment,omitempty"`
+	Description string      `json:"description,omitempty"`
+	DisplayName string      `json:"displayName,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	Schema      *TwinSchema `json:"schema,omitempty"`
+	Writeable   bool        `json:"writable,omitempty"`
 }
 
 type TwinCommand struct {
@@ -85,17 +85,17 @@ type TwinCommand struct {
 }
 
 type CommandRequest struct {
-	Name        string     `json:"name,omitempty"`
-	DisplayName string     `json:"displayName,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Schema      TwinSchema `json:"schema,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	DisplayName string      `json:"displayName,omitempty"`
+	Description string      `json:"description,omitempty"`
+	Schema      *TwinSchema `json:"schema,omitempty"`
 }
 
 type CommandResponse struct {
-	Name        string     `json:"name,omitempty"`
-	DisplayName string     `json:"displayName,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Schema      TwinSchema `json:"schema,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	DisplayName string      `json:"displayName,omitempty"`
+	Description string      `json:"description,omitempty"`
+	Schema      *TwinSchema `json:"schema,omitempty"`
 }
 
 type TwinRelationship struct {
@@ -108,22 +108,22 @@ type TwinRelationship struct {
 	Name            string         `json:"name,omitempty"`
 	Properties      []TwinProperty `json:"properties,omitempty"`
 	Target          string         `json:"target,omitempty"`
-	Schema          TwinSchema     `json:"schema,omitempty"`
+	Schema          *TwinSchema    `json:"schema,omitempty"`
 	Writeable       bool           `json:"writeable,omitempty"`
 }
 
 type TwinTelemetry struct {
-	Id          string     `json:"id,omitempty"`
-	Comment     string     `json:"comment,omitempty"`
-	Description string     `json:"description,omitempty"`
-	DisplayName string     `json:"displayName,omitempty"`
-	Name        string     `json:"name,omitempty"`
-	Schema      TwinSchema `json:"schema,omitempty"`
+	Id          string      `json:"id,omitempty"`
+	Comment     string      `json:"comment,omitempty"`
+	Description string      `json:"description,omitempty"`
+	DisplayName string      `json:"displayName,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	Schema      *TwinSchema `json:"schema,omitempty"`
 }
 
 type TwinSchema struct {
-	PrimitiveType PrimitiveType  `json:"primitiveType,omitempty"`
-	EnumType      TwinEnumSchema `json:"enumType,omitempty"`
+	PrimitiveType PrimitiveType   `json:"primitiveType,omitempty"`
+	EnumType      *TwinEnumSchema `json:"enumType,omitempty"`
 }
 
 type TwinEnumSchema struct {
