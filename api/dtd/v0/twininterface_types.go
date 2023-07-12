@@ -48,15 +48,15 @@ const (
 
 // TwinInterfaceSpec defines the desired state of TwinInterface
 type TwinInterfaceSpec struct {
-	Id            string                   `json:"id,omitempty"`
-	DisplayName   string                   `json:"displayName,omitempty"`
-	Description   string                   `json:"description,omitempty"`
-	Comment       string                   `json:"comment,omitempty"`
-	Properties    []TwinProperty           `json:"properties,omitempty"`
-	Commands      []TwinCommand            `json:"commands,omitempty"`
-	Relationships []TwinRelationship       `json:"relationships,omitempty"`
-	Telemetries   []TwinTelemetry          `json:"telemetries,omitempty"`
-	Extends       TwinInterfaceExtendsSpec `json:"extends"`
+	Id            string                    `json:"id,omitempty"`
+	DisplayName   string                    `json:"displayName,omitempty"`
+	Description   string                    `json:"description,omitempty"`
+	Comment       string                    `json:"comment,omitempty"`
+	Properties    []TwinProperty            `json:"properties,omitempty"`
+	Commands      []TwinCommand             `json:"commands,omitempty"`
+	Relationships []TwinRelationship        `json:"relationships,omitempty"`
+	Telemetries   []TwinTelemetry           `json:"telemetries,omitempty"`
+	Extends       *TwinInterfaceExtendsSpec `json:"extends,omitempty"`
 }
 
 type TwinInterfaceExtendsSpec struct {

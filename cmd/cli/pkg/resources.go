@@ -32,7 +32,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 	var relationships []apiv0.TwinRelationship
 	var telemetries []apiv0.TwinTelemetry
 	var commands []apiv0.TwinCommand
-	var extendedComponent apiv0.TwinInterfaceExtendsSpec
+	var extendedComponent *apiv0.TwinInterfaceExtendsSpec
 
 	for _, content := range tInterface.Contents {
 		if content.Property != nil {
@@ -51,7 +51,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 
 	// Only supports one parent interface
 	if len(tInterface.Extends) > 0 {
-		extendedComponent = apiv0.TwinInterfaceExtendsSpec{
+		extendedComponent = &apiv0.TwinInterfaceExtendsSpec{
 			Id: r.hostUtils.ParseHostName(tInterface.Extends[0]),
 		}
 	}
