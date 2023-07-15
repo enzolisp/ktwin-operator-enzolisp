@@ -29,6 +29,10 @@ type twinInterfaceGraph struct {
 type TwinInterfaceGraphVertex struct {
 	TwinInterface  dtdv0.TwinInterface
 	EdgeInterfaces []*TwinInterfaceGraphVertex
+
+	// Used for when the vertex was not processed yet, but it is listed in a relationship
+	// At the end, none of the vertexes must be temporary
+	HasTemporaryInterface bool
 }
 
 func NewTwinInterfaceGraph() TwinInterfaceGraph {
@@ -47,13 +51,34 @@ func (g *twinInterfaceGraph) GetVertex(twinInterfaceId string) *dtdv0.TwinInterf
 }
 
 func (g *twinInterfaceGraph) AddVertex(twinInterface dtdv0.TwinInterface) (*TwinInterfaceGraphVertex, error) {
-	if g.Vertexes[twinInterface.Spec.Id] != nil {
+	vertex := g.Vertexes[twinInterface.Spec.Id]
+	if vertex != nil {
+		if vertex.HasTemporaryInterface {
+			g.Vertexes[twinInterface.Spec.Id].TwinInterface = twinInterface
+			g.Vertexes[twinInterface.Spec.Id].HasTemporaryInterface = false
+		}
 		return g.Vertexes[twinInterface.Spec.Id], errors.New("TwinInterface already exist in the graph")
 	}
 
 	g.Vertexes[twinInterface.Spec.Id] = &TwinInterfaceGraphVertex{
 		TwinInterface:  twinInterface,
 		EdgeInterfaces: []*TwinInterfaceGraphVertex{},
+	}
+
+	g.NumberOfVertex = g.NumberOfVertex + 1
+
+	return g.Vertexes[twinInterface.Spec.Id], nil
+}
+
+func (g *twinInterfaceGraph) addTemporaryVertex(twinInterface dtdv0.TwinInterface) (*TwinInterfaceGraphVertex, error) {
+	if g.Vertexes[twinInterface.Spec.Id] != nil {
+		return g.Vertexes[twinInterface.Spec.Id], errors.New("TwinInterface already exist in the graph")
+	}
+
+	g.Vertexes[twinInterface.Spec.Id] = &TwinInterfaceGraphVertex{
+		TwinInterface:         twinInterface,
+		EdgeInterfaces:        []*TwinInterfaceGraphVertex{},
+		HasTemporaryInterface: true,
 	}
 
 	g.NumberOfVertex = g.NumberOfVertex + 1
@@ -88,8 +113,8 @@ func (g *twinInterfaceGraph) RemoveVertex(twinInterface dtdv0.TwinInterface) err
 func (g *twinInterfaceGraph) AddEdge(sourceTwinInterface dtdv0.TwinInterface, targetTwinInterface dtdv0.TwinInterface) error {
 
 	// Add both Vertex if they not exist, if some of they exist, just ignore error
-	sourceTwinInterfaceGraph, _ := g.AddVertex(sourceTwinInterface)
-	targetTwinInterfaceGraph, _ := g.AddVertex(targetTwinInterface)
+	sourceTwinInterfaceGraph, _ := g.addTemporaryVertex(sourceTwinInterface)
+	targetTwinInterfaceGraph, _ := g.addTemporaryVertex(targetTwinInterface)
 
 	sourceTwinInterfaceGraph.EdgeInterfaces = append(sourceTwinInterfaceGraph.EdgeInterfaces, targetTwinInterfaceGraph)
 	//targetTwinInterfaceGraph.EdgeInterfaces = append(targetTwinInterfaceGraph.EdgeInterfaces, sourceTwinInterfaceGraph)
