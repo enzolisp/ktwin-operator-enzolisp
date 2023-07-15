@@ -284,8 +284,6 @@ spec:
                       type: object
                   type: object
                 type: array
-            required:
-            - extends
             type: object
           status:
             description: TwinInterfaceStatus defines the observed state of TwinInterface

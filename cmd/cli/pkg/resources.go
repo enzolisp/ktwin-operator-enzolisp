@@ -104,13 +104,13 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 				Spec: corev1.PodSpec{Containers: []corev1.Container{
 					{
 						Name:            "ktwin/" + normalizeTwinInterfacedId,
-						Image:           "ktwin/" + normalizeTwinInterfacedId + ":0.0.1",
+						Image:           "ktwin/" + "edge-service" + ":0.1",
 						ImagePullPolicy: corev1.PullIfNotPresent,
-						Args:            []string{"http://mqtt-response-handler", "80"},
 					},
 				}},
 			},
 			Events: r.getEventFilters(twinInterface),
+			Data:   r.getTwinData(twinInterface),
 		},
 	}
 
@@ -192,6 +192,34 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 	return twinInterfaceEvents
 }
 
+func (r *resourceBuilder) getTwinData(twinInterface apiv0.TwinInterface) *apiv0.TwinInstanceDataSpec {
+	var twinInstanceData *apiv0.TwinInstanceDataSpec
+
+	if len(twinInterface.Spec.Properties) == 0 && len(twinInterface.Spec.Telemetries) == 0 {
+		return twinInstanceData
+	}
+
+	twinInstanceData = &apiv0.TwinInstanceDataSpec{}
+
+	for _, twinProperty := range twinInterface.Spec.Properties {
+		twinInstanceData.Properties = append(twinInstanceData.Properties, apiv0.TwinInstancePropertyData{
+			Id:    twinProperty.Id,
+			Name:  twinProperty.Name,
+			Value: "",
+		})
+	}
+
+	for _, twinTelemetry := range twinInterface.Spec.Telemetries {
+		twinInstanceData.Telemetries = append(twinInstanceData.Telemetries, apiv0.TwinInstanceTelemetryData{
+			Id:    twinTelemetry.Id,
+			Name:  twinTelemetry.Name,
+			Value: "",
+		})
+	}
+
+	return twinInstanceData
+}
+
 func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.TwinCommand) []apiv0.TwinCommand {
 	newCommand := apiv0.TwinCommand{
 		Id:          string(command.Id),
@@ -204,7 +232,6 @@ func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.
 			Name:        command.Request.Name,
 			DisplayName: string(command.Request.DisplayName),
 			Description: string(command.Request.Comment),
-			//Schema:      command.Request.Schema,
 		},
 		Response: apiv0.CommandResponse{
 			Name:        command.Response.Name,

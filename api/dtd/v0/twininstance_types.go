@@ -38,6 +38,24 @@ type TwinInstanceSpec struct {
 	Events           []TwinInstanceEvents          `json:"events,omitempty"`
 	Template         corev1.PodTemplateSpec        `json:"template,omitempty"`
 	EndpointSettings *TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
+	Data             *TwinInstanceDataSpec         `json:"data,omitempty"`
+}
+
+type TwinInstanceDataSpec struct {
+	Properties  []TwinInstancePropertyData  `json:"properties,omitempty"`
+	Telemetries []TwinInstanceTelemetryData `json:"telemetries,omitempty"`
+}
+
+type TwinInstancePropertyData struct {
+	Id    string `json:"id,omitempty"`
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+
+type TwinInstanceTelemetryData struct {
+	Id    string `json:"id,omitempty"`
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // TODO: Configure as read-only

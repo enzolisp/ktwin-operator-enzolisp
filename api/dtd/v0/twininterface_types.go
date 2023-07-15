@@ -135,11 +135,6 @@ type TwinEnumSchemaValues struct {
 	EnumValue   string `json:"enumValue,omitempty"`
 }
 
-// TODO: review this definition: rename TwinInterface to TwinInterface
-// TODO: TwinInstance instantiate the TwinInterface
-// type Component struct {
-// }
-
 // TwinInterfaceStatus defines the observed state of TwinInterface
 type TwinInterfaceStatus struct {
 	Status TwinInterfacePhase `json:"status,omitempty"`

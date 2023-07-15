@@ -35,6 +35,27 @@ spec:
           spec:
             description: TwinInstanceSpec defines the desired state of TwinInstance
             properties:
+              data:
+                properties:
+                  properties:
+                    items:
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  telemetries:
+                    items:
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                type: object
               endpointSettings:
                 description: 'TODO: Configure as read-only'
                 properties:
@@ -68,8 +89,7 @@ spec:
                 items:
                   properties:
                     filters:
-                      description: 'Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters
-                        TODO: build complex filtering criteria'
+                      description: 'Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters'
                       properties:
                         exact:
                           properties:
@@ -340,8 +360,6 @@ spec:
                           type: object
                       type: object
                     type: array
-                required:
-                - extends
                 type: object
               parentInstance:
                 type: string
