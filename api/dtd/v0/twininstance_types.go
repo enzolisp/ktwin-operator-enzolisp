@@ -47,15 +47,15 @@ type TwinInstanceDataSpec struct {
 }
 
 type TwinInstancePropertyData struct {
-	Id    string `json:"id,omitempty"`
-	Name  string `json:"name,omitempty"`
-	Value string `json:"value,omitempty"`
+	Id    string      `json:"id,omitempty"`
+	Name  string      `json:"name,omitempty"`
+	Value interface{} `json:"value"`
 }
 
 type TwinInstanceTelemetryData struct {
-	Id    string `json:"id,omitempty"`
-	Name  string `json:"name,omitempty"`
-	Value string `json:"value,omitempty"`
+	Id    string      `json:"id,omitempty"`
+	Name  string      `json:"name,omitempty"`
+	Value interface{} `json:"value"`
 }
 
 // TODO: Configure as read-only

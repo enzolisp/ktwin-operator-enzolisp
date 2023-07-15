@@ -203,17 +203,15 @@ func (r *resourceBuilder) getTwinData(twinInterface apiv0.TwinInterface) *apiv0.
 
 	for _, twinProperty := range twinInterface.Spec.Properties {
 		twinInstanceData.Properties = append(twinInstanceData.Properties, apiv0.TwinInstancePropertyData{
-			Id:    twinProperty.Id,
-			Name:  twinProperty.Name,
-			Value: "",
+			Id:   twinProperty.Id,
+			Name: twinProperty.Name,
 		})
 	}
 
 	for _, twinTelemetry := range twinInterface.Spec.Telemetries {
 		twinInstanceData.Telemetries = append(twinInstanceData.Telemetries, apiv0.TwinInstanceTelemetryData{
-			Id:    twinTelemetry.Id,
-			Name:  twinTelemetry.Name,
-			Value: "",
+			Id:   twinTelemetry.Id,
+			Name: twinTelemetry.Name,
 		})
 	}
 
