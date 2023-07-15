@@ -14,6 +14,7 @@ const (
 
 type TwinInterfaceGraph interface {
 	AddVertex(twinInterface dtdv0.TwinInterface) (*TwinInterfaceGraphVertex, error)
+	GetVertex(twinInterfaceId string) *dtdv0.TwinInterface
 	RemoveVertex(twinInterface dtdv0.TwinInterface) error
 	AddEdge(sourceTwinInterface dtdv0.TwinInterface, targetTwinInterface dtdv0.TwinInterface) error
 	RemoveEdge(sourceTwinInterface dtdv0.TwinInterface, targetTwinInterface dtdv0.TwinInterface) error
@@ -35,6 +36,14 @@ func NewTwinInterfaceGraph() TwinInterfaceGraph {
 		NumberOfVertex: 0,
 		Vertexes:       map[string]*TwinInterfaceGraphVertex{},
 	}
+}
+
+func (g *twinInterfaceGraph) GetVertex(twinInterfaceId string) *dtdv0.TwinInterface {
+	if g.Vertexes[twinInterfaceId] == nil {
+		return nil
+	}
+
+	return &g.Vertexes[twinInterfaceId].TwinInterface
 }
 
 func (g *twinInterfaceGraph) AddVertex(twinInterface dtdv0.TwinInterface) (*TwinInterfaceGraphVertex, error) {

@@ -4,22 +4,28 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
+	"path/filepath"
 )
 
-func IsJsonFile(filename string) bool {
-	s := strings.Split(filename, ".")
-	return len(s) > 1 && s[1] == "json"
+func IsJsonFile(filePath string) bool {
+	return filepath.Ext(filePath) == ".json"
 }
 
 func PrepareOutputFolder(dirname string) error {
-	err := os.Mkdir(dirname, os.ModePerm)
+	fileInfo, err := os.Stat(dirname)
 
-	if err == nil {
-		fmt.Println("Output directory " + dirname + " was created")
+	// fmt.Printf(dirname + "\n")
+
+	if err == nil && fileInfo.IsDir() {
 		return nil
-	} else {
-		log.Fatal("Output directory "+dirname+" was not created", err)
+	}
+
+	if err != nil && !os.IsNotExist(err) {
+		log.Fatal("Output path has a file, it is impossible to proceed")
+	}
+
+	if err != nil && os.IsNotExist(err) {
+		err = os.Mkdir(dirname, os.ModePerm)
 	}
 
 	if os.IsExist(err) {
