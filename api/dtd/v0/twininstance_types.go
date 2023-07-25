@@ -100,7 +100,7 @@ type TwinInstanceEvents struct {
 
 // Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters
 type TwinInstanceEventsFilters struct {
-	Exact TwinInstanceEventsFiltersProperties `json:"exact,omitempty"`
+	Exact TwinInstanceEventsFiltersAttributes `json:"exact,omitempty"`
 	// Prefix TwinInstanceEventsFiltersProperties `json:"prefix,omitempty"` // Unsupported
 	// Suffix TwinInstanceEventsFiltersProperties `json:"suffix,omitempty"` // Unsupported
 	// All    TwinInstanceEventsFiltersProperties `json:"all,omitempty"` // Unsupported
@@ -108,10 +108,7 @@ type TwinInstanceEventsFilters struct {
 	// Not    TwinInstanceEventsFiltersProperties `json:"not,omitempty"` // Unsupported
 }
 
-type TwinInstanceEventsFiltersProperties struct {
-	Type    string `json:"type,omitempty"`
-	Subject string `json:"subject,omitempty"`
-}
+type TwinInstanceEventsFiltersAttributes map[string]string
 
 type TwinInterfaceEventsSink struct {
 	InstanceId string `json:"instanceId,omitempty"`

@@ -156,7 +156,26 @@ func (e *twinEvent) GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Tr
 	})
 	twinTriggers = append(twinTriggers, trigger)
 
+	e.populateTwinInstanceEventStructure(twinInstance, twinTriggers)
+
 	return twinTriggers
+}
+
+func (e *twinEvent) populateTwinInstanceEventStructure(twinInstance *dtdv0.TwinInstance, twinTriggers []kEventing.Trigger) *dtdv0.TwinInstance {
+	for _, twinTrigger := range twinTriggers {
+		attributesMap := twinTrigger.Spec.Filter.Attributes
+		twinInstanceEvents := dtdv0.TwinInstanceEvents{
+			Filters: dtdv0.TwinInstanceEventsFilters{
+				Exact: dtdv0.TwinInstanceEventsFiltersAttributes(attributesMap),
+			},
+			Sink: dtdv0.TwinInterfaceEventsSink{
+				InstanceId: twinTrigger.Spec.Subscriber.Ref.Name,
+			},
+		}
+		twinInstance.Spec.Events = append(twinInstance.Spec.Events, twinInstanceEvents)
+	}
+
+	return twinInstance
 }
 
 func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.Trigger {

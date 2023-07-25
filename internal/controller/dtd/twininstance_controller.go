@@ -79,16 +79,16 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance) (ctrl.Result, error) {
 	twinInstanceName := twinInstance.ObjectMeta.Name
 
-	var errors []error
+	var resultErrors []error
 	logger := log.FromContext(ctx)
 
 	// Create Service Instance
 	kService := r.TwinService.GetService(twinInstance)
 	err := r.Create(ctx, kService, &client.CreateOptions{})
 
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstanceName))
-		errors = append(errors, err)
+		resultErrors = append(resultErrors, err)
 	}
 
 	// Create MQTT Integrators
@@ -101,24 +101,32 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	// 	}
 	// }
 
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstanceName))
-		errors = append(errors, err)
-	}
+	// if err != nil {
+	// 	logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstanceName))
+	// 	resultErrors = append(resultErrors, err)
+	// }
 
 	// Create Triggers
 	triggers := r.TwinEvent.GetTriggers(twinInstance)
 
 	for _, trigger := range triggers {
 		err := r.Create(ctx, &trigger, &client.CreateOptions{})
-		if err != nil {
+		if err != nil && !errors.IsAlreadyExists(err) {
 			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInstanceName))
-			errors = append(errors, err)
+			resultErrors = append(resultErrors, err)
 		}
 	}
 
-	if len(errors) > 0 {
-		return ctrl.Result{}, errors[0]
+	// Update TwinInstance
+	err = r.Update(ctx, twinInstance, &client.UpdateOptions{})
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while updating TwinInstance %s", twinInstanceName))
+		return ctrl.Result{}, err
+	}
+
+	if len(resultErrors) > 0 {
+		return ctrl.Result{}, resultErrors[0]
 	}
 
 	return ctrl.Result{}, nil

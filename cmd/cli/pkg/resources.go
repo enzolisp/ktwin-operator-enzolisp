@@ -138,8 +138,8 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 
 	realToVirtualEventFilter := apiv0.TwinInstanceEvents{
 		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersProperties{
-				Type: "ktwin.real" + normalizeTwinInterfacedId + ".generated",
+			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
+				"Type": "ktwin.real" + normalizeTwinInterfacedId + ".generated",
 			},
 		},
 		Sink: apiv0.TwinInterfaceEventsSink{
@@ -149,8 +149,8 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 
 	virtualToRealEventFilter := apiv0.TwinInstanceEvents{
 		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersProperties{
-				Type: "ktwin.virtual" + normalizeTwinInterfacedId + ".generated",
+			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
+				"Type": "ktwin.virtual" + normalizeTwinInterfacedId + ".generated",
 			},
 		},
 		Sink: apiv0.TwinInterfaceEventsSink{
@@ -160,8 +160,8 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 
 	realToEventStore := apiv0.TwinInstanceEvents{
 		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersProperties{
-				Type: "ktwin.real.store.generated",
+			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
+				"Type": "ktwin.real.store.generated",
 			},
 		},
 		Sink: apiv0.TwinInterfaceEventsSink{
@@ -171,8 +171,8 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 
 	virtualToEventStore := apiv0.TwinInstanceEvents{
 		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersProperties{
-				Type: "ktwin.virtual.store.generated",
+			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
+				"Type": "ktwin.virtual.store.generated",
 			},
 		},
 		Sink: apiv0.TwinInterfaceEventsSink{
@@ -191,8 +191,8 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 
 			commandEvent := apiv0.TwinInstanceEvents{
 				Filters: apiv0.TwinInstanceEventsFilters{
-					Exact: apiv0.TwinInstanceEventsFiltersProperties{
-						Type: "ktwin.command." + normalizeTwinInterfacedId + "." + commandName + ".generated",
+					Exact: apiv0.TwinInstanceEventsFiltersAttributes{
+						"Type": "ktwin.command." + normalizeTwinInterfacedId + "." + commandName + ".generated",
 					},
 				},
 				Sink: apiv0.TwinInterfaceEventsSink{
