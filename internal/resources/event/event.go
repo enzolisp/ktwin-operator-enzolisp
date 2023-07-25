@@ -72,7 +72,7 @@ func (e *twinEvent) getVirtualToEventStoreTriggerName(twinInstanceName string) s
 
 func (e *twinEvent) getTriggerLabels(twinInstanceName string) map[string]string {
 	return map[string]string{
-		"instance": twinInstanceName,
+		"ktwin/twininstance": twinInstanceName,
 	}
 }
 
