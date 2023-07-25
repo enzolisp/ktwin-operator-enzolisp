@@ -32,7 +32,6 @@ const (
 
 // TwinInstanceSpec defines the desired state of TwinInstance
 type TwinInstanceSpec struct {
-	Id                        string                        `json:"id,omitempty"`
 	Interface                 string                        `json:"interface,omitempty"`
 	Events                    []TwinInstanceEvents          `json:"events,omitempty"`
 	Template                  corev1.PodTemplateSpec        `json:"template,omitempty"`
