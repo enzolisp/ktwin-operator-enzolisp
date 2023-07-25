@@ -121,11 +121,8 @@ spec:
                 type: string
               displayName:
                 type: string
-              extends:
-                properties:
-                  id:
-                    type: string
-                type: object
+              extendsInterface:
+                type: string
               id:
                 type: string
               properties:

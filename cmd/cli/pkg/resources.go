@@ -32,7 +32,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 	var relationships []apiv0.TwinRelationship
 	var telemetries []apiv0.TwinTelemetry
 	var commands []apiv0.TwinCommand
-	var extendedComponent *apiv0.TwinInterfaceExtendsSpec
+	var interfaceExtends string
 
 	for _, content := range tInterface.Contents {
 		if content.Property != nil {
@@ -51,9 +51,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 
 	// Only supports one parent interface
 	if len(tInterface.Extends) > 0 {
-		extendedComponent = &apiv0.TwinInterfaceExtendsSpec{
-			Id: r.hostUtils.ParseHostName(tInterface.Extends[0]),
-		}
+		interfaceExtends = r.hostUtils.ParseHostName(tInterface.Extends[0])
 	}
 
 	normalizedInterfaceId := r.hostUtils.ParseHostName(string(tInterface.Id))
@@ -68,15 +66,15 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInterfaceSpec{
-			Id:            normalizedInterfaceId,
-			DisplayName:   string(tInterface.DisplayName),
-			Description:   string(tInterface.Description),
-			Comment:       string(tInterface.Comment),
-			Properties:    properties,
-			Relationships: relationships,
-			Commands:      commands,
-			Telemetries:   telemetries,
-			Extends:       extendedComponent,
+			Id:               normalizedInterfaceId,
+			DisplayName:      string(tInterface.DisplayName),
+			Description:      string(tInterface.Description),
+			Comment:          string(tInterface.Comment),
+			Properties:       properties,
+			Relationships:    relationships,
+			Commands:         commands,
+			Telemetries:      telemetries,
+			ExtendsInterface: interfaceExtends,
 		},
 	}
 
@@ -96,10 +94,8 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInstanceSpec{
-			Id: normalizeTwinInterfacedId + "-instance",
-			Interface: apiv0.TwinInterfaceSpec{
-				Id: normalizeTwinInterfacedId,
-			},
+			Id:        normalizeTwinInterfacedId + "-instance",
+			Interface: normalizeTwinInterfacedId,
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{Containers: []corev1.Container{
 					{
@@ -109,12 +105,30 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 					},
 				}},
 			},
-			Events: r.getEventFilters(twinInterface),
-			Data:   r.getTwinData(twinInterface),
+			TwinInstanceRelationships: r.getTwinInstanceRelationships(twinInterface),
+			//Events: r.getEventFilters(twinInterface),
+			//Data:   r.getTwinData(twinInterface),
 		},
 	}
 
 	return twinInstance
+}
+
+func (r *resourceBuilder) getTwinInstanceRelationships(twinInterface apiv0.TwinInterface) []apiv0.TwinInstanceRelationship {
+	var twinInstanceRelationship []apiv0.TwinInstanceRelationship
+
+	if len(twinInterface.Spec.Relationships) == 0 {
+		return twinInstanceRelationship
+	}
+
+	for _, twinRelationship := range twinInterface.Spec.Relationships {
+		twinInstanceRelationship = append(twinInstanceRelationship, apiv0.TwinInstanceRelationship{
+			Name:   twinRelationship.Name + "-instance",
+			Target: twinRelationship.Target + "-instance",
+		})
+	}
+
+	return twinInstanceRelationship
 }
 
 func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []apiv0.TwinInstanceEvents {

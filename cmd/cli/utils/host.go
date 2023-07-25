@@ -19,10 +19,17 @@ type hostUtils struct{}
 // Parse the string and make it compliant with RFC 1123 host names, by removing invalid characters
 func (r *hostUtils) ParseHostName(name string) string {
 	newName := strings.ToLower(name)
-	invalidCharacters := []string{":", ";", "_"}
 
+	// Replace character by hyphen
+	invalidCharacters := []string{":", ";", "_"}
 	for _, invalidString := range invalidCharacters {
 		newName = strings.Replace(newName, invalidString, "-", -1)
+	}
+
+	// Remove character
+	notAllowedCharacters := []string{"\""}
+	for _, nowAllowedString := range notAllowedCharacters {
+		newName = strings.Replace(newName, nowAllowedString, "", -1)
 	}
 
 	_, err := regexp.MatchString("[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*", newName)

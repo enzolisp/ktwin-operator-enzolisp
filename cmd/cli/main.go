@@ -111,6 +111,11 @@ func loadDTDLFileIntoGraph(inputFilePath string) v0.TwinInterface {
 	return twinInterfaceResource
 }
 
+// Process Inherit Properties and Telemetries
+func processInheritContents(dtdlGraph graph.TwinInterfaceGraph) graph.TwinInterfaceGraph {
+	return dtdlGraph
+}
+
 func generateOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInterfaceGraph) {
 
 	fmt.Println("Generating output files...")

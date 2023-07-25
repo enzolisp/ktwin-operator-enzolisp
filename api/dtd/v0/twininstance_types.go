@@ -32,30 +32,37 @@ const (
 
 // TwinInstanceSpec defines the desired state of TwinInstance
 type TwinInstanceSpec struct {
-	Id               string                        `json:"id,omitempty"`
-	ParentInstance   string                        `json:"parentInstance,omitempty"`
-	Interface        TwinInterfaceSpec             `json:"interface,omitempty"`
-	Events           []TwinInstanceEvents          `json:"events,omitempty"`
-	Template         corev1.PodTemplateSpec        `json:"template,omitempty"`
-	EndpointSettings *TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
-	Data             *TwinInstanceDataSpec         `json:"data,omitempty"`
+	Id                        string                        `json:"id,omitempty"`
+	Interface                 string                        `json:"interface,omitempty"`
+	Events                    []TwinInstanceEvents          `json:"events,omitempty"`
+	Template                  corev1.PodTemplateSpec        `json:"template,omitempty"`
+	EndpointSettings          *TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
+	Data                      *TwinInstanceDataSpec         `json:"data,omitempty"`
+	TwinInstanceRelationships []TwinInstanceRelationship    `json:"twinInstanceRelationships,omitempty"`
 }
 
 type TwinInstanceDataSpec struct {
-	Properties  []TwinInstancePropertyData  `json:"properties,omitempty"`
-	Telemetries []TwinInstanceTelemetryData `json:"telemetries,omitempty"`
+	Properties  []TwinInstancePropertyData  `json:"properties,omitempty"`  // TODO: read-only
+	Telemetries []TwinInstanceTelemetryData `json:"telemetries,omitempty"` // TODO: read-only
 }
 
+// TODO: read-only
 type TwinInstancePropertyData struct {
 	Id    string `json:"id,omitempty"`
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value"`
 }
 
+// TODO: read-only
 type TwinInstanceTelemetryData struct {
 	Id    string `json:"id,omitempty"`
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value"`
+}
+
+type TwinInstanceRelationship struct {
+	Name   string `json:"name,omitempty"`
+	Target string `json:"target,omitempty"`
 }
 
 // TODO: Configure as read-only

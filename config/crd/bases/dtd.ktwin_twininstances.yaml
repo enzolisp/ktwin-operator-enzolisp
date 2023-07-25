@@ -39,6 +39,7 @@ spec:
                 properties:
                   properties:
                     items:
+                      description: 'TODO: read-only'
                       properties:
                         id:
                           type: string
@@ -52,6 +53,7 @@ spec:
                     type: array
                   telemetries:
                     items:
+                      description: 'TODO: read-only'
                       properties:
                         id:
                           type: string
@@ -117,259 +119,6 @@ spec:
               id:
                 type: string
               interface:
-                description: TwinInterfaceSpec defines the desired state of TwinInterface
-                properties:
-                  commands:
-                    items:
-                      properties:
-                        commandType:
-                          type: string
-                        comment:
-                          type: string
-                        description:
-                          type: string
-                        displayName:
-                          type: string
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        request:
-                          properties:
-                            description:
-                              type: string
-                            displayName:
-                              type: string
-                            name:
-                              type: string
-                            schema:
-                              properties:
-                                enumType:
-                                  properties:
-                                    enumValues:
-                                      items:
-                                        properties:
-                                          displayName:
-                                            type: string
-                                          enumValue:
-                                            type: string
-                                          name:
-                                            type: string
-                                        type: object
-                                      type: array
-                                    valueSchema:
-                                      type: string
-                                  type: object
-                                primitiveType:
-                                  type: string
-                              type: object
-                          type: object
-                        response:
-                          properties:
-                            description:
-                              type: string
-                            displayName:
-                              type: string
-                            name:
-                              type: string
-                            schema:
-                              properties:
-                                enumType:
-                                  properties:
-                                    enumValues:
-                                      items:
-                                        properties:
-                                          displayName:
-                                            type: string
-                                          enumValue:
-                                            type: string
-                                          name:
-                                            type: string
-                                        type: object
-                                      type: array
-                                    valueSchema:
-                                      type: string
-                                  type: object
-                                primitiveType:
-                                  type: string
-                              type: object
-                          type: object
-                      required:
-                      - request
-                      - response
-                      type: object
-                    type: array
-                  comment:
-                    type: string
-                  description:
-                    type: string
-                  displayName:
-                    type: string
-                  extends:
-                    properties:
-                      id:
-                        type: string
-                    type: object
-                  id:
-                    type: string
-                  properties:
-                    items:
-                      properties:
-                        comment:
-                          type: string
-                        description:
-                          type: string
-                        displayName:
-                          type: string
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        schema:
-                          properties:
-                            enumType:
-                              properties:
-                                enumValues:
-                                  items:
-                                    properties:
-                                      displayName:
-                                        type: string
-                                      enumValue:
-                                        type: string
-                                      name:
-                                        type: string
-                                    type: object
-                                  type: array
-                                valueSchema:
-                                  type: string
-                              type: object
-                            primitiveType:
-                              type: string
-                          type: object
-                        writable:
-                          type: boolean
-                      type: object
-                    type: array
-                  relationships:
-                    items:
-                      properties:
-                        comment:
-                          type: string
-                        description:
-                          type: string
-                        displayName:
-                          type: string
-                        id:
-                          type: string
-                        maxMultiplicity:
-                          type: integer
-                        minMultiplicity:
-                          type: integer
-                        name:
-                          type: string
-                        properties:
-                          items:
-                            properties:
-                              comment:
-                                type: string
-                              description:
-                                type: string
-                              displayName:
-                                type: string
-                              id:
-                                type: string
-                              name:
-                                type: string
-                              schema:
-                                properties:
-                                  enumType:
-                                    properties:
-                                      enumValues:
-                                        items:
-                                          properties:
-                                            displayName:
-                                              type: string
-                                            enumValue:
-                                              type: string
-                                            name:
-                                              type: string
-                                          type: object
-                                        type: array
-                                      valueSchema:
-                                        type: string
-                                    type: object
-                                  primitiveType:
-                                    type: string
-                                type: object
-                              writable:
-                                type: boolean
-                            type: object
-                          type: array
-                        schema:
-                          properties:
-                            enumType:
-                              properties:
-                                enumValues:
-                                  items:
-                                    properties:
-                                      displayName:
-                                        type: string
-                                      enumValue:
-                                        type: string
-                                      name:
-                                        type: string
-                                    type: object
-                                  type: array
-                                valueSchema:
-                                  type: string
-                              type: object
-                            primitiveType:
-                              type: string
-                          type: object
-                        target:
-                          type: string
-                        writeable:
-                          type: boolean
-                      type: object
-                    type: array
-                  telemetries:
-                    items:
-                      properties:
-                        comment:
-                          type: string
-                        description:
-                          type: string
-                        displayName:
-                          type: string
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        schema:
-                          properties:
-                            enumType:
-                              properties:
-                                enumValues:
-                                  items:
-                                    properties:
-                                      displayName:
-                                        type: string
-                                      enumValue:
-                                        type: string
-                                      name:
-                                        type: string
-                                    type: object
-                                  type: array
-                                valueSchema:
-                                  type: string
-                              type: object
-                            primitiveType:
-                              type: string
-                          type: object
-                      type: object
-                    type: array
-                type: object
-              parentInstance:
                 type: string
               template:
                 description: PodTemplateSpec describes the data a pod should have
@@ -7748,6 +7497,15 @@ spec:
                     - containers
                     type: object
                 type: object
+              twinInstanceRelationships:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    target:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
             description: TwinInstanceStatus defines the observed state of TwinInstance
