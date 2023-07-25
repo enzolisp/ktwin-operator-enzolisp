@@ -11,6 +11,10 @@ import (
 	"ktwin/operator/cmd/cli/utils"
 )
 
+const (
+	INSTANCE_SUFFIX = "-001"
+)
+
 type ResourceBuilder interface {
 	CreateTwinInterface(tInterface dtdl.Interface) apiv0.TwinInterface
 	CreateTwinInstance(twinInterface apiv0.TwinInterface) apiv0.TwinInstance
@@ -83,7 +87,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 
 func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) apiv0.TwinInstance {
 	normalizeTwinInterfacedId := r.hostUtils.ParseHostName(string(twinInterface.Spec.Id))
-	normalizeTwinInstanceId := normalizeTwinInterfacedId + "-instance"
+	normalizeTwinInstanceId := normalizeTwinInterfacedId + INSTANCE_SUFFIX
 
 	twinInstance := apiv0.TwinInstance{
 		TypeMeta: v1.TypeMeta{
@@ -123,8 +127,8 @@ func (r *resourceBuilder) getTwinInstanceRelationships(twinInterface apiv0.TwinI
 
 	for _, twinRelationship := range twinInterface.Spec.Relationships {
 		twinInstanceRelationship = append(twinInstanceRelationship, apiv0.TwinInstanceRelationship{
-			Name:   twinRelationship.Name + "-instance",
-			Target: twinRelationship.Target + "-instance",
+			Name:   twinRelationship.Name + INSTANCE_SUFFIX,
+			Target: twinRelationship.Target + INSTANCE_SUFFIX,
 		})
 	}
 
