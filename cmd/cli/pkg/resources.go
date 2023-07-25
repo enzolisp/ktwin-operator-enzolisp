@@ -99,8 +99,8 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{Containers: []corev1.Container{
 					{
-						Name:            "ktwin/" + normalizeTwinInterfacedId,
-						Image:           "ktwin/" + "edge-service" + ":0.1",
+						Name:            normalizeTwinInterfacedId,
+						Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
 						ImagePullPolicy: corev1.PullIfNotPresent,
 					},
 				}},
