@@ -117,16 +117,30 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 		}
 	}
 
-	// Update TwinInstance
-	err = r.Update(ctx, twinInstance, &client.UpdateOptions{})
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while updating TwinInstance %s", twinInstanceName))
-		return ctrl.Result{}, err
+	if len(resultErrors) > 0 {
+		twinInstance.Status.Status = dtdv0.TwinInstancePhaseFailed
+		return ctrl.Result{}, resultErrors[0]
+	} else {
+		twinInstance.Status.Status = dtdv0.TwinInstancePhaseRunning
 	}
 
-	if len(resultErrors) > 0 {
-		return ctrl.Result{}, resultErrors[0]
+	// Update Status for Running or Failed
+	_, err = r.updateTwinInstance(ctx, req, twinInstance)
+
+	if err != nil {
+		return ctrl.Result{}, nil
+	}
+
+	return ctrl.Result{}, nil
+}
+
+func (r *TwinInstanceReconciler) updateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+	err := r.Update(ctx, twinInstance, &client.UpdateOptions{})
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while updating TwinInstance %s", twinInstance.ObjectMeta.Name))
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil

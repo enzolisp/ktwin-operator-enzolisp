@@ -102,11 +102,8 @@ spec:
                       description: 'Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters'
                       properties:
                         exact:
-                          properties:
-                            subject:
-                              type: string
-                            type:
-                              type: string
+                          additionalProperties:
+                            type: string
                           type: object
                       type: object
                     sink:
