@@ -15,11 +15,10 @@ import (
 )
 
 const (
-	EVENT_REAL_TO_VIRTUAL        string = "ktwin.real.%s.generated"
-	EVENT_VIRTUAL_TO_REAL        string = "ktwin.virtual.%s.generated"
-	EVENT_REAL_TO_EVENT_STORE    string = "ktwin.real.store.generated"
-	EVENT_VIRTUAL_TO_EVENT_STORE string = "ktwin.virtual.store.generated"
-	EVENT_VIRTUAL_TO_VIRTUAL     string = "ktwin.virtual.virtual.generated" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
+	EVENT_REAL_TO_VIRTUAL    string = "ktwin.real.%s.generated"
+	EVENT_VIRTUAL_TO_REAL    string = "ktwin.virtual.%s.generated"
+	EVENT_TO_EVENT_STORE     string = "ktwin.event.store.generated"
+	EVENT_VIRTUAL_TO_VIRTUAL string = "ktwin.virtual.virtual.generated" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
 )
 
 func NewTwinEvent() TwinEvent {
@@ -85,7 +84,7 @@ func (e *twinEvent) GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Tr
 	var twinTriggers []kEventing.Trigger
 	var trigger kEventing.Trigger
 
-	realEventSource := twinInstance.Name + "mqtt"
+	realEventSource := twinInstance.Name + "-mqtt"
 	virtualEventSource := twinInstance.Name
 
 	// If twin instance has container associated, create the triggers
@@ -138,8 +137,8 @@ func (e *twinEvent) GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Tr
 		triggerName:  e.getRealToEventStoreTriggerName(twinInstance.Name),
 		namespace:    twinInstance.Namespace,
 		brokerName:   broker.EVENT_BROKER_NAME,
-		eventType:    EVENT_REAL_TO_EVENT_STORE,
-		eventSource:  twinInstance.Name,
+		eventType:    e.getEventTypeRealToVirtual(twinInstance.Name),
+		eventSource:  realEventSource,
 		subscriber:   eventStore.EVENT_STORE_SERVICE,
 		instanceName: twinInstance.Name,
 	})
@@ -150,8 +149,8 @@ func (e *twinEvent) GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Tr
 		triggerName:  e.getVirtualToEventStoreTriggerName(twinInstance.Name),
 		namespace:    twinInstance.Namespace,
 		brokerName:   broker.EVENT_BROKER_NAME,
-		eventType:    EVENT_VIRTUAL_TO_EVENT_STORE,
-		eventSource:  twinInstance.Name,
+		eventType:    e.getEventTypeVirtualToReal(twinInstance.Name),
+		eventSource:  virtualEventSource,
 		subscriber:   eventStore.EVENT_STORE_SERVICE,
 		instanceName: twinInstance.Name,
 	})
