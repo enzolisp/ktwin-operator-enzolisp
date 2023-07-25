@@ -24,6 +24,8 @@ import (
 	twinintegrator "ktwin/operator/internal/resources/integrator"
 	twinservice "ktwin/operator/internal/resources/service"
 
+	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -123,7 +125,7 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 }
 
 func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctrl.Request, namespacedName types.NamespacedName) (ctrl.Result, error) {
-	var errors []error
+	var errorsResult []error
 	logger := log.FromContext(ctx)
 
 	// Create Service Instance
@@ -132,7 +134,7 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Error while deleting TwinInstance %s", namespacedName.Name))
-		errors = append(errors, err)
+		errorsResult = append(errorsResult, err)
 	}
 
 	// Delete MQTT Integrators
@@ -146,18 +148,33 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 	// }
 
 	// Delete Triggers
-	triggers := r.TwinEvent.GetDeletionTriggers(namespacedName)
+	deletionTriggerLabels := r.TwinEvent.GetTriggersDeletionFilterCriteria(namespacedName)
 
-	for _, trigger := range triggers {
+	triggerList := kEventing.TriggerList{}
+	listOptions := []client.ListOption{
+		client.InNamespace(namespacedName.Namespace),
+		client.MatchingLabels(deletionTriggerLabels),
+	}
+
+	err = r.List(ctx, &triggerList, listOptions...)
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while getting triggers %s", namespacedName.Name))
+		return ctrl.Result{}, err
+	}
+
+	for _, trigger := range triggerList.Items {
 		err := r.Delete(ctx, &trigger, &client.DeleteOptions{})
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while deleting trigger %s", namespacedName.Name))
-			errors = append(errors, err)
+			if !errors.IsNotFound(err) {
+				logger.Error(err, fmt.Sprintf("Error while deleting trigger %s", namespacedName.Name))
+				errorsResult = append(errorsResult, err)
+			}
 		}
 	}
 
-	if len(errors) > 0 {
-		return ctrl.Result{}, errors[0]
+	if len(errorsResult) > 0 {
+		return ctrl.Result{}, errorsResult[0]
 	}
 
 	return ctrl.Result{}, nil

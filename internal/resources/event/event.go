@@ -1,10 +1,13 @@
 package event
 
 import (
+	"fmt"
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	broker "ktwin/operator/internal/resources/broker"
 	eventStore "ktwin/operator/internal/resources/event-store"
+	"reflect"
 
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -12,11 +15,11 @@ import (
 )
 
 const (
-	EVENT_REAL_TO_VIRTUAL        string = "ktwin.real.virtual.generated"
-	EVENT_VIRTUAL_TO_REAL        string = "ktwin.virtual.real.generated"
+	EVENT_REAL_TO_VIRTUAL        string = "ktwin.real.%s.generated"
+	EVENT_VIRTUAL_TO_REAL        string = "ktwin.virtual.%s.generated"
 	EVENT_REAL_TO_EVENT_STORE    string = "ktwin.real.store.generated"
-	EVENT_VIRTUAL_TO_EVENT_STORE string = "ktwin.real.store.generated"
-	EVENT_VIRTUAL_TO_VIRTUAL     string = "ktwin.virtual.virtual.generated"
+	EVENT_VIRTUAL_TO_EVENT_STORE string = "ktwin.virtual.store.generated"
+	EVENT_VIRTUAL_TO_VIRTUAL     string = "ktwin.virtual.virtual.generated" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
 )
 
 func NewTwinEvent() TwinEvent {
@@ -25,18 +28,31 @@ func NewTwinEvent() TwinEvent {
 
 type TwinEvent interface {
 	GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Trigger
-	GetDeletionTriggers(namespacedName types.NamespacedName) []kEventing.Trigger
+	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
 type twinEvent struct{}
 
 type triggerParameters struct {
-	triggerName string
-	namespace   string
-	brokerName  string
-	eventType   string
-	eventSource string
-	subscriber  string
+	instanceName string
+	triggerName  string
+	namespace    string
+	brokerName   string
+	eventType    string
+	eventSource  string
+	subscriber   string
+}
+
+func (e *twinEvent) getEventTypeRealToVirtual(twinInstanceName string) string {
+	return fmt.Sprintf(EVENT_REAL_TO_VIRTUAL, twinInstanceName)
+}
+
+func (e *twinEvent) getEventTypeVirtualToReal(twinInstanceName string) string {
+	return fmt.Sprintf(EVENT_VIRTUAL_TO_REAL, twinInstanceName)
+}
+
+func (e *twinEvent) getVirtualToVirtualTriggerName(sourceTwinInstanceName string, targetTwinInstanceName string) string {
+	return sourceTwinInstanceName + "-to-" + targetTwinInstanceName
 }
 
 func (e *twinEvent) getRealToVirtualTriggerName(twinInstanceName string) string {
@@ -55,106 +71,96 @@ func (e *twinEvent) getVirtualToEventStoreTriggerName(twinInstanceName string) s
 	return twinInstanceName + "-virtual-to-event-store"
 }
 
-func (e *twinEvent) GetDeletionTriggers(namespacedName types.NamespacedName) []kEventing.Trigger {
-	var twinTriggers []kEventing.Trigger
-	var trigger kEventing.Trigger
+func (e *twinEvent) getTriggerLabels(twinInstanceName string) map[string]string {
+	return map[string]string{
+		"instance": twinInstanceName,
+	}
+}
 
-	// Real to Virtual
-	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getRealToVirtualTriggerName(namespacedName.Name),
-		namespace:   namespacedName.Namespace,
-	})
-	twinTriggers = append(twinTriggers, trigger)
-
-	// Virtual to Real
-	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getVirtualToRealTriggerName(namespacedName.Name),
-		namespace:   namespacedName.Namespace,
-	})
-	twinTriggers = append(twinTriggers, trigger)
-
-	// Real to Event Store
-	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getRealToEventStoreTriggerName(namespacedName.Name),
-		namespace:   namespacedName.Namespace,
-	})
-	twinTriggers = append(twinTriggers, trigger)
-
-	// Virtual to Event Store
-	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getVirtualToEventStoreTriggerName(namespacedName.Name),
-		namespace:   namespacedName.Namespace,
-	})
-	twinTriggers = append(twinTriggers, trigger)
-	return twinTriggers
+func (e *twinEvent) GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string {
+	return e.getTriggerLabels(namespacedName.Name)
 }
 
 func (e *twinEvent) GetTriggers(twinInstance *dtdv0.TwinInstance) []kEventing.Trigger {
 	var twinTriggers []kEventing.Trigger
 	var trigger kEventing.Trigger
 
-	// Real to Virtual
-	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getRealToVirtualTriggerName(twinInstance.Name),
-		namespace:   twinInstance.Namespace,
-		brokerName:  broker.EVENT_BROKER_NAME,
-		eventType:   EVENT_REAL_TO_VIRTUAL,
-		eventSource: twinInstance.Name,
-		subscriber:  twinInstance.Name,
-	})
-	twinTriggers = append(twinTriggers, trigger)
+	realEventSource := twinInstance.Name + "mqtt"
+	virtualEventSource := twinInstance.Name
 
-	// Virtual to Real
-	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getVirtualToRealTriggerName(twinInstance.Name),
-		namespace:   twinInstance.Namespace,
-		brokerName:  broker.EVENT_BROKER_NAME,
-		eventType:   EVENT_VIRTUAL_TO_REAL,
-		eventSource: twinInstance.Name,
-		subscriber:  twinInstance.Name + "-mqtt",
-	})
-	twinTriggers = append(twinTriggers, trigger)
+	// If twin instance has container associated, create the triggers
+	if e.hasTwinInstanceContainer(twinInstance) {
+		// Real to Virtual
+		trigger = e.createTrigger(triggerParameters{
+			triggerName:  e.getRealToVirtualTriggerName(twinInstance.Name),
+			namespace:    twinInstance.Namespace,
+			brokerName:   broker.EVENT_BROKER_NAME,
+			eventType:    e.getEventTypeRealToVirtual(twinInstance.Name),
+			eventSource:  realEventSource,
+			subscriber:   virtualEventSource,
+			instanceName: twinInstance.Name,
+		})
+		twinTriggers = append(twinTriggers, trigger)
+
+		// Virtual to Real
+		trigger = e.createTrigger(triggerParameters{
+			triggerName:  e.getVirtualToRealTriggerName(twinInstance.Name),
+			namespace:    twinInstance.Namespace,
+			brokerName:   broker.EVENT_BROKER_NAME,
+			eventType:    e.getEventTypeVirtualToReal(twinInstance.Name),
+			eventSource:  virtualEventSource,
+			subscriber:   realEventSource,
+			instanceName: twinInstance.Name,
+		})
+		twinTriggers = append(twinTriggers, trigger)
+
+		// Virtual to virtual
+		for _, twinInstanceRelationship := range twinInstance.Spec.TwinInstanceRelationships {
+			if twinInstanceRelationship.AggregateData {
+				realEventSource := twinInstanceRelationship.Target + "-mqtt"
+				trigger = e.createTrigger(triggerParameters{
+					triggerName:  e.getVirtualToVirtualTriggerName(twinInstanceRelationship.Target, twinInstance.Name),
+					namespace:    twinInstance.Namespace,
+					brokerName:   broker.EVENT_BROKER_NAME,
+					eventType:    e.getEventTypeRealToVirtual(twinInstanceRelationship.Target),
+					eventSource:  realEventSource,
+					subscriber:   twinInstance.Name,
+					instanceName: twinInstance.Name,
+				})
+				twinTriggers = append(twinTriggers, trigger)
+			}
+		}
+
+	}
 
 	// Real to Event Store
 	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getRealToEventStoreTriggerName(twinInstance.Name),
-		namespace:   twinInstance.Namespace,
-		brokerName:  broker.EVENT_BROKER_NAME,
-		eventType:   EVENT_REAL_TO_EVENT_STORE,
-		eventSource: twinInstance.Name,
-		subscriber:  eventStore.EVENT_STORE_SERVICE,
+		triggerName:  e.getRealToEventStoreTriggerName(twinInstance.Name),
+		namespace:    twinInstance.Namespace,
+		brokerName:   broker.EVENT_BROKER_NAME,
+		eventType:    EVENT_REAL_TO_EVENT_STORE,
+		eventSource:  twinInstance.Name,
+		subscriber:   eventStore.EVENT_STORE_SERVICE,
+		instanceName: twinInstance.Name,
 	})
 	twinTriggers = append(twinTriggers, trigger)
 
 	// Virtual to Event Store
 	trigger = e.createTrigger(triggerParameters{
-		triggerName: e.getVirtualToEventStoreTriggerName(twinInstance.Name),
-		namespace:   twinInstance.Namespace,
-		brokerName:  broker.EVENT_BROKER_NAME,
-		eventType:   EVENT_VIRTUAL_TO_EVENT_STORE,
-		eventSource: twinInstance.Name,
-		subscriber:  eventStore.EVENT_STORE_SERVICE,
+		triggerName:  e.getVirtualToEventStoreTriggerName(twinInstance.Name),
+		namespace:    twinInstance.Namespace,
+		brokerName:   broker.EVENT_BROKER_NAME,
+		eventType:    EVENT_VIRTUAL_TO_EVENT_STORE,
+		eventSource:  twinInstance.Name,
+		subscriber:   eventStore.EVENT_STORE_SERVICE,
+		instanceName: twinInstance.Name,
 	})
 	twinTriggers = append(twinTriggers, trigger)
-
-	// // Virtual to virtual
-	// // TODO: refactor event routing
-	// for _, relationship := range twinInstance.Spec.Interface.Relationships {
-	// 	trigger = e.createTrigger(triggerParameters{
-	// 		triggerName: twinInstance.Name + "-to-" + relationship.Target,
-	// 		namespace:   twinInstance.Namespace,
-	// 		brokerName:  broker.EVENT_BROKER_NAME,
-	// 		eventType:   EVENT_VIRTUAL_TO_VIRTUAL + "-" + relationship.Target,
-	// 		eventSource: twinInstance.Name,
-	// 		subscriber:  eventStore.EVENT_STORE_SERVICE,
-	// 	})
-	// 	twinTriggers = append(twinTriggers, trigger)
-	// }
 
 	return twinTriggers
 }
 
-func (*twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.Trigger {
+func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.Trigger {
 	return kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Trigger",
@@ -163,6 +169,7 @@ func (*twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.T
 		ObjectMeta: v1.ObjectMeta{
 			Name:      triggerParameters.triggerName,
 			Namespace: triggerParameters.namespace,
+			Labels:    e.getTriggerLabels(triggerParameters.instanceName),
 		},
 		Spec: kEventing.TriggerSpec{
 			Broker: triggerParameters.brokerName,
@@ -181,4 +188,8 @@ func (*twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.T
 			},
 		},
 	}
+}
+
+func (*twinEvent) hasTwinInstanceContainer(twinInstance *dtdv0.TwinInstance) bool {
+	return !reflect.DeepEqual(twinInstance.Spec.Template, corev1.PodTemplateSpec{})
 }
