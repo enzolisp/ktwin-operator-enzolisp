@@ -83,6 +83,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 
 func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) apiv0.TwinInstance {
 	normalizeTwinInterfacedId := r.hostUtils.ParseHostName(string(twinInterface.Spec.Id))
+	normalizeTwinInstanceId := normalizeTwinInterfacedId + "-instance"
 
 	twinInstance := apiv0.TwinInstance{
 		TypeMeta: v1.TypeMeta{
@@ -90,16 +91,15 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 			APIVersion: "dtd.ktwin/v0",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name:      normalizeTwinInterfacedId,
+			Name:      normalizeTwinInstanceId,
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInstanceSpec{
-			Id:        normalizeTwinInterfacedId + "-instance",
 			Interface: normalizeTwinInterfacedId,
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{Containers: []corev1.Container{
 					{
-						Name:            normalizeTwinInterfacedId,
+						Name:            normalizeTwinInstanceId,
 						Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
 						ImagePullPolicy: corev1.PullIfNotPresent,
 					},

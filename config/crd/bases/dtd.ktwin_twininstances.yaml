@@ -116,8 +116,6 @@ spec:
                       type: object
                   type: object
                 type: array
-              id:
-                type: string
               interface:
                 type: string
               template:

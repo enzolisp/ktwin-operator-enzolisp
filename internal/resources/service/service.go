@@ -30,7 +30,7 @@ type TwinService interface {
 type twinService struct{}
 
 func (*twinService) GetService(twinInstance *dtdv0.TwinInstance) *kserving.Service {
-	serviceId := twinInstance.Spec.Id
+	twinInstanceName := twinInstance.ObjectMeta.Name
 	podSpec := twinInstance.Spec.Template.Spec
 
 	service := &kserving.Service{
@@ -46,7 +46,7 @@ func (*twinService) GetService(twinInstance *dtdv0.TwinInstance) *kserving.Servi
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
 					ObjectMeta: v1.ObjectMeta{
-						Name: serviceId + "-v1",
+						Name: twinInstanceName + "-v1",
 						Annotations: map[string]string{
 							"autoscaling.knative.dev/target":   "1",
 							"autoscaling.knative.dev/maxScale": "1",

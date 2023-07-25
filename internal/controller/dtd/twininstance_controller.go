@@ -75,6 +75,8 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance) (ctrl.Result, error) {
+	twinInstanceName := twinInstance.ObjectMeta.Name
+
 	var errors []error
 	logger := log.FromContext(ctx)
 
@@ -83,22 +85,22 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	err := r.Create(ctx, kService, &client.CreateOptions{})
 
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstance.Spec.Id))
+		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstanceName))
 		errors = append(errors, err)
 	}
 
 	// Create MQTT Integrators
-	mqttIntegrators := r.TwinMqttIntegrator.GetIntegrators(twinInstance)
-	for _, integrator := range *mqttIntegrators {
-		err = r.Create(ctx, &integrator, &client.CreateOptions{})
-		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while creating Twin Integrators %s", twinInstance.Spec.Id))
-			errors = append(errors, err)
-		}
-	}
+	// mqttIntegrators := r.TwinMqttIntegrator.GetIntegrators(twinInstance)
+	// for _, integrator := range *mqttIntegrators {
+	// 	err = r.Create(ctx, &integrator, &client.CreateOptions{})
+	// 	if err != nil {
+	// 		logger.Error(err, fmt.Sprintf("Error while creating Twin Integrators %s", twinInstanceName))
+	// 		errors = append(errors, err)
+	// 	}
+	// }
 
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstance.Spec.Id))
+		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstanceName))
 		errors = append(errors, err)
 	}
 
@@ -108,7 +110,7 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	for _, trigger := range triggers {
 		err := r.Create(ctx, &trigger, &client.CreateOptions{})
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInstance.Spec.Id))
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInstanceName))
 			errors = append(errors, err)
 		}
 	}
@@ -134,14 +136,14 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 	}
 
 	// Delete MQTT Integrators
-	integrators := r.TwinMqttIntegrator.GetDeletionIntegrator(namespacedName)
-	for _, integrator := range *integrators {
-		err := r.Delete(ctx, &integrator, &client.DeleteOptions{})
-		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while deleting Mqtt Integrator %s", namespacedName.Name))
-			errors = append(errors, err)
-		}
-	}
+	// integrators := r.TwinMqttIntegrator.GetDeletionIntegrator(namespacedName)
+	// for _, integrator := range *integrators {
+	// 	err := r.Delete(ctx, &integrator, &client.DeleteOptions{})
+	// 	if err != nil {
+	// 		logger.Error(err, fmt.Sprintf("Error while deleting Mqtt Integrator %s", namespacedName.Name))
+	// 		errors = append(errors, err)
+	// 	}
+	// }
 
 	// Delete Triggers
 	triggers := r.TwinEvent.GetDeletionTriggers(namespacedName)
