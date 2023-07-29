@@ -18,8 +18,11 @@ package dtd
 
 import (
 	"context"
+	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -47,12 +50,37 @@ type TwinInterfaceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.4/pkg/reconcile
 func (r *TwinInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	twinInterface := &dtdv0.TwinInterface{}
+	err := r.Get(ctx, types.NamespacedName{Name: req.Name, Namespace: req.Namespace}, twinInterface)
+
+	// Delete scenario
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return r.deleteTwinInterface(ctx, req, req.NamespacedName)
+		}
+		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
+		return ctrl.Result{}, err
+	}
 
 	// Create Mew Schema in Event Store
 
+	return r.createUpdateTwinInterface(ctx, req, twinInterface)
+}
+
+func (r *TwinInterfaceReconciler) deleteTwinInterface(ctx context.Context, req ctrl.Request, namespacedName types.NamespacedName) (ctrl.Result, error) {
+	var errorsResult []error
+
+	if len(errorsResult) > 0 {
+		return ctrl.Result{}, errorsResult[0]
+	}
+
+	return ctrl.Result{}, nil
+}
+
+func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInterface) (ctrl.Result, error) {
+	_ = log.FromContext(ctx)
 	return ctrl.Result{}, nil
 }
 

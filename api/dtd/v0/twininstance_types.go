@@ -17,7 +17,6 @@ limitations under the License.
 package v0
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,7 +33,6 @@ const (
 type TwinInstanceSpec struct {
 	Interface                 string                        `json:"interface,omitempty"`
 	Events                    []TwinInstanceEvents          `json:"events,omitempty"`
-	Template                  corev1.PodTemplateSpec        `json:"template,omitempty"`
 	EndpointSettings          *TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
 	Data                      *TwinInstanceDataSpec         `json:"data,omitempty"`
 	TwinInstanceRelationships []TwinInstanceRelationship    `json:"twinInstanceRelationships,omitempty"`

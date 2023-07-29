@@ -25,6 +25,7 @@ import (
 	twinservice "ktwin/operator/internal/resources/service"
 
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
+	kServing "knative.dev/serving/pkg/apis/serving/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -73,21 +74,31 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	return r.createUpdateTwinInstance(ctx, req, twinInstance)
+	// Get parent TwinInterface
+	twinInterface := &dtdv0.TwinInterface{}
+	twinInterfaceName := twinInstance.Spec.Interface
+	err = r.Get(ctx, types.NamespacedName{Name: twinInterfaceName, Namespace: twinInstance.Namespace}, twinInterface)
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Unexpected error while getting TwinInterface %s", twinInterfaceName))
+		return ctrl.Result{}, err
+	}
+
+	return r.createUpdateTwinInstance(ctx, req, twinInstance, twinInterface)
 }
 
-func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance) (ctrl.Result, error) {
-	twinInstanceName := twinInstance.ObjectMeta.Name
+func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {
+	twinInterfaceName := twinInstance.ObjectMeta.Name
 
 	var resultErrors []error
 	logger := log.FromContext(ctx)
 
 	// Create Service Instance
-	kService := r.TwinService.GetService(twinInstance)
+	kService := r.TwinService.GetService(twinInterface)
 	err := r.Create(ctx, kService, &client.CreateOptions{})
 
 	if err != nil && !errors.IsAlreadyExists(err) {
-		logger.Error(err, fmt.Sprintf("Error while creating Twin Instance %s", twinInstanceName))
+		logger.Error(err, fmt.Sprintf("Error while creating Knative Service %s", twinInterfaceName))
 		resultErrors = append(resultErrors, err)
 	}
 
@@ -107,12 +118,12 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	// }
 
 	// Create Triggers
-	triggers := r.TwinEvent.GetTriggers(twinInstance)
+	triggers := r.TwinEvent.GetTriggers(twinInstance, twinInterface)
 
 	for _, trigger := range triggers {
 		err := r.Create(ctx, &trigger, &client.CreateOptions{})
 		if err != nil && !errors.IsAlreadyExists(err) {
-			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInstanceName))
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
 		}
 	}
@@ -151,12 +162,29 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 	logger := log.FromContext(ctx)
 
 	// Create Service Instance
-	kService := r.TwinService.GetDeletionService(namespacedName)
-	err := r.Delete(ctx, kService, &client.DeleteOptions{})
+	deletionServiceLabels := r.TwinService.GetServiceDeletionCriteria(namespacedName)
+
+	kServiceList := kServing.ServiceList{}
+	kServiceListOptions := []client.ListOption{
+		client.InNamespace(namespacedName.Namespace),
+		client.MatchingLabels(deletionServiceLabels),
+	}
+
+	err := r.List(ctx, &kServiceList, kServiceListOptions...)
 
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while deleting TwinInstance %s", namespacedName.Name))
-		errorsResult = append(errorsResult, err)
+		logger.Error(err, fmt.Sprintf("Error while getting services to be deleted %s", namespacedName.Name))
+		return ctrl.Result{}, err
+	}
+
+	for _, kService := range kServiceList.Items {
+		err := r.Delete(ctx, &kService, &client.DeleteOptions{})
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				logger.Error(err, fmt.Sprintf("Error while deleting Knative Service %s", namespacedName.Name))
+				errorsResult = append(errorsResult, err)
+			}
+		}
 	}
 
 	// Delete MQTT Integrators
@@ -173,12 +201,12 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 	deletionTriggerLabels := r.TwinEvent.GetTriggersDeletionFilterCriteria(namespacedName)
 
 	triggerList := kEventing.TriggerList{}
-	listOptions := []client.ListOption{
+	triggerListOptions := []client.ListOption{
 		client.InNamespace(namespacedName.Namespace),
 		client.MatchingLabels(deletionTriggerLabels),
 	}
 
-	err = r.List(ctx, &triggerList, listOptions...)
+	err = r.List(ctx, &triggerList, triggerListOptions...)
 
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Error while getting triggers %s", namespacedName.Name))

@@ -79,6 +79,15 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 			Commands:         commands,
 			Telemetries:      telemetries,
 			ExtendsInterface: interfaceExtends,
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{Containers: []corev1.Container{
+					{
+						Name:            normalizedInterfaceId,
+						Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
+						ImagePullPolicy: corev1.PullIfNotPresent,
+					},
+				}},
+			},
 		},
 	}
 
@@ -99,16 +108,7 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 			Namespace: "default",
 		},
 		Spec: apiv0.TwinInstanceSpec{
-			Interface: normalizeTwinInterfacedId,
-			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{Containers: []corev1.Container{
-					{
-						Name:            normalizeTwinInstanceId,
-						Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
-						ImagePullPolicy: corev1.PullIfNotPresent,
-					},
-				}},
-			},
+			Interface:                 normalizeTwinInterfacedId,
 			TwinInstanceRelationships: r.getTwinInstanceRelationships(twinInterface),
 			//Events: r.getEventFilters(twinInterface),
 			//Data:   r.getTwinData(twinInterface),

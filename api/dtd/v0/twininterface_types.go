@@ -17,6 +17,7 @@ limitations under the License.
 package v0
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -46,15 +47,16 @@ const (
 
 // TwinInterfaceSpec defines the desired state of TwinInterface
 type TwinInterfaceSpec struct {
-	Id               string             `json:"id,omitempty"`
-	DisplayName      string             `json:"displayName,omitempty"`
-	Description      string             `json:"description,omitempty"`
-	Comment          string             `json:"comment,omitempty"`
-	Properties       []TwinProperty     `json:"properties,omitempty"`
-	Commands         []TwinCommand      `json:"commands,omitempty"`
-	Relationships    []TwinRelationship `json:"relationships,omitempty"`
-	Telemetries      []TwinTelemetry    `json:"telemetries,omitempty"`
-	ExtendsInterface string             `json:"extendsInterface,omitempty"`
+	Id               string                 `json:"id,omitempty"`
+	DisplayName      string                 `json:"displayName,omitempty"`
+	Description      string                 `json:"description,omitempty"`
+	Comment          string                 `json:"comment,omitempty"`
+	Properties       []TwinProperty         `json:"properties,omitempty"`
+	Commands         []TwinCommand          `json:"commands,omitempty"`
+	Relationships    []TwinRelationship     `json:"relationships,omitempty"`
+	Telemetries      []TwinTelemetry        `json:"telemetries,omitempty"`
+	Template         corev1.PodTemplateSpec `json:"template,omitempty"`
+	ExtendsInterface string                 `json:"extendsInterface,omitempty"`
 }
 
 type TwinProperty struct {

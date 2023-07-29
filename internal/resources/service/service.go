@@ -2,7 +2,6 @@ package service
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
@@ -15,15 +14,25 @@ func NewTwinService() TwinService {
 }
 
 type TwinService interface {
-	GetService(twinInstance *dtdv0.TwinInstance) *kserving.Service
-	GetDeletionService(namespacedName types.NamespacedName) *kserving.Service
+	GetService(twinInterface *dtdv0.TwinInterface) *kserving.Service
+	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
 type twinService struct{}
 
-func (*twinService) GetService(twinInstance *dtdv0.TwinInstance) *kserving.Service {
-	twinInstanceName := twinInstance.ObjectMeta.Name
-	podSpec := twinInstance.Spec.Template.Spec
+func (e *twinService) getServiceLabels(twinInterfaceName string) map[string]string {
+	return map[string]string{
+		"ktwin/twininterface": twinInterfaceName,
+	}
+}
+
+func (e *twinService) GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string {
+	return e.getServiceLabels(namespacedName.Name)
+}
+
+func (t *twinService) GetService(twinInterface *dtdv0.TwinInterface) *kserving.Service {
+	twinInterfaceName := twinInterface.ObjectMeta.Name
+	podSpec := twinInterface.Spec.Template.Spec
 
 	service := &kserving.Service{
 		TypeMeta: v1.TypeMeta{
@@ -31,14 +40,15 @@ func (*twinService) GetService(twinInstance *dtdv0.TwinInstance) *kserving.Servi
 			APIVersion: "serving.knative.dev/v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name:      twinInstance.ObjectMeta.Name,
-			Namespace: twinInstance.ObjectMeta.Namespace,
+			Name:      twinInterface.ObjectMeta.Name,
+			Namespace: twinInterface.ObjectMeta.Namespace,
+			Labels:    t.getServiceLabels(twinInterfaceName),
 		},
 		Spec: kserving.ServiceSpec{
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
 					ObjectMeta: v1.ObjectMeta{
-						Name: twinInstanceName + "-v1",
+						Name: twinInterfaceName + "-v1",
 						Annotations: map[string]string{
 							"autoscaling.knative.dev/target":   "1",
 							"autoscaling.knative.dev/maxScale": "1",
@@ -54,17 +64,4 @@ func (*twinService) GetService(twinInstance *dtdv0.TwinInstance) *kserving.Servi
 		},
 	}
 	return service
-}
-
-func (*twinService) GetDeletionService(namespacedName types.NamespacedName) *kserving.Service {
-	return &kserving.Service{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Service",
-			APIVersion: "serving.knative.dev/v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      namespacedName.Name,
-			Namespace: namespacedName.Namespace,
-		},
-	}
 }
