@@ -47,16 +47,20 @@ const (
 
 // TwinInterfaceSpec defines the desired state of TwinInterface
 type TwinInterfaceSpec struct {
-	Id               string                 `json:"id,omitempty"`
-	DisplayName      string                 `json:"displayName,omitempty"`
-	Description      string                 `json:"description,omitempty"`
-	Comment          string                 `json:"comment,omitempty"`
-	Properties       []TwinProperty         `json:"properties,omitempty"`
-	Commands         []TwinCommand          `json:"commands,omitempty"`
-	Relationships    []TwinRelationship     `json:"relationships,omitempty"`
-	Telemetries      []TwinTelemetry        `json:"telemetries,omitempty"`
-	Template         corev1.PodTemplateSpec `json:"template,omitempty"`
-	ExtendsInterface string                 `json:"extendsInterface,omitempty"`
+	Id               string                `json:"id,omitempty"`
+	DisplayName      string                `json:"displayName,omitempty"`
+	Description      string                `json:"description,omitempty"`
+	Comment          string                `json:"comment,omitempty"`
+	Properties       []TwinProperty        `json:"properties,omitempty"`
+	Commands         []TwinCommand         `json:"commands,omitempty"`
+	Relationships    []TwinRelationship    `json:"relationships,omitempty"`
+	Telemetries      []TwinTelemetry       `json:"telemetries,omitempty"`
+	ExtendsInterface string                `json:"extendsInterface,omitempty"`
+	Service          *TwinInterfaceService `json:"service,omitempty"` // Must be a pointer because Containers[] field is required
+}
+
+type TwinInterfaceService struct {
+	Template corev1.PodTemplateSpec `json:"template,omitempty"`
 }
 
 type TwinProperty struct {

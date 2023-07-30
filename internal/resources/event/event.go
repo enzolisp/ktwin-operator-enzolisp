@@ -5,9 +5,7 @@ import (
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	broker "ktwin/operator/internal/resources/broker"
 	eventStore "ktwin/operator/internal/resources/event-store"
-	"reflect"
 
-	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -212,5 +210,5 @@ func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing
 }
 
 func (*twinEvent) hasContainerInTwinInterface(twinInterface *dtdv0.TwinInterface) bool {
-	return !reflect.DeepEqual(twinInterface.Spec.Template, corev1.PodTemplateSpec{})
+	return twinInterface.Spec.Service != nil
 }

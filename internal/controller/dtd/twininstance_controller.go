@@ -25,7 +25,6 @@ import (
 	twinservice "ktwin/operator/internal/resources/service"
 
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
-	kServing "knative.dev/serving/pkg/apis/serving/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -93,15 +92,6 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	var resultErrors []error
 	logger := log.FromContext(ctx)
 
-	// Create Service Instance
-	kService := r.TwinService.GetService(twinInterface)
-	err := r.Create(ctx, kService, &client.CreateOptions{})
-
-	if err != nil && !errors.IsAlreadyExists(err) {
-		logger.Error(err, fmt.Sprintf("Error while creating Knative Service %s", twinInterfaceName))
-		resultErrors = append(resultErrors, err)
-	}
-
 	// Create MQTT Integrators
 	// mqttIntegrators := r.TwinMqttIntegrator.GetIntegrators(twinInstance)
 	// for _, integrator := range *mqttIntegrators {
@@ -136,7 +126,7 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	}
 
 	// Update Status for Running or Failed
-	_, err = r.updateTwinInstance(ctx, req, twinInstance)
+	_, err := r.updateTwinInstance(ctx, req, twinInstance)
 
 	if err != nil {
 		return ctrl.Result{}, nil
@@ -161,32 +151,6 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 	var errorsResult []error
 	logger := log.FromContext(ctx)
 
-	// Create Service Instance
-	deletionServiceLabels := r.TwinService.GetServiceDeletionCriteria(namespacedName)
-
-	kServiceList := kServing.ServiceList{}
-	kServiceListOptions := []client.ListOption{
-		client.InNamespace(namespacedName.Namespace),
-		client.MatchingLabels(deletionServiceLabels),
-	}
-
-	err := r.List(ctx, &kServiceList, kServiceListOptions...)
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while getting services to be deleted %s", namespacedName.Name))
-		return ctrl.Result{}, err
-	}
-
-	for _, kService := range kServiceList.Items {
-		err := r.Delete(ctx, &kService, &client.DeleteOptions{})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				logger.Error(err, fmt.Sprintf("Error while deleting Knative Service %s", namespacedName.Name))
-				errorsResult = append(errorsResult, err)
-			}
-		}
-	}
-
 	// Delete MQTT Integrators
 	// integrators := r.TwinMqttIntegrator.GetDeletionIntegrator(namespacedName)
 	// for _, integrator := range *integrators {
@@ -206,7 +170,7 @@ func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctr
 		client.MatchingLabels(deletionTriggerLabels),
 	}
 
-	err = r.List(ctx, &triggerList, triggerListOptions...)
+	err := r.List(ctx, &triggerList, triggerListOptions...)
 
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Error while getting triggers %s", namespacedName.Name))

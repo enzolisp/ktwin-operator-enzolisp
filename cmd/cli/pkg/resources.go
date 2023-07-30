@@ -79,14 +79,16 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 			Commands:         commands,
 			Telemetries:      telemetries,
 			ExtendsInterface: interfaceExtends,
-			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{Containers: []corev1.Container{
-					{
-						Name:            normalizedInterfaceId,
-						Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
-						ImagePullPolicy: corev1.PullIfNotPresent,
-					},
-				}},
+			Service: &apiv0.TwinInterfaceService{
+				Template: corev1.PodTemplateSpec{
+					Spec: corev1.PodSpec{Containers: []corev1.Container{
+						{
+							Name:            normalizedInterfaceId,
+							Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
+							ImagePullPolicy: corev1.PullIfNotPresent,
+						},
+					}},
+				},
 			},
 		},
 	}

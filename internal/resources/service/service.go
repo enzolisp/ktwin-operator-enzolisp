@@ -32,7 +32,7 @@ func (e *twinService) GetServiceDeletionCriteria(namespacedName types.Namespaced
 
 func (t *twinService) GetService(twinInterface *dtdv0.TwinInterface) *kserving.Service {
 	twinInterfaceName := twinInterface.ObjectMeta.Name
-	podSpec := twinInterface.Spec.Template.Spec
+	podSpec := twinInterface.Spec.Service.Template.Spec
 
 	service := &kserving.Service{
 		TypeMeta: v1.TypeMeta{

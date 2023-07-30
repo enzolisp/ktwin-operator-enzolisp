@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 
+	kServing "knative.dev/serving/pkg/apis/serving/v1"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -28,12 +30,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	dtdv0 "ktwin/operator/api/dtd/v0"
+	twinservice "ktwin/operator/internal/resources/service"
 )
 
 // TwinInterfaceReconciler reconciles a TwinInterface object
 type TwinInterfaceReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme      *runtime.Scheme
+	TwinService twinservice.TwinService
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininterfaces,verbs=get;list;watch;create;update;patch;delete
@@ -71,6 +75,33 @@ func (r *TwinInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 func (r *TwinInterfaceReconciler) deleteTwinInterface(ctx context.Context, req ctrl.Request, namespacedName types.NamespacedName) (ctrl.Result, error) {
 	var errorsResult []error
+	logger := log.FromContext(ctx)
+
+	// Create Service Instance
+	deletionServiceLabels := r.TwinService.GetServiceDeletionCriteria(namespacedName)
+
+	kServiceList := kServing.ServiceList{}
+	kServiceListOptions := []client.ListOption{
+		client.InNamespace(namespacedName.Namespace),
+		client.MatchingLabels(deletionServiceLabels),
+	}
+
+	err := r.List(ctx, &kServiceList, kServiceListOptions...)
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while getting services to be deleted %s", namespacedName.Name))
+		return ctrl.Result{}, err
+	}
+
+	for _, kService := range kServiceList.Items {
+		err := r.Delete(ctx, &kService, &client.DeleteOptions{})
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				logger.Error(err, fmt.Sprintf("Error while deleting Knative Service %s", namespacedName.Name))
+				errorsResult = append(errorsResult, err)
+			}
+		}
+	}
 
 	if len(errorsResult) > 0 {
 		return ctrl.Result{}, errorsResult[0]
@@ -79,8 +110,49 @@ func (r *TwinInterfaceReconciler) deleteTwinInterface(ctx context.Context, req c
 	return ctrl.Result{}, nil
 }
 
-func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInterface) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {
+	twinInterfaceName := twinInterface.ObjectMeta.Name
+
+	var resultErrors []error
+	logger := log.FromContext(ctx)
+
+	// Create Service Instance if pod is specified
+	if twinInterface.Spec.Service != nil {
+		kService := r.TwinService.GetService(twinInterface)
+		err := r.Create(ctx, kService, &client.CreateOptions{})
+
+		if err != nil && !errors.IsAlreadyExists(err) {
+			logger.Error(err, fmt.Sprintf("Error while creating Knative Service %s", twinInterfaceName))
+			resultErrors = append(resultErrors, err)
+		}
+	}
+
+	if len(resultErrors) > 0 {
+		twinInterface.Status.Status = dtdv0.TwinInterfacePhaseFailed
+		return ctrl.Result{}, resultErrors[0]
+	} else {
+		twinInterface.Status.Status = dtdv0.TwinInterfacePhaseRunning
+	}
+
+	// Update Status for Running or Failed
+	_, err := r.updateTwinInterface(ctx, req, twinInterface)
+
+	if err != nil {
+		return ctrl.Result{}, nil
+	}
+
+	return ctrl.Result{}, nil
+}
+
+func (r *TwinInterfaceReconciler) updateTwinInterface(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+	err := r.Update(ctx, twinInterface, &client.UpdateOptions{})
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while updating TwinInterface %s", twinInterface.ObjectMeta.Name))
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
 }
 

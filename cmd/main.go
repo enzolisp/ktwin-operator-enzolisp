@@ -105,8 +105,9 @@ func main() {
 	}
 
 	if err = (&dtdcontroller.TwinInterfaceReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:      mgr.GetClient(),
+		Scheme:      mgr.GetScheme(),
+		TwinService: service.NewTwinService(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInterface")
 		os.Exit(1)
