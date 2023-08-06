@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	twinevent "ktwin/operator/internal/resources/event"
-	twinintegrator "ktwin/operator/internal/resources/integrator"
 	twinservice "ktwin/operator/internal/resources/service"
 
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -39,10 +38,9 @@ import (
 // TwinInstanceReconciler reconciles a TwinInstance object
 type TwinInstanceReconciler struct {
 	client.Client
-	Scheme             *runtime.Scheme
-	TwinService        twinservice.TwinService
-	TwinEvent          twinevent.TwinEvent
-	TwinMqttIntegrator twinintegrator.TwinIntegrator
+	Scheme      *runtime.Scheme
+	TwinService twinservice.TwinService
+	TwinEvent   twinevent.TwinEvent
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete

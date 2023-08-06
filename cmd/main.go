@@ -36,7 +36,6 @@ import (
 	corecontroller "ktwin/operator/internal/controller/core"
 	dtdcontroller "ktwin/operator/internal/controller/dtd"
 	"ktwin/operator/internal/resources/event"
-	"ktwin/operator/internal/resources/integrator"
 	"ktwin/operator/internal/resources/service"
 
 	camelv1 "github.com/apache/camel-k/pkg/apis/camel/v1"
@@ -114,11 +113,10 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&dtdcontroller.TwinInstanceReconciler{
-		Client:             mgr.GetClient(),
-		Scheme:             mgr.GetScheme(),
-		TwinService:        service.NewTwinService(),
-		TwinEvent:          event.NewTwinEvent(),
-		TwinMqttIntegrator: integrator.NewTwinIntegrator(),
+		Client:      mgr.GetClient(),
+		Scheme:      mgr.GetScheme(),
+		TwinService: service.NewTwinService(),
+		TwinEvent:   event.NewTwinEvent(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInstance")
 		os.Exit(1)
