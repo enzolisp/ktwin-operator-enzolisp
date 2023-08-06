@@ -33,7 +33,35 @@
     - Application receives a synchronous or asynchronous request
       - External Entity (asynchronous only)
       - Virtual Entity (Command): synchronous or asynchronous request from another TwinInstance that has a relationship with.
+        - Why would a Virtual Entity call another Virtual Entity? To get its last states? It can call event-store for this.
+        - URLs of relationships can be added to the environment variables of the container (this can be done by the container).
+        - Configure initial state of instances
     - How to send the response back? It is the user responsability to post the message in the broker with the right event type header.
       - How to convert message response -> Broker - MQTT/AMQP?
 
+- Functions:
+func deploy --remote --git-url=https://github.com/agwermann/pole-function
+
+Must install telko
+
 - UI to view components created.
+
+Poste tem containers. Agrega o dado dos sensores.
+Qualidade do ar da região.
+
+Menor quantidade de containers.
+- Function (permite escalar melhor)
+
+Definir uma cidade com ruas, postes e estacionamentos.
+
+Any Trigger:
+https://github.com/knative/eventing/blob/ffa591593417f3e879a4834ddb87cc13e6cd3e05/pkg/apis/eventing/v1/trigger_types.go#L135
+
+- Sensores que variam com o tempo (bursts). Sensores de estacionamentos. Eficiência (criar menos pods).
+- Como diminuir número triggers.
+- Reduzir número de pods containers e triggers.
+  - Receber mensagens em containers mais alto nível.
+  - 1-1 Containers: 1 container (N postes)
+
+- Mover imagem para TwinInterface
+- Image precisa identificar qual é o poste que a mensagem
