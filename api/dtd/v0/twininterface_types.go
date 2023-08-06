@@ -110,6 +110,7 @@ type TwinRelationship struct {
 	Target          string         `json:"target,omitempty"`
 	Schema          *TwinSchema    `json:"schema,omitempty"`
 	Writeable       bool           `json:"writeable,omitempty"`
+	AggregateData   bool           `json:"aggregateData,omitempty"`
 }
 
 type TwinTelemetry struct {

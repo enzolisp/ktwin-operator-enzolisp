@@ -108,6 +108,7 @@ func main() {
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		TwinService: service.NewTwinService(),
+		TwinEvent:   event.NewTwinEvent(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInterface")
 		os.Exit(1)

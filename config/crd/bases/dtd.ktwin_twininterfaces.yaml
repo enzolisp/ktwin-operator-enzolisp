@@ -166,6 +166,8 @@ spec:
               relationships:
                 items:
                   properties:
+                    aggregateData:
+                      type: boolean
                     comment:
                       type: string
                     description:
