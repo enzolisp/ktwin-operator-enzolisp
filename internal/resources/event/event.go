@@ -159,7 +159,7 @@ func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing
 	for _, eventType := range triggerParameters.eventTypes {
 		eventTypeFilters = append(eventTypeFilters, kEventing.SubscriptionsAPIFilter{
 			Exact: map[string]string{
-				"type": eventType,
+				"type" + eventType: eventType,
 			},
 		})
 	}
@@ -176,11 +176,17 @@ func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing
 		},
 		Spec: kEventing.TriggerSpec{
 			Broker: triggerParameters.brokerName,
-			Filters: []kEventing.SubscriptionsAPIFilter{
-				{
-					Any: eventTypeFilters,
+			Filter: &kEventing.TriggerFilter{
+				Attributes: map[string]string{
+					"type": triggerParameters.eventTypes[0],
 				},
 			},
+			// TODO: review filters for relationship event messages
+			// Filters: []kEventing.SubscriptionsAPIFilter{
+			// 	{
+			// 		Any: eventTypeFilters,
+			// 	},
+			// },
 			Subscriber: duckv1.Destination{
 				Ref: &duckv1.KReference{
 					Kind:       "Service",
