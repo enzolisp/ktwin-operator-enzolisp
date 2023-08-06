@@ -6,6 +6,7 @@ import (
 	broker "ktwin/operator/pkg/broker"
 	eventStore "ktwin/operator/pkg/event-store"
 
+	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -25,6 +26,7 @@ func NewTwinEvent() TwinEvent {
 
 type TwinEvent interface {
 	GetTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
+	GetRelationshipBindings(twinInterface *dtdv0.TwinInterface) (*rabbitmqv1beta1.Binding, error)
 	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
@@ -35,7 +37,7 @@ type triggerParameters struct {
 	triggerName   string
 	namespace     string
 	brokerName    string
-	eventTypes    []string
+	eventType     string
 	subscriber    string
 }
 
@@ -73,6 +75,24 @@ func (e *twinEvent) GetTriggersDeletionFilterCriteria(namespacedName types.Names
 	return e.getTriggerLabels(namespacedName.Name)
 }
 
+// Knative Triggers do not allow to route multiple events `types` to the same dispatcher service
+// The New Trigger filters feature should provide this feature, but it is not yet developed in RabbitMQ Broker resources
+// https://knative.dev/docs/eventing/experimental-features/new-trigger-filters
+// In order to reduce the number of pods created in KTWIN cluster, we will be creating only one dispatcher per TwinInterface.
+// In case multiple event types needs to be routed to the same dispatcher/TwinInterface KService (twin relationship scenario),
+// KTWIN creates Binding resources using rabbitmq/messaging-topology-operator and redirect those messages to the same Knative dispatcher.
+// This can be revisit when Knative has this feature available out-of-the-box in RabbitMQ Broker
+func (e *twinEvent) GetRelationshipBindings(twinInterface *dtdv0.TwinInterface) (*rabbitmqv1beta1.Binding, error) {
+	eventTypes := []string{}
+	// Relationship event
+	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
+		if twinInterfaceRelationship.AggregateData {
+			eventTypes = append(eventTypes, e.getEventTypeRealGenerated(twinInterfaceRelationship.Target))
+		}
+	}
+	return nil, nil
+}
+
 func (e *twinEvent) GetTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger {
 	var twinTriggers []kEventing.Trigger
 	var trigger kEventing.Trigger
@@ -82,23 +102,14 @@ func (e *twinEvent) GetTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.
 
 	// If TwinInstance has container associated, create the triggers
 	if e.hasContainerInTwinInterface(twinInterface) {
-		eventTypes := []string{}
-
 		// Real Twin Event Type
-		eventTypes = append(eventTypes, e.getEventTypeRealGenerated(twinInterface.Name))
-
-		// Relationship event
-		for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
-			if twinInterfaceRelationship.AggregateData {
-				eventTypes = append(eventTypes, e.getEventTypeRealGenerated(twinInterfaceRelationship.Target))
-			}
-		}
+		twinInterfaceEventType := e.getEventTypeRealGenerated(twinInterface.Name)
 
 		trigger = e.createTrigger(triggerParameters{
 			triggerName:   e.getTwinInterfaceTrigger(twinInterface.Name),
 			namespace:     twinInterface.Namespace,
 			brokerName:    broker.EVENT_BROKER_NAME,
-			eventTypes:    eventTypes,
+			eventType:     twinInterfaceEventType,
 			subscriber:    virtualTwinService,
 			interfaceName: twinInterface.Name,
 		})
@@ -111,7 +122,7 @@ func (e *twinEvent) GetTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.
 		triggerName:   e.getRealToEventStoreTriggerName(twinInterface.Name),
 		namespace:     twinInterface.Namespace,
 		brokerName:    broker.EVENT_BROKER_NAME,
-		eventTypes:    []string{e.getEventTypeRealGenerated(twinInterface.Name)},
+		eventType:     e.getEventTypeRealGenerated(twinInterface.Name),
 		subscriber:    eventStore.EVENT_STORE_SERVICE,
 		interfaceName: twinInterface.Name,
 	})
@@ -122,7 +133,7 @@ func (e *twinEvent) GetTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.
 		triggerName:   e.getVirtualToEventStoreTriggerName(twinInterface.Name),
 		namespace:     twinInterface.Namespace,
 		brokerName:    broker.EVENT_BROKER_NAME,
-		eventTypes:    []string{e.getEventTypeVirtualGenerated(twinInterface.Name)},
+		eventType:     e.getEventTypeVirtualGenerated(twinInterface.Name),
 		subscriber:    eventStore.EVENT_STORE_SERVICE,
 		interfaceName: twinInterface.Name,
 	})
@@ -154,16 +165,6 @@ func (e *twinEvent) populateTwinInstanceEventStructure(twinInstance *dtdv0.TwinI
 }
 
 func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.Trigger {
-	eventTypeFilters := []kEventing.SubscriptionsAPIFilter{}
-
-	for _, eventType := range triggerParameters.eventTypes {
-		eventTypeFilters = append(eventTypeFilters, kEventing.SubscriptionsAPIFilter{
-			Exact: map[string]string{
-				"type" + eventType: eventType,
-			},
-		})
-	}
-
 	return kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Trigger",
@@ -178,15 +179,9 @@ func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing
 			Broker: triggerParameters.brokerName,
 			Filter: &kEventing.TriggerFilter{
 				Attributes: map[string]string{
-					"type": triggerParameters.eventTypes[0],
+					"type": triggerParameters.eventType,
 				},
 			},
-			// TODO: review filters for relationship event messages
-			// Filters: []kEventing.SubscriptionsAPIFilter{
-			// 	{
-			// 		Any: eventTypeFilters,
-			// 	},
-			// },
 			Subscriber: duckv1.Destination{
 				Ref: &duckv1.KReference{
 					Kind:       "Service",
