@@ -10,11 +10,6 @@ KNATIVE_RABBITMQ_BROKER_VERSION=v1.9.1
 
 ### Execute Installation scripts
 
-# MQTT Deployment
-kubectl create namespace default
-kubectl apply -f ${SCRIPT_PATH}/mosquitto --namespace default
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace default
-
 # RabbitMQ Cluster
 kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/download/${RABBITMQ_VERSION}/cluster-operator.yml
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace rabbitmq-system
