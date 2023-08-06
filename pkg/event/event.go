@@ -3,8 +3,8 @@ package event
 import (
 	"fmt"
 	dtdv0 "ktwin/operator/api/dtd/v0"
-	broker "ktwin/operator/internal/resources/broker"
-	eventStore "ktwin/operator/internal/resources/event-store"
+	broker "ktwin/operator/pkg/broker"
+	eventStore "ktwin/operator/pkg/event-store"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

@@ -20,8 +20,8 @@ import (
 	"context"
 	"fmt"
 
-	twinevent "ktwin/operator/internal/resources/event"
-	twinservice "ktwin/operator/internal/resources/service"
+	twinevent "ktwin/operator/pkg/event"
+	twinservice "ktwin/operator/pkg/service"
 
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 

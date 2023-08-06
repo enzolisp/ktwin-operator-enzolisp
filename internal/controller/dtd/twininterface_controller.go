@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	dtdv0 "ktwin/operator/api/dtd/v0"
-	twinevent "ktwin/operator/internal/resources/event"
-	twinservice "ktwin/operator/internal/resources/service"
+	twinevent "ktwin/operator/pkg/event"
+	twinservice "ktwin/operator/pkg/service"
 )
 
 // TwinInterfaceReconciler reconciles a TwinInterface object

@@ -35,8 +35,8 @@ import (
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	corecontroller "ktwin/operator/internal/controller/core"
 	dtdcontroller "ktwin/operator/internal/controller/dtd"
-	"ktwin/operator/internal/resources/event"
-	"ktwin/operator/internal/resources/service"
+	"ktwin/operator/pkg/event"
+	"ktwin/operator/pkg/service"
 
 	camelv1 "github.com/apache/camel-k/pkg/apis/camel/v1"
 	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
