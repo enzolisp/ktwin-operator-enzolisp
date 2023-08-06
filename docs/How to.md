@@ -21,3 +21,9 @@ Run the following command to expose MQTT port:
 ```sh
 kubectl port-forward --address 0.0.0.0 svc/rabbitmq 1883:1883
 ```
+
+Run the following command to expose AMQP port:
+
+```sh
+kubectl port-forward --address 0.0.0.0 svc/rabbitmq 5672:5672
+```
