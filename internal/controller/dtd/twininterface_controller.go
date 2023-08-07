@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kServing "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -154,17 +155,66 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
-		// Create Triggers
-		triggers := r.TwinEvent.GetTriggers(twinInterface)
-
-		for _, trigger := range triggers {
-			err := r.Create(ctx, &trigger, &client.CreateOptions{})
-			if err != nil && !errors.IsAlreadyExists(err) {
-				logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInterfaceName))
-				resultErrors = append(resultErrors, err)
-			}
+		// Create Trigger
+		trigger := r.TwinEvent.GetTwinInterfaceTrigger(twinInterface)
+		err = r.Create(ctx, &trigger, &client.CreateOptions{})
+		if err != nil && !errors.IsAlreadyExists(err) {
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInterfaceName))
+			resultErrors = append(resultErrors, err)
 		}
 
+		// Create Relationship RabbitMQ bindings to existing Queue and Eventing
+		// RabbitMQ exchange (Broker): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/broker/broker.go#L133
+		// RabbitMQ Queue (Trigger): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/trigger/trigger.go#L233
+		// Deletion: Can use ownerReferences for deletion in cascade
+
+		exchangeList := rabbitmqv1beta1.ExchangeList{}
+		exchangeListOptions := []client.ListOption{
+			client.InNamespace(twinInterface.Namespace),
+			client.MatchingLabels(client.MatchingFields{
+				"eventing.knative.dev/broker": "default",
+			}),
+		}
+
+		err = r.List(ctx, &exchangeList, exchangeListOptions...)
+
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("No Broker Exchange found"))
+			resultErrors = append(resultErrors, err)
+		}
+
+		if len(exchangeList.Items) == 0 {
+			logger.Error(err, fmt.Sprintf("No Broker Exchange found for TwinInterface %s", twinInterfaceName))
+			resultErrors = append(resultErrors, err)
+		} else {
+			queueList := rabbitmqv1beta1.QueueList{}
+			queueListOptions := []client.ListOption{
+				client.InNamespace(twinInterface.Namespace),
+				client.MatchingLabels(client.MatchingFields{
+					"eventing.knative.dev/broker":  "default",
+					"eventing.knative.dev/trigger": twinInterface.Name,
+				}),
+			}
+
+			err = r.List(ctx, &queueList, queueListOptions...)
+
+			if len(queueList.Items) == 0 {
+				logger.Error(err, fmt.Sprintf("No Broker Queue found for TwinInterface %s", twinInterfaceName))
+				resultErrors = append(resultErrors, err)
+			} else {
+				brokerExchange := exchangeList.Items[0]
+				twinInterfaceQueue := queueList.Items[0]
+				bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, trigger, brokerExchange, twinInterfaceQueue)
+
+				for _, binding := range bindings {
+					err = r.Create(ctx, &binding, &client.CreateOptions{})
+					if err != nil && !errors.IsAlreadyExists(err) {
+						logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+						resultErrors = append(resultErrors, err)
+					}
+				}
+			}
+		}
 	}
 
 	if len(resultErrors) > 0 {

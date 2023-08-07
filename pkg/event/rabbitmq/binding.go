@@ -18,7 +18,7 @@ const (
 type BindingArgs struct {
 	Name                     string
 	Namespace                string
-	Owner                    metav1.OwnerReference
+	Owner                    []metav1.OwnerReference
 	RabbitmqClusterReference *rabbitmqv1beta1.RabbitmqClusterReference
 	RabbitMQVhost            string
 	Source                   string
@@ -28,7 +28,7 @@ type BindingArgs struct {
 	ClusterName              string
 }
 
-func NewBinding(args BindingArgs) (*rabbitmqv1beta1.Binding, error) {
+func NewBinding(args BindingArgs) (rabbitmqv1beta1.Binding, error) {
 	if args.Filters == nil {
 		args.Filters = map[string]string{}
 	}
@@ -36,14 +36,14 @@ func NewBinding(args BindingArgs) (*rabbitmqv1beta1.Binding, error) {
 
 	argumentsJson, err := json.Marshal(args.Filters)
 	if err != nil {
-		return nil, fmt.Errorf("failed to encode binding arguments %+v : %s", argumentsJson, err)
+		return rabbitmqv1beta1.Binding{}, fmt.Errorf("failed to encode binding arguments %+v : %s", argumentsJson, err)
 	}
 
-	binding := &rabbitmqv1beta1.Binding{
+	binding := rabbitmqv1beta1.Binding{
 		ObjectMeta: v1.ObjectMeta{
 			Name:            args.Name,
 			Namespace:       args.Namespace,
-			OwnerReferences: []v1.OwnerReference{args.Owner},
+			OwnerReferences: args.Owner,
 			Labels:          args.Labels,
 		},
 		Spec: rabbitmqv1beta1.BindingSpec{
