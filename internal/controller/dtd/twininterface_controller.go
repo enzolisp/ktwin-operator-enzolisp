@@ -163,6 +163,13 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
+		// Get Created Trigger
+		err = r.Get(ctx, types.NamespacedName{Namespace: trigger.Namespace, Name: trigger.Name}, &trigger, &client.GetOptions{})
+		if err != nil && !errors.IsAlreadyExists(err) {
+			logger.Error(err, fmt.Sprintf("Error while getting trigger %s", trigger.Name))
+			resultErrors = append(resultErrors, err)
+		}
+
 		// Create Relationship RabbitMQ bindings to existing Queue and Eventing
 		// RabbitMQ exchange (Broker): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/broker/broker.go#L133
 		// RabbitMQ Queue (Trigger): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/trigger/trigger.go#L233
@@ -179,7 +186,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		err = r.List(ctx, &exchangeList, exchangeListOptions...)
 
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("No Broker Exchange found"))
+			logger.Error(err, fmt.Sprintf("Error while getting default broker exchange"))
 			resultErrors = append(resultErrors, err)
 		}
 

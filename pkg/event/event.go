@@ -5,6 +5,7 @@ import (
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	broker "ktwin/operator/pkg/broker"
 	"ktwin/operator/pkg/event/rabbitmq"
+	"strings"
 
 	"github.com/google/uuid"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
@@ -87,8 +88,9 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 
 	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
 		if twinInterfaceRelationship.AggregateData {
+
 			binding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-				Name:      twinInterface.Name + "-" + twinInterfaceRelationship.Name + "-" + uuid.NewString(),
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-" + uuid.NewString(),
 				Namespace: twinInterface.Namespace,
 				Labels: map[string]string{
 					"ktwin/twin-interface":         twinInterface.Name,
@@ -107,12 +109,12 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 						Name:       twinInterface.Name,
 						UID:        twinInterface.UID,
 					},
-					{
-						APIVersion: twinInterfaceTrigger.APIVersion,
-						Kind:       twinInterfaceTrigger.Kind,
-						Name:       twinInterfaceTrigger.Name,
-						UID:        twinInterfaceTrigger.UID,
-					},
+					// {
+					// 	APIVersion: twinInterfaceTrigger.APIVersion,
+					// 	Kind:       twinInterfaceTrigger.Kind,
+					// 	Name:       twinInterfaceTrigger.Name,
+					// 	UID:        twinInterfaceTrigger.UID,
+					// },
 				},
 				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 					Name:      "rabbitmq",
