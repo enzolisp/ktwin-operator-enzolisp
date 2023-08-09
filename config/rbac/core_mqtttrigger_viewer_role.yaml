@@ -1,0 +1,27 @@
+# permissions for end users to view mqtttriggers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: mqtttrigger-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: ktwin-operator
+    app.kubernetes.io/part-of: ktwin-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: mqtttrigger-viewer-role
+rules:
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers/status
+  verbs:
+  - get

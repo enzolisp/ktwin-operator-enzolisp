@@ -32,6 +32,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - dtd.ktwin
   resources:
   - twininstances
