@@ -23,8 +23,9 @@ type BindingArgs struct {
 	RabbitMQVhost            string
 	Source                   string
 	Destination              string
-	Labels                   map[string]string
+	RoutingKey               string
 	Filters                  map[string]string
+	Labels                   map[string]string
 	ClusterName              string
 }
 
