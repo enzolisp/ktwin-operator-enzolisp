@@ -134,10 +134,15 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 	}
 
 	// Create Cloud Event Dispatcher
+	ceDispatcherQueue := r.getCloudEventDispatcherQueue(mqttTrigger)
 	ceDispacherDeployment := r.getCloudEventDispatcherDeployment(mqttTrigger, rabbitMQSecret)
 	ceDispacherService := r.geCloudEventDispatcherService(mqttTrigger)
 
-	// Create Cloud Event Dispatcher queue
+	err = r.Create(ctx, ceDispatcherQueue, &client.CreateOptions{})
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while creating cloud event dispatcher queue %s", mqttTrigger.Name))
+		return ctrl.Result{}, err
+	}
 
 	err = r.Create(ctx, &ceDispacherDeployment, &client.CreateOptions{})
 	if err != nil {
@@ -192,7 +197,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherBinding(mqttTrigger corev0.MQTT
 			Namespace: "default",
 		},
 		RabbitMQVhost: "/",
-		Source:        "amqp.topic",
+		Source:        "amq.topic",
 		Destination:   MQTT_DISPATCHER_QUEUE,
 		Labels:        map[string]string{},
 		RoutingKey:    "ktwin.real.*",
@@ -298,22 +303,24 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 }
 
 func (r *MQTTTriggerReconciler) getCloudEventDispatcherQueue(mqttTrigger corev0.MQTTTrigger) *rabbitmqv1beta1.Queue {
-	return &rabbitmqv1beta1.Queue{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      CLOUD_EVENT_DISPATCHER_QUEUE,
+	args := &rabbitmq.QueueArgs{
+		Name:          CLOUD_EVENT_DISPATCHER_QUEUE,
+		Namespace:     mqttTrigger.Namespace,
+		QueueName:     CLOUD_EVENT_DISPATCHER_QUEUE,
+		RabbitMQVhost: "/",
+		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+			Name:      "rabbitmq",
 			Namespace: mqttTrigger.Namespace,
 		},
-		Spec: rabbitmqv1beta1.QueueSpec{
-			Name:    CLOUD_EVENT_DISPATCHER_QUEUE,
-			Durable: true,
-			Vhost:   "/",
-			Type:    "quorum",
-			RabbitmqClusterReference: rabbitmqv1beta1.RabbitmqClusterReference{
-				Name:      "rabbitmq",
-				Namespace: "default",
-			},
+		Owner: metav1.OwnerReference{
+			APIVersion: mqttTrigger.APIVersion,
+			Kind:       mqttTrigger.Kind,
+			Name:       mqttTrigger.ObjectMeta.Name,
+			UID:        mqttTrigger.ObjectMeta.UID,
 		},
+		Labels: map[string]string{},
 	}
+	return rabbitmq.NewQueue(args)
 }
 
 func (r *MQTTTriggerReconciler) getMQQTDispatcherService(mqttTrigger corev0.MQTTTrigger) v1.Service {

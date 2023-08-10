@@ -52,7 +52,7 @@ func NewBinding(args BindingArgs) (rabbitmqv1beta1.Binding, error) {
 			Source:          args.Source,
 			Destination:     args.Destination,
 			DestinationType: "queue",
-			RoutingKey:      "",
+			RoutingKey:      args.RoutingKey,
 			Arguments: &runtime.RawExtension{
 				Raw: argumentsJson,
 			},
