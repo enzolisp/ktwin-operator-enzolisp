@@ -86,11 +86,46 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 ) []rabbitmqv1beta1.Binding {
 	rabbitMQBindings := []rabbitmqv1beta1.Binding{}
 
+	virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+		Name:      strings.ToLower(twinInterface.Name) + "-virtual-" + uuid.NewString(),
+		Namespace: twinInterface.Namespace,
+		Labels: map[string]string{
+			"ktwin/twin-interface":         twinInterface.Name,
+			"eventing.knative.dev/trigger": twinInterface.Name,
+		},
+		Filters: map[string]string{
+			"type":              e.getEventTypeVirtualGenerated(twinInterface.Name),
+			"x-knative-trigger": twinInterface.Name,
+		},
+		RabbitMQVhost: "/",
+		Owner: []v1.OwnerReference{
+			{
+				APIVersion: twinInterface.APIVersion,
+				Kind:       twinInterface.Kind,
+				Name:       twinInterface.Name,
+				UID:        twinInterface.UID,
+			},
+			{
+				APIVersion: twinInterfaceTrigger.APIVersion,
+				Kind:       twinInterfaceTrigger.Kind,
+				Name:       twinInterfaceTrigger.Name,
+				UID:        twinInterfaceTrigger.UID,
+			},
+		},
+		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+			Name:      "rabbitmq",
+			Namespace: "default",
+		},
+		Source:      brokerExchange.Spec.Name,       // broker exchange
+		Destination: "cloud-event-dispatcher-queue", // trigger queue
+	})
+
+	rabbitMQBindings = append(rabbitMQBindings, virtualEventBinding)
+
 	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
 		if twinInterfaceRelationship.AggregateData {
-
-			binding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-" + uuid.NewString(),
+			realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-real-" + uuid.NewString(),
 				Namespace: twinInterface.Namespace,
 				Labels: map[string]string{
 					"ktwin/twin-interface":         twinInterface.Name,
@@ -98,6 +133,40 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 				},
 				Filters: map[string]string{
 					"type":              e.getEventTypeRealGenerated(twinInterfaceRelationship.Target),
+					"x-knative-trigger": twinInterface.Name,
+				},
+				RabbitMQVhost: "/",
+				Owner: []v1.OwnerReference{
+					{
+						APIVersion: twinInterface.APIVersion,
+						Kind:       twinInterface.Kind,
+						Name:       twinInterface.Name,
+						UID:        twinInterface.UID,
+					},
+					{
+						APIVersion: twinInterfaceTrigger.APIVersion,
+						Kind:       twinInterfaceTrigger.Kind,
+						Name:       twinInterfaceTrigger.Name,
+						UID:        twinInterfaceTrigger.UID,
+					},
+				},
+				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+					Name:      "rabbitmq",
+					Namespace: "default",
+				},
+				Source:      brokerExchange.Spec.Name,     // broker exchange
+				Destination: twinInterfaceQueue.Spec.Name, // trigger queue
+			})
+
+			virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-virtual-" + uuid.NewString(),
+				Namespace: twinInterface.Namespace,
+				Labels: map[string]string{
+					"ktwin/twin-interface":         twinInterface.Name,
+					"eventing.knative.dev/trigger": twinInterface.Name,
+				},
+				Filters: map[string]string{
+					"type":              e.getEventTypeVirtualGenerated(twinInterfaceRelationship.Target),
 					"x-knative-trigger": twinInterface.Name,
 				},
 				RabbitMQVhost: "/",
@@ -120,10 +189,12 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 					Name:      "rabbitmq",
 					Namespace: "default",
 				},
-				Source:      brokerExchange.Spec.Name,     // broker exchange
-				Destination: twinInterfaceQueue.Spec.Name, // trigger queue
+				Source:      brokerExchange.Spec.Name,       // broker exchange
+				Destination: "cloud-event-dispatcher-queue", // trigger queue
 			})
-			rabbitMQBindings = append(rabbitMQBindings, binding)
+
+			rabbitMQBindings = append(rabbitMQBindings, virtualEventBinding)
+			rabbitMQBindings = append(rabbitMQBindings, realEventBinding)
 		}
 	}
 
