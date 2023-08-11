@@ -105,19 +105,12 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 
 	// Create MQTT Dispatcher dependencies
 	mqttDispatcherQueue := r.getMQQTDispatcherQueue(mqttTrigger)
-	mqttDispatcherBinding, err := r.getMQQTDispatcherBinding(mqttTrigger)
 	mqttDispacherDeployment := r.getMQQTDispatcherDeployment(mqttTrigger, rabbitMQSecret, defaultBrokerExchange)
 	mqttDispacherService := r.getMQQTDispatcherService(mqttTrigger)
 
 	err = r.Create(ctx, mqttDispatcherQueue, &client.CreateOptions{})
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Error while creating mqtt dispatcher queue %s", mqttTrigger.Name))
-		return ctrl.Result{}, err
-	}
-
-	err = r.Create(ctx, &mqttDispatcherBinding, &client.CreateOptions{})
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while creating mqtt dispatcher binding %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
 
@@ -178,31 +171,6 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherQueue(mqttTrigger corev0.MQTTTr
 		Labels: map[string]string{},
 	}
 	return rabbitmq.NewQueue(args)
-}
-
-func (r *MQTTTriggerReconciler) getMQQTDispatcherBinding(mqttTrigger corev0.MQTTTrigger) (rabbitmqv1beta1.Binding, error) {
-	args := rabbitmq.BindingArgs{
-		Name:      "mqtt-dispatcher-binding",
-		Namespace: mqttTrigger.Namespace,
-		Owner: []metav1.OwnerReference{
-			{
-				APIVersion: mqttTrigger.APIVersion,
-				Kind:       mqttTrigger.Kind,
-				Name:       mqttTrigger.ObjectMeta.Name,
-				UID:        mqttTrigger.ObjectMeta.UID,
-			},
-		},
-		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
-			Name:      "rabbitmq",
-			Namespace: "default",
-		},
-		RabbitMQVhost: "/",
-		Source:        "amq.topic",
-		Destination:   MQTT_DISPATCHER_QUEUE,
-		Labels:        map[string]string{},
-		RoutingKey:    "ktwin.real.*",
-	}
-	return rabbitmq.NewBinding(args)
 }
 
 func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.MQTTTrigger, rabbitMQSecret v1.Secret, defaultBrokerExchange rabbitmqv1beta1.Exchange) appsv1.Deployment {

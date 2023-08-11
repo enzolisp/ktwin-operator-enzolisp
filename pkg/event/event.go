@@ -78,6 +78,42 @@ func (e *twinEvent) GetTriggersDeletionFilterCriteria(namespacedName types.Names
 	return e.getTriggerLabels(namespacedName.Name)
 }
 
+func (e *twinEvent) getMQQTDispatcherBinding(
+	twinInterface *dtdv0.TwinInterface,
+	twinInterfaceTrigger kEventing.Trigger,
+	brokerExchange rabbitmqv1beta1.Exchange,
+	twinInterfaceQueue rabbitmqv1beta1.Queue,
+) (rabbitmqv1beta1.Binding, error) {
+	args := rabbitmq.BindingArgs{
+		Name:      strings.ToLower(twinInterface.Name) + "-real-" + uuid.NewString(),
+		Namespace: twinInterface.Namespace,
+		Owner: []v1.OwnerReference{
+			{
+				APIVersion: twinInterface.APIVersion,
+				Kind:       twinInterface.Kind,
+				Name:       twinInterface.Name,
+				UID:        twinInterface.UID,
+			},
+			{
+				APIVersion: twinInterfaceTrigger.APIVersion,
+				Kind:       twinInterfaceTrigger.Kind,
+				Name:       twinInterfaceTrigger.Name,
+				UID:        twinInterfaceTrigger.UID,
+			},
+		},
+		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+			Name:      "rabbitmq",
+			Namespace: "default",
+		},
+		RabbitMQVhost: "/",
+		Source:        "amq.topic",
+		Destination:   "mqtt-dispatcher-queue",
+		Labels:        map[string]string{},
+		RoutingKey:    e.getEventTypeRealGenerated(twinInterface.Name),
+	}
+	return rabbitmq.NewBinding(args)
+}
+
 func (e *twinEvent) GetRelationshipBrokerBindings(
 	twinInterface *dtdv0.TwinInterface,
 	twinInterfaceTrigger kEventing.Trigger,
@@ -85,7 +121,6 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 	twinInterfaceQueue rabbitmqv1beta1.Queue,
 ) []rabbitmqv1beta1.Binding {
 	rabbitMQBindings := []rabbitmqv1beta1.Binding{}
-
 	virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
 		Name:      strings.ToLower(twinInterface.Name) + "-virtual-" + uuid.NewString(),
 		Namespace: twinInterface.Namespace,
@@ -96,6 +131,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 		Filters: map[string]string{
 			"type":              e.getEventTypeVirtualGenerated(twinInterface.Name),
 			"x-knative-trigger": twinInterface.Name,
+			"x-match":           "all",
 		},
 		RabbitMQVhost: "/",
 		Owner: []v1.OwnerReference{
@@ -122,6 +158,10 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 
 	rabbitMQBindings = append(rabbitMQBindings, virtualEventBinding)
 
+	realEventBinding, _ := e.getMQQTDispatcherBinding(twinInterface, twinInterfaceTrigger, brokerExchange, twinInterfaceQueue)
+
+	rabbitMQBindings = append(rabbitMQBindings, realEventBinding)
+
 	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
 		if twinInterfaceRelationship.AggregateData {
 			realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
@@ -134,6 +174,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 				Filters: map[string]string{
 					"type":              e.getEventTypeRealGenerated(twinInterfaceRelationship.Target),
 					"x-knative-trigger": twinInterface.Name,
+					"x-match":           "all",
 				},
 				RabbitMQVhost: "/",
 				Owner: []v1.OwnerReference{
@@ -168,6 +209,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 				Filters: map[string]string{
 					"type":              e.getEventTypeVirtualGenerated(twinInterfaceRelationship.Target),
 					"x-knative-trigger": twinInterface.Name,
+					"x-match":           "all",
 				},
 				RabbitMQVhost: "/",
 				// Check who is going to be owner

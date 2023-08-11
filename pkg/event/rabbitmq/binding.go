@@ -33,7 +33,6 @@ func NewBinding(args BindingArgs) (rabbitmqv1beta1.Binding, error) {
 	if args.Filters == nil {
 		args.Filters = map[string]string{}
 	}
-	args.Filters["x-match"] = "all"
 
 	argumentsJson, err := json.Marshal(args.Filters)
 	if err != nil {
