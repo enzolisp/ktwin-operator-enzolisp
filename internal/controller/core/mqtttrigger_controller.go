@@ -248,7 +248,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 									Value: "false",
 								},
 								{
-									Name:  "PUBLISHER_TOPIC",
+									Name:  "PUBLISHER_EXCHANGE",
 									Value: defaultBrokerExchange.Spec.Name,
 								},
 								{
@@ -399,7 +399,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 									Value: "false",
 								},
 								{
-									Name:  "PUBLISHER_TOPIC",
+									Name:  "PUBLISHER_EXCHANGE",
 									Value: "amqp.topic",
 								},
 								{
