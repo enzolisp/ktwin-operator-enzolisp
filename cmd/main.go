@@ -36,6 +36,7 @@ import (
 	corecontroller "ktwin/operator/internal/controller/core"
 	dtdcontroller "ktwin/operator/internal/controller/dtd"
 	"ktwin/operator/pkg/event"
+	eventStore "ktwin/operator/pkg/event-store"
 	"ktwin/operator/pkg/service"
 
 	camelv1 "github.com/apache/camel-k/pkg/apis/camel/v1"
@@ -135,6 +136,14 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MQTTTrigger")
+		os.Exit(1)
+	}
+	if err = (&corecontroller.EventStoreReconciler{
+		Client:     mgr.GetClient(),
+		Scheme:     mgr.GetScheme(),
+		EventStore: eventStore.NewEventStore(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "EventStore")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -45,4 +45,13 @@ resources:
   kind: MQTTTrigger
   path: ktwin/operator/api/core/v0
   version: v0
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: ktwin
+  group: core
+  kind: EventStore
+  path: ktwin/operator/api/core/v0
+  version: v0
 version: "3"

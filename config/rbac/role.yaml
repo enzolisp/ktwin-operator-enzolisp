@@ -8,6 +8,32 @@ rules:
 - apiGroups:
   - core.ktwin
   resources:
+  - eventstores
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
   - gateways
   verbs:
   - create

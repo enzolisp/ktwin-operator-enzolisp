@@ -103,4 +103,5 @@ kubebuilder create api --group dtd --version v0 --kind TwinInterface
 kubebuilder create api --group dtd --version v0 --kind TwinInstance
 kubebuilder create api --group core --version v0 --kind Gateway
 kubebuilder create api --group core --version v0 --kind MQTTTrigger
+kubebuilder create api --group core --version v0 --kind EventStore
 ```

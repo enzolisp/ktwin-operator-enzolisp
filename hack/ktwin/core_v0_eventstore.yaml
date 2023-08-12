@@ -1,0 +1,6 @@
+apiVersion: core.ktwin/v0
+kind: EventStore
+metadata:
+  labels:
+    app.kubernetes.io/name: event-store
+  name: event-store
