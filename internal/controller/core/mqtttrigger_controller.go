@@ -400,7 +400,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 								},
 								{
 									Name:  "PUBLISHER_EXCHANGE",
-									Value: "amqp.topic",
+									Value: "amq.topic",
 								},
 								{
 									Name:  "SUBSCRIBER_QUEUE",
