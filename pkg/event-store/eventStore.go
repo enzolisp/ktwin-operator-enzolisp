@@ -42,6 +42,14 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 			Labels: map[string]string{
 				"ktwin/event-store": eventStoreName,
 			},
+			OwnerReferences: []v1.OwnerReference{
+				{
+					APIVersion: eventStore.APIVersion,
+					Kind:       eventStore.Kind,
+					Name:       eventStore.ObjectMeta.Name,
+					UID:        eventStore.UID,
+				},
+			},
 		},
 		Spec: kserving.ServiceSpec{
 			ConfigurationSpec: kserving.ConfigurationSpec{
@@ -64,7 +72,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 									Env: []corev1.EnvVar{
 										{
 											Name:  "DB_HOST",
-											Value: "",
+											Value: "scylla-client.scylla.svc.cluster.local",
 										},
 										{
 											Name:  "DB_PASSWORD",
