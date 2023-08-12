@@ -1,6 +1,6 @@
 # KTWIN - Kubernetes-based Platform for Digital Twins
 
-KTWIN Operator implementation.
+KTWIN Operator manages the creation of KTWIN resources within the Kubernetes cluster.
 
 ## Description
 // TODO(user): An in-depth paragraph about your project and overview of use
