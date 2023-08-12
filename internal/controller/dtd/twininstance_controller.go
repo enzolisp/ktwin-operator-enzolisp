@@ -88,24 +88,17 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	twinInterfaceName := twinInstance.ObjectMeta.Name
 
 	var resultErrors []error
-	//logger := log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
-	// Get TwinInterface Trigger
+	bindings := r.TwinEvent.GetMQQTDispatcherBindings(twinInstance)
 
-	// Merge with new Trigger
-
-	// Get Event Store Trigger
-
-	// Create Triggers
-	// triggers := r.TwinEvent.GetTriggers(twinInstance, twinInterface)
-
-	// for _, trigger := range triggers {
-	// 	err := r.Create(ctx, &trigger, &client.CreateOptions{})
-	// 	if err != nil && !errors.IsAlreadyExists(err) {
-	// 		logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInterfaceName))
-	// 		resultErrors = append(resultErrors, err)
-	// 	}
-	// }
+	for _, binding := range bindings {
+		err := r.Create(ctx, &binding, &client.CreateOptions{})
+		if err != nil && !errors.IsAlreadyExists(err) {
+			logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+			resultErrors = append(resultErrors, err)
+		}
+	}
 
 	if len(resultErrors) > 0 {
 		twinInstance.Status.Status = dtdv0.TwinInstancePhaseFailed
