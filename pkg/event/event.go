@@ -4,7 +4,7 @@ import (
 	"fmt"
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	broker "ktwin/operator/pkg/broker"
-	"ktwin/operator/pkg/event/rabbitmq"
+	"ktwin/operator/pkg/third-party/rabbitmq"
 	"strings"
 
 	"github.com/google/uuid"

@@ -6,7 +6,7 @@ import (
 
 	corev0 "ktwin/operator/api/core/v0"
 	dtdv0 "ktwin/operator/api/dtd/v0"
-	knative "ktwin/operator/pkg/knative"
+	knative "ktwin/operator/pkg/third-party/knative"
 
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"

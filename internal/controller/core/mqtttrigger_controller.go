@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	corev0 "ktwin/operator/api/core/v0"
-	"ktwin/operator/pkg/event/rabbitmq"
+	"ktwin/operator/pkg/third-party/rabbitmq"
 
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
