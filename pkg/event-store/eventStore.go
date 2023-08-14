@@ -6,7 +6,9 @@ import (
 
 	corev0 "ktwin/operator/api/core/v0"
 	dtdv0 "ktwin/operator/api/dtd/v0"
+	knative "ktwin/operator/pkg/knative"
 
+	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 )
 
@@ -18,8 +20,12 @@ func NewEventStore() EventStore {
 	return &eventStore{}
 }
 
+// TODO: create binding for mqtt and cloud event
+
 type EventStore interface {
 	GetEventStoreService(eventStore *corev0.EventStore) *kserving.Service
+	GetEventStoreTrigger(eventStore *corev0.EventStore) kEventing.Trigger
+
 	CreateTwinInterface(twinInterface *dtdv0.TwinInstance) error
 	DeleteTwinInterface(twinInterface *dtdv0.TwinInstance) error
 	CreateTwinInstance(twinInstance *dtdv0.TwinInstance) error
@@ -93,6 +99,29 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 	}
 
 	return service
+}
+
+func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventing.Trigger {
+	return knative.NewTrigger(knative.TriggerParameters{
+		TriggerName:    eventStore.Name + "-trigger",
+		Namespace:      eventStore.Namespace,
+		BrokerName:     "default",
+		SubscriberName: "event-store",
+		OwnerReferences: []v1.OwnerReference{
+			{
+				APIVersion: eventStore.APIVersion,
+				Kind:       eventStore.Kind,
+				Name:       eventStore.Name,
+				UID:        eventStore.UID,
+			},
+		},
+		Attributes: map[string]string{
+			"type": "ktwin.event-store",
+		},
+		Labels: map[string]string{
+			"ktwin/event-store": "event-store",
+		},
+	})
 }
 
 func (t *eventStore) CreateTwinInterface(twinInterface *dtdv0.TwinInstance) error {

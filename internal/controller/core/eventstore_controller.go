@@ -63,6 +63,13 @@ func (r *EventStoreReconciler) createOrUpdateMQTTTrigger(ctx context.Context, re
 		return ctrl.Result{}, err
 	}
 
+	trigger := r.EventStore.GetEventStoreTrigger(&eventStore)
+	err = r.Create(ctx, &trigger, &client.CreateOptions{})
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while creating trigger for event store %s", eventStore.Name))
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
 }
 
