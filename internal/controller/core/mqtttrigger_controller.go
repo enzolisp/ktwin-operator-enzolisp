@@ -55,12 +55,12 @@ func (r *MQTTTriggerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	mqttTrigger := corev0.MQTTTrigger{}
 	err := r.Get(ctx, types.NamespacedName{Name: req.Name, Namespace: req.Namespace}, &mqttTrigger)
 
-	// Delete scenario
+	// Delete scenario, should skip
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return ctrl.Result{}, err
+			return ctrl.Result{}, nil
 		}
-		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
+		logger.Error(err, fmt.Sprintf("Unexpected error while getting TwinInstance %s", req.Name))
 		return ctrl.Result{}, err
 	}
 
