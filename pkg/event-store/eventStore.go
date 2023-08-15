@@ -107,7 +107,7 @@ func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventi
 	return knative.NewTrigger(knative.TriggerParameters{
 		TriggerName:    eventStore.Name + "-trigger",
 		Namespace:      eventStore.Namespace,
-		BrokerName:     "default",
+		BrokerName:     "ktwin",
 		SubscriberName: "event-store",
 		OwnerReferences: []v1.OwnerReference{
 			{
@@ -143,7 +143,7 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 			},
 			RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 				Name:      "rabbitmq",
-				Namespace: "default",
+				Namespace: "ktwin",
 			},
 			RabbitMQVhost: "/",
 			Source:        brokerExchange.Spec.Name,
@@ -169,7 +169,7 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 			},
 			RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 				Name:      "rabbitmq",
-				Namespace: "default",
+				Namespace: "ktwin",
 			},
 			RabbitMQVhost: "/",
 			Source:        brokerExchange.Spec.Name,

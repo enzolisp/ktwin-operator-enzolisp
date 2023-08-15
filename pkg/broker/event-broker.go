@@ -1,5 +1,5 @@
 package broker
 
 const (
-	EVENT_BROKER_NAME string = "default"
+	EVENT_BROKER_NAME string = "ktwin"
 )

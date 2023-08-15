@@ -1,0 +1,1 @@
+kubectl apply -f hack/ktwin/namespace.yaml

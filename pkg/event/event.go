@@ -97,7 +97,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 		},
 		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 			Name:      "rabbitmq",
-			Namespace: "default",
+			Namespace: "ktwin",
 		},
 		RabbitMQVhost: "/",
 		Source:        "amq.topic",
@@ -123,7 +123,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 				},
 				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 					Name:      "rabbitmq",
-					Namespace: "default",
+					Namespace: "ktwin",
 				},
 				RabbitMQVhost: "/",
 				Source:        "amq.topic",
@@ -174,7 +174,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 		},
 		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 			Name:      "rabbitmq",
-			Namespace: "default",
+			Namespace: "ktwin",
 		},
 		Source:      brokerExchange.Spec.Name,       // broker exchange
 		Destination: "cloud-event-dispatcher-queue", // trigger queue
@@ -213,7 +213,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 				},
 				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 					Name:      "rabbitmq",
-					Namespace: "default",
+					Namespace: "ktwin",
 				},
 				Source:      brokerExchange.Spec.Name,     // broker exchange
 				Destination: twinInterfaceQueue.Spec.Name, // trigger queue
@@ -249,7 +249,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 				},
 				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 					Name:      "rabbitmq",
-					Namespace: "default",
+					Namespace: "ktwin",
 				},
 				Source:      brokerExchange.Spec.Name,       // broker exchange
 				Destination: "cloud-event-dispatcher-queue", // trigger queue

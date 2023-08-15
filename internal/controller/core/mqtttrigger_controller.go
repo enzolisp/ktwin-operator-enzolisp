@@ -74,7 +74,7 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 	rabbitMQSecret := v1.Secret{}
 	err := r.Get(ctx, types.NamespacedName{
 		Name:      "rabbitmq-default-user",
-		Namespace: "default",
+		Namespace: "ktwin",
 	}, &rabbitMQSecret)
 
 	if err != nil {
@@ -84,9 +84,9 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 
 	brokerCloudEventExchange := rabbitmqv1beta1.ExchangeList{}
 	listOption := []client.ListOption{
-		client.InNamespace("default"),
+		client.InNamespace("ktwin"),
 		client.MatchingLabels(client.MatchingFields{
-			"eventing.knative.dev/broker": "default",
+			"eventing.knative.dev/broker": "ktwin",
 		}),
 	}
 	err = r.List(ctx, &brokerCloudEventExchange, listOption...)

@@ -25,15 +25,15 @@ kubectl apply -f https://github.com/knative-sandbox/eventing-rabbitmq/releases/d
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 
 # RabbitMQ Cluster
-kubectl apply -f ${SCRIPT_PATH}/rabbitmq-cluster -n default
+kubectl apply -f ${SCRIPT_PATH}/rabbitmq-cluster -n ktwin
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace default
-kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace default
+kubectl wait --for=condition=available --timeout=200s --all deployments --namespace ktwin
+kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace ktwin
 
 # RabbitMQ Broker
-kubectl apply -f ${SCRIPT_PATH}/rabbitmq-broker -n default
+kubectl apply -f ${SCRIPT_PATH}/rabbitmq-broker -n ktwin
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace default
-kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace default
+kubectl wait --for=condition=available --timeout=200s --all deployments --namespace ktwin
+kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace ktwin
 
 echo "Setup broker script has finished"

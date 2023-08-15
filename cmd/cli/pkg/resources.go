@@ -67,7 +67,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 		},
 		ObjectMeta: v1.ObjectMeta{
 			Name:      normalizedInterfaceId,
-			Namespace: "default",
+			Namespace: "ktwin",
 		},
 		Spec: apiv0.TwinInterfaceSpec{
 			Id:               normalizedInterfaceId,
@@ -107,7 +107,7 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 		},
 		ObjectMeta: v1.ObjectMeta{
 			Name:      normalizeTwinInstanceId,
-			Namespace: "default",
+			Namespace: "ktwin",
 		},
 		Spec: apiv0.TwinInstanceSpec{
 			Interface:                 normalizeTwinInterfacedId,

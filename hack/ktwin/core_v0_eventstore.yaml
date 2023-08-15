@@ -4,3 +4,4 @@ metadata:
   labels:
     app.kubernetes.io/name: event-store
   name: event-store
+  namespace: ktwin

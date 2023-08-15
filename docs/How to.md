@@ -3,11 +3,11 @@
 Get auto generated user and password of RabbitMQ admin area.
 
 ```sh
-kubectl describe secret rabbitmq-default-user
-kubectl get secrets/rabbitmq-default-user --template={{.data.host}} | base64 -D
-kubectl get secrets/rabbitmq-default-user --template={{.data.port}} | base64 -D
-kubectl get secrets/rabbitmq-default-user --template={{.data.username}} | base64 -D
-kubectl get secrets/rabbitmq-default-user --template={{.data.password}} | base64 -D
+kubectl describe secret rabbitmq-default-user -n ktwin
+kubectl get secrets/rabbitmq-default-user -n ktwin --template={{.data.host}} | base64 -D
+kubectl get secrets/rabbitmq-default-user -n ktwin --template={{.data.port}} | base64 -D
+kubectl get secrets/rabbitmq-default-user -n ktwin --template={{.data.username}} | base64 -D
+kubectl get secrets/rabbitmq-default-user -n ktwin --template={{.data.password}} | base64 -D
 ```
 
 Run the following command to expose RabbitMQ cluster Admin area:

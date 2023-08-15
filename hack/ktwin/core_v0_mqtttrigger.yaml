@@ -8,3 +8,4 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: ktwin-operator
   name: mqtttrigger
+  namespace: ktwin

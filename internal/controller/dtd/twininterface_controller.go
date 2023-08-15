@@ -197,7 +197,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		exchangeListOptions := []client.ListOption{
 			client.InNamespace(twinInterface.Namespace),
 			client.MatchingLabels(client.MatchingFields{
-				"eventing.knative.dev/broker": "default",
+				"eventing.knative.dev/broker": "ktwin",
 			}),
 		}
 
@@ -216,7 +216,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			queueListOptions := []client.ListOption{
 				client.InNamespace(twinInterface.Namespace),
 				client.MatchingLabels(client.MatchingFields{
-					"eventing.knative.dev/broker":  "default",
+					"eventing.knative.dev/broker":  "ktwin",
 					"eventing.knative.dev/trigger": twinInterface.Name,
 				}),
 			}
