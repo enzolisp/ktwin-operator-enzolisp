@@ -111,6 +111,7 @@ func main() {
 		Scheme:      mgr.GetScheme(),
 		TwinService: service.NewTwinService(),
 		TwinEvent:   event.NewTwinEvent(),
+		EventStore:  eventStore.NewEventStore(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInterface")
 		os.Exit(1)
@@ -120,6 +121,7 @@ func main() {
 		Scheme:      mgr.GetScheme(),
 		TwinService: service.NewTwinService(),
 		TwinEvent:   event.NewTwinEvent(),
+		EventStore:  eventStore.NewEventStore(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInstance")
 		os.Exit(1)

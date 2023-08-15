@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	twinevent "ktwin/operator/pkg/event"
+	eventStore "ktwin/operator/pkg/event-store"
 	twinservice "ktwin/operator/pkg/service"
 
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -41,6 +42,7 @@ type TwinInstanceReconciler struct {
 	Scheme      *runtime.Scheme
 	TwinService twinservice.TwinService
 	TwinEvent   twinevent.TwinEvent
+	EventStore  eventStore.EventStore
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete

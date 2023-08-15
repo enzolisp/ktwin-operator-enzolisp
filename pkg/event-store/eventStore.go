@@ -1,13 +1,19 @@
 package eventStore
 
 import (
+	"strings"
+
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	corev0 "ktwin/operator/api/core/v0"
 	dtdv0 "ktwin/operator/api/dtd/v0"
+	"ktwin/operator/pkg/naming"
 	knative "ktwin/operator/pkg/third-party/knative"
+	"ktwin/operator/pkg/third-party/rabbitmq"
 
+	"github.com/google/uuid"
+	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 )
@@ -21,15 +27,11 @@ func NewEventStore() EventStore {
 }
 
 // TODO: create binding for mqtt and cloud event
-
+// TODO: Implement creation of TwinInstance and TwinInterface in event store tables
 type EventStore interface {
 	GetEventStoreService(eventStore *corev0.EventStore) *kserving.Service
 	GetEventStoreTrigger(eventStore *corev0.EventStore) kEventing.Trigger
-
-	CreateTwinInterface(twinInterface *dtdv0.TwinInstance) error
-	DeleteTwinInterface(twinInterface *dtdv0.TwinInstance) error
-	CreateTwinInstance(twinInstance *dtdv0.TwinInstance) error
-	DeleteTwinInstance(twinInstance *dtdv0.TwinInstance) error
+	GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 }
 
 type eventStore struct{}
@@ -124,27 +126,65 @@ func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventi
 	})
 }
 
-func (t *eventStore) CreateTwinInterface(twinInterface *dtdv0.TwinInstance) error {
-	// TwinInstance
+func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding {
+	var eventStoreBindings []rabbitmqv1beta1.Binding
 
-	// Interface
-	return nil
-}
+	for _, relationship := range twinInterface.Spec.Relationships {
+		realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+			Name:      strings.ToLower(relationship.Name) + "-real-event-store-" + uuid.NewString(),
+			Namespace: twinInterface.Namespace,
+			Owner: []v1.OwnerReference{
+				{
+					APIVersion: twinInterface.APIVersion,
+					Kind:       twinInterface.Kind,
+					Name:       twinInterface.Name,
+					UID:        twinInterface.UID,
+				},
+			},
+			RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+				Name:      "rabbitmq",
+				Namespace: "default",
+			},
+			RabbitMQVhost: "/",
+			Source:        brokerExchange.Spec.Name,
+			Destination:   eventStoreQueue.Spec.Name,
+			Filters: map[string]string{
+				"type":              naming.GetEventTypeRealGenerated(twinInterface.Name),
+				"x-knative-trigger": "event-store-trigger",
+				"x-match":           "all",
+			},
+			Labels: map[string]string{},
+		})
 
-func (t *eventStore) DeleteTwinInterface(twinInterface *dtdv0.TwinInstance) error {
-	// TwinInstance
+		virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+			Name:      strings.ToLower(relationship.Name) + "-virtual-event-store-" + uuid.NewString(),
+			Namespace: twinInterface.Namespace,
+			Owner: []v1.OwnerReference{
+				{
+					APIVersion: twinInterface.APIVersion,
+					Kind:       twinInterface.Kind,
+					Name:       twinInterface.Name,
+					UID:        twinInterface.UID,
+				},
+			},
+			RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+				Name:      "rabbitmq",
+				Namespace: "default",
+			},
+			RabbitMQVhost: "/",
+			Source:        brokerExchange.Spec.Name,
+			Destination:   eventStoreQueue.Spec.Name,
+			Filters: map[string]string{
+				"type":              naming.GetEventTypeVirtualGenerated(twinInterface.Name),
+				"x-knative-trigger": "event-store-trigger",
+				"x-match":           "all",
+			},
+			Labels: map[string]string{},
+		})
 
-	return nil
-}
+		eventStoreBindings = append(eventStoreBindings, realEventBinding)
+		eventStoreBindings = append(eventStoreBindings, virtualEventBinding)
+	}
 
-func (t *eventStore) CreateTwinInstance(twinInstance *dtdv0.TwinInstance) error {
-	//
-
-	return nil
-}
-
-func (t *eventStore) DeleteTwinInstance(twinInstance *dtdv0.TwinInstance) error {
-	//
-
-	return nil
+	return eventStoreBindings
 }

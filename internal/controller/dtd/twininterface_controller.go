@@ -33,6 +33,7 @@ import (
 
 	dtdv0 "ktwin/operator/api/dtd/v0"
 	twinevent "ktwin/operator/pkg/event"
+	eventStore "ktwin/operator/pkg/event-store"
 	twinservice "ktwin/operator/pkg/service"
 )
 
@@ -42,6 +43,7 @@ type TwinInterfaceReconciler struct {
 	Scheme      *runtime.Scheme
 	TwinService twinservice.TwinService
 	TwinEvent   twinevent.TwinEvent
+	EventStore  eventStore.EventStore
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininterfaces,verbs=get;list;watch;create;update;patch;delete
@@ -175,6 +177,22 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		// RabbitMQ Queue (Trigger): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/trigger/trigger.go#L233
 		// Deletion: Can use ownerReferences for deletion in cascade
 
+		eventStoreQueuesList := rabbitmqv1beta1.QueueList{}
+		queueListOptions := []client.ListOption{
+			client.InNamespace(twinInterface.Namespace),
+			client.MatchingLabels(client.MatchingFields{
+				"eventing.knative.dev/trigger": "event-store-trigger",
+			}),
+		}
+
+		err = r.List(ctx, &eventStoreQueuesList, queueListOptions...)
+
+		if len(eventStoreQueuesList.Items) == 0 {
+			logger.Error(err, fmt.Sprintf("No Queue found for event store %s", twinInterfaceName))
+			resultErrors = append(resultErrors, err)
+			return ctrl.Result{}, err
+		}
+
 		exchangeList := rabbitmqv1beta1.ExchangeList{}
 		exchangeListOptions := []client.ListOption{
 			client.InNamespace(twinInterface.Namespace),
@@ -220,6 +238,18 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 						resultErrors = append(resultErrors, err)
 					}
 				}
+
+				eventStoreQueue := eventStoreQueuesList.Items[0]
+				bindings = r.EventStore.GetEventStoreBrokerBindings(twinInterface, trigger, brokerExchange, eventStoreQueue)
+
+				for _, binding := range bindings {
+					err = r.Create(ctx, &binding, &client.CreateOptions{})
+					if err != nil && !errors.IsAlreadyExists(err) {
+						logger.Error(err, fmt.Sprintf("Error while creating EventStore TwinInterface Bindings %s", binding.Name))
+						resultErrors = append(resultErrors, err)
+					}
+				}
+
 			}
 		}
 	}
