@@ -5,6 +5,9 @@
             "name": "Launch KTwin Operator",
             "type": "go",
             "request": "launch",
+            "env": {
+                "ENV": "local"
+            },
             "mode": "auto",
             "program": "${workspaceRoot}/cmd"
         },
