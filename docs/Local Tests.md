@@ -34,6 +34,10 @@ mosquitto_sub -h localhost -u USER -P PASSWORD -p 1883 -d -t ktwin/virtual/city-
 mosquitto_pub -h localhost -m "{"temperature":{"min":21,"max":29,"unit":"celsius"},"time":1568881230}" -u USER -P PASSWORD -p 1883 -d -t ktwin/real/city-pole/city-pole-001
 ```
 
+```sh
+mosquitto_pub -h localhost -m "{"temperature":{"min":21,"max":29,"unit":"celsius"},"time":1568881230}" -u USER -P PASSWORD -p 1883 -d -t ktwin/real/ngsi-ld-city-noiselevelobserved/ngsi-ld-city-noiselevelobserved-001
+```
+
 ### Publish Event within the cluster
 
 ```sh
