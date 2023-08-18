@@ -6,6 +6,9 @@
 2. Execute the installation scripts.
 3. Load local docker images.
 4. Install Ktwin resources.
+    - MQTT Trigger
+    - Cloud Event
+5. Create ktwin keyspace in ScyllaDB.
 
 ## Steps
 
