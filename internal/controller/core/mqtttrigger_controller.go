@@ -14,6 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	corev0 "ktwin/operator/api/core/v0"
+	"ktwin/operator/pkg/naming"
 	"ktwin/operator/pkg/third-party/rabbitmq"
 
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
@@ -207,7 +208,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 					Containers: []v1.Container{
 						{
 							Name:            "mqtt-dispatcher",
-							Image:           "dev.local/ktwin/mqtt-dispatcher:0.1",
+							Image:           naming.GetContainerRegistry("mqtt-dispatcher:0.1"),
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Ports: []v1.ContainerPort{
 								{
@@ -358,7 +359,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 					Containers: []v1.Container{
 						{
 							Name:            CLOUD_EVENT_DISPATCHER,
-							Image:           "dev.local/ktwin/cloud-event-dispatcher:0.1",
+							Image:           naming.GetContainerRegistry("cloud-event-dispatcher:0.1"),
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Ports: []v1.ContainerPort{
 								{

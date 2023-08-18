@@ -3,6 +3,7 @@ package pkg
 import (
 	apiv0 "ktwin/operator/api/dtd/v0"
 	dtdl "ktwin/operator/cmd/cli/dtdl"
+	"ktwin/operator/pkg/naming"
 	"reflect"
 
 	corev1 "k8s.io/api/core/v1"
@@ -84,7 +85,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 					Spec: corev1.PodSpec{Containers: []corev1.Container{
 						{
 							Name:            normalizedInterfaceId,
-							Image:           "dev.local/ktwin/" + "edge-service" + ":0.1",
+							Image:           naming.GetContainerRegistry("edge-service:0.1"),
 							ImagePullPolicy: corev1.PullIfNotPresent,
 						},
 					}},
