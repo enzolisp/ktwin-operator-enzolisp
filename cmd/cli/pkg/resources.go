@@ -130,8 +130,9 @@ func (r *resourceBuilder) getTwinInstanceRelationships(twinInterface apiv0.TwinI
 
 	for _, twinRelationship := range twinInterface.Spec.Relationships {
 		twinInstanceRelationship = append(twinInstanceRelationship, apiv0.TwinInstanceRelationship{
-			Name:   twinRelationship.Name + INSTANCE_SUFFIX,
-			Target: twinRelationship.Target + INSTANCE_SUFFIX,
+			Name:      twinRelationship.Name + INSTANCE_SUFFIX,
+			Interface: twinRelationship.Interface,
+			Instance:  twinRelationship.Interface + INSTANCE_SUFFIX,
 		})
 	}
 
@@ -299,7 +300,7 @@ func (r *resourceBuilder) processRelationship(relationship dtdl.Relationship, re
 		MinMultiplicity: relationship.MinMultiplicity,
 		Schema:          twinSchema,
 		Properties:      relationshipProperties,
-		Target:          r.hostUtils.ParseHostName(string(relationship.Target)),
+		Interface:       r.hostUtils.ParseHostName(string(relationship.Target)),
 	}
 	relationships = append(relationships, newRelationship)
 	return relationships

@@ -107,7 +107,7 @@ type TwinRelationship struct {
 	MinMultiplicity int            `json:"minMultiplicity,omitempty"`
 	Name            string         `json:"name,omitempty"`
 	Properties      []TwinProperty `json:"properties,omitempty"`
-	Target          string         `json:"target,omitempty"`
+	Interface       string         `json:"interface,omitempty"`
 	Schema          *TwinSchema    `json:"schema,omitempty"`
 	Writeable       bool           `json:"writeable,omitempty"`
 	AggregateData   bool           `json:"aggregateData,omitempty"`

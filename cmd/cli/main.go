@@ -166,7 +166,7 @@ func updateGraph(dtdlGraph graph.TwinInterfaceGraph, twinInterface v0.TwinInterf
 	for _, relationship := range twinInterface.Spec.Relationships {
 		tInterface := v0.TwinInterface{
 			Spec: v0.TwinInterfaceSpec{
-				Id: relationship.Target,
+				Id: relationship.Interface,
 			},
 		}
 		dtdlGraph.AddEdge(twinInterface, tInterface)

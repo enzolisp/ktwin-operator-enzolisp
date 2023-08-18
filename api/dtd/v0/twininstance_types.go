@@ -60,8 +60,10 @@ type TwinInstanceTelemetryData struct {
 type TwinInstanceRelationship struct {
 	// The TwinInstance Relationship name
 	Name string `json:"name,omitempty"`
+	// The Target TwinInterface of the Relationship
+	Interface string `json:"interface,omitempty"`
 	// The Target TwinInstance of the Relationship
-	Target string `json:"target,omitempty"`
+	Instance string `json:"instance,omitempty"`
 	// Indicates if the data from the relationship must be aggregated in the twin instance
 	AggregateData bool `json:"aggregateData,omitempty"`
 }

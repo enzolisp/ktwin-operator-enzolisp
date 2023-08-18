@@ -176,6 +176,8 @@ spec:
                       type: string
                     id:
                       type: string
+                    interface:
+                      type: string
                     maxMultiplicity:
                       type: integer
                     minMultiplicity:
@@ -241,8 +243,6 @@ spec:
                         primitiveType:
                           type: string
                       type: object
-                    target:
-                      type: string
                     writeable:
                       type: boolean
                   type: object

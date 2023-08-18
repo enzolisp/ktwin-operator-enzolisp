@@ -122,11 +122,14 @@ spec:
                       description: Indicates if the data from the relationship must
                         be aggregated in the twin instance
                       type: boolean
+                    instance:
+                      description: The Target TwinInstance of the Relationship
+                      type: string
+                    interface:
+                      description: The Target TwinInterface of the Relationship
+                      type: string
                     name:
                       description: The TwinInstance Relationship name
-                      type: string
-                    target:
-                      description: The Target TwinInstance of the Relationship
                       type: string
                   type: object
                 type: array

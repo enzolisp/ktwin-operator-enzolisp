@@ -129,7 +129,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 				Source:        "amq.topic",
 				Destination:   "mqtt-dispatcher-queue",
 				Labels:        map[string]string{},
-				RoutingKey:    e.getEventTypeRealGenerated(twinInstance.Spec.Interface + "." + twinInstance.Name),
+				RoutingKey:    e.getEventTypeRealGenerated(relationship.Interface + "." + relationship.Instance),
 			})
 			rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
 		}
@@ -192,7 +192,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 					"eventing.knative.dev/trigger": twinInterface.Name,
 				},
 				Filters: map[string]string{
-					"type":              e.getEventTypeRealGenerated(twinInterfaceRelationship.Target),
+					"type":              e.getEventTypeRealGenerated(twinInterfaceRelationship.Interface),
 					"x-knative-trigger": twinInterface.Name,
 					"x-match":           "all",
 				},
@@ -227,7 +227,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 					"eventing.knative.dev/trigger": twinInterface.Name,
 				},
 				Filters: map[string]string{
-					"type":              e.getEventTypeVirtualGenerated(twinInterfaceRelationship.Target),
+					"type":              e.getEventTypeVirtualGenerated(twinInterfaceRelationship.Interface),
 					"x-knative-trigger": twinInterface.Name,
 					"x-match":           "all",
 				},
