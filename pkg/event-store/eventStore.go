@@ -145,7 +145,7 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 			Source:        brokerExchange.Spec.Name,
 			Destination:   eventStoreQueue.Spec.Name,
 			Filters: map[string]string{
-				"type":              naming.GetEventTypeRealGenerated(twinInterface.Name),
+				"type":              naming.GetEventTypeRealGenerated(relationship.Interface),
 				"x-knative-trigger": "event-store-trigger",
 				"x-match":           "all",
 			},
@@ -171,7 +171,7 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 			Source:        brokerExchange.Spec.Name,
 			Destination:   eventStoreQueue.Spec.Name,
 			Filters: map[string]string{
-				"type":              naming.GetEventTypeVirtualGenerated(twinInterface.Name),
+				"type":              naming.GetEventTypeVirtualGenerated(relationship.Interface),
 				"x-knative-trigger": "event-store-trigger",
 				"x-match":           "all",
 			},
