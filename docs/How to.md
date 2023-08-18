@@ -13,7 +13,7 @@ kubectl get secrets/rabbitmq-default-user -n ktwin --template={{.data.password}}
 Run the following command to expose RabbitMQ cluster Admin area:
 
 ```sh
-kubectl port-forward --address 0.0.0.0 svc/rabbitmq 15672:15672
+kubectl port-forward -n ktwin --address 0.0.0.0 svc/rabbitmq 15672:15672
 ```
 
 Access the following URL and login with the credentials previously generated: http://localhost:15672
@@ -21,11 +21,11 @@ Access the following URL and login with the credentials previously generated: ht
 Run the following command to expose MQTT port:
 
 ```sh
-kubectl port-forward --address 0.0.0.0 svc/rabbitmq 1883:1883
+kubectl port-forward -n ktwin --address 0.0.0.0 svc/rabbitmq 1883:1883
 ```
 
 Run the following command to expose AMQP port:
 
 ```sh
-kubectl port-forward --address 0.0.0.0 svc/rabbitmq 5672:5672
+kubectl port-forward -n ktwin --address 0.0.0.0 svc/rabbitmq 5672:5672
 ```
