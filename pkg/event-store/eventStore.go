@@ -80,7 +80,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 									Env: []corev1.EnvVar{
 										{
 											Name:  "DB_HOST",
-											Value: "scylla-client.scylla.svc.cluster.local",
+											Value: "scylla-client.ktwin.svc.cluster.local",
 										},
 										{
 											Name:  "DB_KEYSPACE",

@@ -16,13 +16,13 @@ kubectl wait -n scylla-manager --for=condition=ready pod -l app.kubernetes.io/na
 kubectl wait -n scylla-manager --for=condition=ready pod -l app.kubernetes.io/name=scylla-manager-controller --timeout=200s
 
 # Configure scylla with helm values
-helm install scylla scylla/scylla --values hack/scylla-operator/helm/values.cluster.yaml --create-namespace --namespace scylla
-kubectl wait -n scylla --for=condition=ready pod -l app.kubernetes.io/name=scylla --timeout=200s
+helm install scylla scylla/scylla --values hack/scylla-operator/helm/values.cluster.yaml --create-namespace --namespace ktwin
+kubectl wait -n ktwin --for=condition=ready pod -l app.kubernetes.io/name=scylla --timeout=200s
 
 # Uninstall
-# helm uninstall scylla -n scylla
+# helm uninstall scylla -n ktwin
 # helm uninstall scylla-manager -n scylla-manager
 # helm uninstall scylla-operator -n scylla-operator
 
 # Expose scylla
-# kubectl port-forward --address 0.0.0.0 svc/scylla-client 9042:9042 -n scylla
+# kubectl port-forward --address 0.0.0.0 svc/scylla-client 9042:9042 -n ktwin
