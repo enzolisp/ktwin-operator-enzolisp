@@ -15,13 +15,6 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
-const (
-	EVENT_REAL_TO_VIRTUAL    string = "ktwin.real.%s"
-	EVENT_VIRTUAL_TO_REAL    string = "ktwin.virtual.%s"
-	EVENT_TO_EVENT_STORE     string = "ktwin.event.store"
-	EVENT_VIRTUAL_TO_VIRTUAL string = "ktwin.virtual.virtual" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
-)
-
 func NewTwinEvent() TwinEvent {
 	return &twinEvent{}
 }
@@ -102,7 +95,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 		},
 		RabbitMQVhost: "/",
 		Source:        "amq.topic",
-		Destination:   "mqtt-dispatcher-queue",
+		Destination:   MQTT_DISPATCHER_QUEUE,
 		Labels:        map[string]string{},
 		RoutingKey:    e.getEventTypeRealGenerated(twinInstance.Spec.Interface + "." + twinInstance.Name),
 	})
@@ -128,7 +121,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 				},
 				RabbitMQVhost: "/",
 				Source:        "amq.topic",
-				Destination:   "mqtt-dispatcher-queue",
+				Destination:   MQTT_DISPATCHER_QUEUE,
 				Labels:        map[string]string{},
 				RoutingKey:    e.getEventTypeRealGenerated(relationship.Interface + "." + relationship.Instance),
 			})
@@ -177,8 +170,8 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 			Name:      "rabbitmq",
 			Namespace: "ktwin",
 		},
-		Source:      brokerExchange.Spec.Name,       // broker exchange
-		Destination: "cloud-event-dispatcher-queue", // trigger queue
+		Source:      brokerExchange.Spec.Name,     // broker exchange
+		Destination: CLOUD_EVENT_DISPATCHER_QUEUE, // trigger queue
 	})
 
 	rabbitMQBindings = append(rabbitMQBindings, virtualEventBinding)
@@ -245,8 +238,8 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 					Name:      "rabbitmq",
 					Namespace: "ktwin",
 				},
-				Source:      brokerExchange.Spec.Name,       // broker exchange
-				Destination: "cloud-event-dispatcher-queue", // trigger queue
+				Source:      brokerExchange.Spec.Name,     // broker exchange
+				Destination: CLOUD_EVENT_DISPATCHER_QUEUE, // trigger queue
 			})
 
 			rabbitMQBindings = append(rabbitMQBindings, virtualEventBinding)

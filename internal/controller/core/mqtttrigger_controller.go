@@ -14,6 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	corev0 "ktwin/operator/api/core/v0"
+	"ktwin/operator/pkg/event"
 	"ktwin/operator/pkg/naming"
 	"ktwin/operator/pkg/third-party/rabbitmq"
 
@@ -21,14 +22,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-)
-
-const (
-	CLOUD_EVENT_DISPATCHER = "cloud-event-dispatcher"
-	MQTT_DISPATCHER        = "mqtt-dispatcher"
-
-	MQTT_DISPATCHER_QUEUE        = "mqtt-dispatcher-queue"
-	CLOUD_EVENT_DISPATCHER_QUEUE = "cloud-event-dispatcher-queue"
 )
 
 // MQTTTriggerReconciler reconciles a MQTTTrigger object
@@ -146,9 +139,9 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 
 func (r *MQTTTriggerReconciler) getMQQTDispatcherQueue(mqttTrigger corev0.MQTTTrigger) *rabbitmqv1beta1.Queue {
 	args := &rabbitmq.QueueArgs{
-		Name:          MQTT_DISPATCHER_QUEUE,
+		Name:          event.MQTT_DISPATCHER_QUEUE,
 		Namespace:     mqttTrigger.Namespace,
-		QueueName:     MQTT_DISPATCHER_QUEUE,
+		QueueName:     event.MQTT_DISPATCHER_QUEUE,
 		RabbitMQVhost: "/",
 		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 			Name:      "rabbitmq",
@@ -209,7 +202,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 							Env: []v1.EnvVar{
 								{
 									Name:  "SERVICE_NAME",
-									Value: MQTT_DISPATCHER + "-1",
+									Value: event.MQTT_DISPATCHER + "-1",
 								},
 								{
 									Name:  "PROTOCOL",
@@ -245,7 +238,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 								},
 								{
 									Name:  "SUBSCRIBER_QUEUE",
-									Value: MQTT_DISPATCHER_QUEUE,
+									Value: event.MQTT_DISPATCHER_QUEUE,
 								},
 							},
 							Resources: v1.ResourceRequirements{
@@ -264,9 +257,9 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 
 func (r *MQTTTriggerReconciler) getCloudEventDispatcherQueue(mqttTrigger corev0.MQTTTrigger) *rabbitmqv1beta1.Queue {
 	args := &rabbitmq.QueueArgs{
-		Name:          CLOUD_EVENT_DISPATCHER_QUEUE,
+		Name:          event.CLOUD_EVENT_DISPATCHER_QUEUE,
 		Namespace:     mqttTrigger.Namespace,
-		QueueName:     CLOUD_EVENT_DISPATCHER_QUEUE,
+		QueueName:     event.CLOUD_EVENT_DISPATCHER_QUEUE,
 		RabbitMQVhost: "/",
 		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 			Name:      "rabbitmq",
@@ -286,10 +279,10 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherQueue(mqttTrigger corev0.
 func (r *MQTTTriggerReconciler) getMQQTDispatcherService(mqttTrigger corev0.MQTTTrigger) v1.Service {
 	return v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      MQTT_DISPATCHER,
+			Name:      event.MQTT_DISPATCHER,
 			Namespace: mqttTrigger.Namespace,
 			Labels: map[string]string{
-				"ktwin/trigger": MQTT_DISPATCHER,
+				"ktwin/trigger": event.MQTT_DISPATCHER,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -302,7 +295,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherService(mqttTrigger corev0.MQTT
 		},
 		Spec: v1.ServiceSpec{
 			Selector: map[string]string{
-				"ktwin/trigger": MQTT_DISPATCHER,
+				"ktwin/trigger": event.MQTT_DISPATCHER,
 			},
 			Ports: []v1.ServicePort{
 				{
@@ -319,10 +312,10 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherService(mqttTrigger corev0.MQTT
 func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger corev0.MQTTTrigger, rabbitMQSecret v1.Secret) appsv1.Deployment {
 	return appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      CLOUD_EVENT_DISPATCHER,
+			Name:      event.CLOUD_EVENT_DISPATCHER,
 			Namespace: mqttTrigger.Namespace,
 			Labels: map[string]string{
-				"ktwin/trigger": CLOUD_EVENT_DISPATCHER,
+				"ktwin/trigger": event.CLOUD_EVENT_DISPATCHER,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -337,19 +330,19 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 			Replicas: int32Ptr(1),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"ktwin/trigger": CLOUD_EVENT_DISPATCHER,
+					"ktwin/trigger": event.CLOUD_EVENT_DISPATCHER,
 				},
 			},
 			Template: v1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"ktwin/trigger": CLOUD_EVENT_DISPATCHER,
+						"ktwin/trigger": event.CLOUD_EVENT_DISPATCHER,
 					},
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						{
-							Name:            CLOUD_EVENT_DISPATCHER,
+							Name:            event.CLOUD_EVENT_DISPATCHER,
 							Image:           naming.GetContainerRegistry("cloud-event-dispatcher:0.1"),
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Ports: []v1.ContainerPort{
@@ -360,7 +353,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 							Env: []v1.EnvVar{
 								{
 									Name:  "SERVICE_NAME",
-									Value: CLOUD_EVENT_DISPATCHER + "-1",
+									Value: event.CLOUD_EVENT_DISPATCHER + "-1",
 								},
 								{
 									Name:  "PROTOCOL",
@@ -396,7 +389,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 								},
 								{
 									Name:  "SUBSCRIBER_QUEUE",
-									Value: CLOUD_EVENT_DISPATCHER_QUEUE,
+									Value: event.CLOUD_EVENT_DISPATCHER_QUEUE,
 								},
 							},
 							Resources: v1.ResourceRequirements{
@@ -416,10 +409,10 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 func (r *MQTTTriggerReconciler) geCloudEventDispatcherService(mqttTrigger corev0.MQTTTrigger) v1.Service {
 	return v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      CLOUD_EVENT_DISPATCHER,
+			Name:      event.CLOUD_EVENT_DISPATCHER,
 			Namespace: mqttTrigger.Namespace,
 			Labels: map[string]string{
-				"ktwin/trigger": CLOUD_EVENT_DISPATCHER,
+				"ktwin/trigger": event.CLOUD_EVENT_DISPATCHER,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -432,7 +425,7 @@ func (r *MQTTTriggerReconciler) geCloudEventDispatcherService(mqttTrigger corev0
 		},
 		Spec: v1.ServiceSpec{
 			Selector: map[string]string{
-				"ktwin/trigger": CLOUD_EVENT_DISPATCHER,
+				"ktwin/trigger": event.CLOUD_EVENT_DISPATCHER,
 			},
 			Ports: []v1.ServicePort{
 				{
