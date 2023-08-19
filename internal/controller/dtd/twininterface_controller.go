@@ -21,8 +21,6 @@ import (
 	"fmt"
 
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
-	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
-	kServing "knative.dev/serving/pkg/apis/serving/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -59,77 +57,15 @@ func (r *TwinInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	// Delete scenario
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return r.deleteTwinInterface(ctx, req, req.NamespacedName)
+			return ctrl.Result{}, nil
 		}
 		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
 		return ctrl.Result{}, err
 	}
 
-	// Create Mew Schema in Event Store
+	// TODO: Create Entry in Event Store
 
 	return r.createUpdateTwinInterface(ctx, req, twinInterface)
-}
-
-func (r *TwinInterfaceReconciler) deleteTwinInterface(ctx context.Context, req ctrl.Request, namespacedName types.NamespacedName) (ctrl.Result, error) {
-	var errorsResult []error
-	logger := log.FromContext(ctx)
-
-	// Delete Service Instance
-	deletionServiceLabels := r.TwinService.GetServiceDeletionCriteria(namespacedName)
-
-	kServiceList := kServing.ServiceList{}
-	kServiceListOptions := []client.ListOption{
-		client.InNamespace(namespacedName.Namespace),
-		client.MatchingLabels(deletionServiceLabels),
-	}
-
-	err := r.List(ctx, &kServiceList, kServiceListOptions...)
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while getting services to be deleted %s", namespacedName.Name))
-		return ctrl.Result{}, err
-	}
-
-	for _, kService := range kServiceList.Items {
-		err := r.Delete(ctx, &kService, &client.DeleteOptions{})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				logger.Error(err, fmt.Sprintf("Error while deleting Knative Service %s", namespacedName.Name))
-				errorsResult = append(errorsResult, err)
-			}
-		}
-	}
-
-	// Delete Triggers
-	deletionTriggerLabels := r.TwinEvent.GetTriggersDeletionFilterCriteria(namespacedName)
-	triggerList := kEventing.TriggerList{}
-	triggerListOptions := []client.ListOption{
-		client.InNamespace(namespacedName.Namespace),
-		client.MatchingLabels(deletionTriggerLabels),
-	}
-
-	err = r.List(ctx, &triggerList, triggerListOptions...)
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while getting triggers %s", namespacedName.Name))
-		return ctrl.Result{}, err
-	}
-
-	for _, trigger := range triggerList.Items {
-		err := r.Delete(ctx, &trigger, &client.DeleteOptions{})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				logger.Error(err, fmt.Sprintf("Error while deleting trigger %s", namespacedName.Name))
-				errorsResult = append(errorsResult, err)
-			}
-		}
-	}
-
-	if len(errorsResult) > 0 {
-		return ctrl.Result{}, errorsResult[0]
-	}
-
-	return ctrl.Result{}, nil
 }
 
 func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {

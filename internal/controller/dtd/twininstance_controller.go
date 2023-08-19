@@ -24,8 +24,6 @@ import (
 	eventStore "ktwin/operator/pkg/event-store"
 	twinservice "ktwin/operator/pkg/service"
 
-	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
-
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -58,7 +56,7 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// Delete scenario
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return r.deleteTwinInstance(ctx, req, req.NamespacedName)
+			return ctrl.Result{}, nil
 		}
 		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
 		return ctrl.Result{}, err
@@ -121,43 +119,6 @@ func (r *TwinInstanceReconciler) updateTwinInstance(ctx context.Context, req ctr
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Error while updating TwinInstance %s", twinInstance.ObjectMeta.Name))
 		return ctrl.Result{}, err
-	}
-
-	return ctrl.Result{}, nil
-}
-
-func (r *TwinInstanceReconciler) deleteTwinInstance(ctx context.Context, req ctrl.Request, namespacedName types.NamespacedName) (ctrl.Result, error) {
-	var errorsResult []error
-	logger := log.FromContext(ctx)
-
-	// Delete Triggers
-	deletionTriggerLabels := r.TwinEvent.GetTriggersDeletionFilterCriteria(namespacedName)
-
-	triggerList := kEventing.TriggerList{}
-	triggerListOptions := []client.ListOption{
-		client.InNamespace(namespacedName.Namespace),
-		client.MatchingLabels(deletionTriggerLabels),
-	}
-
-	err := r.List(ctx, &triggerList, triggerListOptions...)
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while getting triggers %s", namespacedName.Name))
-		return ctrl.Result{}, err
-	}
-
-	for _, trigger := range triggerList.Items {
-		err := r.Delete(ctx, &trigger, &client.DeleteOptions{})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				logger.Error(err, fmt.Sprintf("Error while deleting trigger %s", namespacedName.Name))
-				errorsResult = append(errorsResult, err)
-			}
-		}
-	}
-
-	if len(errorsResult) > 0 {
-		return ctrl.Result{}, errorsResult[0]
 	}
 
 	return ctrl.Result{}, nil

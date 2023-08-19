@@ -36,13 +36,14 @@ type TwinEvent interface {
 
 type twinEvent struct{}
 
-type triggerParameters struct {
-	interfaceName string
-	triggerName   string
-	namespace     string
-	brokerName    string
-	eventType     string
-	subscriber    string
+type TriggerParameters struct {
+	InterfaceName  string
+	TriggerName    string
+	Namespace      string
+	BrokerName     string
+	EventType      string
+	Subscriber     string
+	OwnerReference []v1.OwnerReference
 }
 
 func (e *twinEvent) getEventTypeRealGenerated(twinInterfaceName string) string {
@@ -232,7 +233,6 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 					"x-match":           "all",
 				},
 				RabbitMQVhost: "/",
-				// Check who is going to be owner
 				Owner: []v1.OwnerReference{
 					{
 						APIVersion: twinInterface.APIVersion,
@@ -240,12 +240,6 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 						Name:       twinInterface.Name,
 						UID:        twinInterface.UID,
 					},
-					// {
-					// 	APIVersion: twinInterfaceTrigger.APIVersion,
-					// 	Kind:       twinInterfaceTrigger.Kind,
-					// 	Name:       twinInterfaceTrigger.Name,
-					// 	UID:        twinInterfaceTrigger.UID,
-					// },
 				},
 				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
 					Name:      "rabbitmq",
@@ -278,40 +272,24 @@ func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) 
 		// Real Twin Event Type
 		twinInterfaceEventType := e.getEventTypeRealGenerated(twinInterface.Name)
 
-		twinInterfaceTrigger = e.createTrigger(triggerParameters{
-			triggerName:   e.getTwinInterfaceTrigger(twinInterface.Name),
-			namespace:     twinInterface.Namespace,
-			brokerName:    broker.EVENT_BROKER_NAME,
-			eventType:     twinInterfaceEventType,
-			subscriber:    virtualTwinService,
-			interfaceName: twinInterface.Name,
+		twinInterfaceTrigger = e.createTrigger(TriggerParameters{
+			TriggerName:   e.getTwinInterfaceTrigger(twinInterface.Name),
+			Namespace:     twinInterface.Namespace,
+			BrokerName:    broker.EVENT_BROKER_NAME,
+			EventType:     twinInterfaceEventType,
+			Subscriber:    virtualTwinService,
+			InterfaceName: twinInterface.Name,
+			OwnerReference: []v1.OwnerReference{
+				{
+					APIVersion: twinInterface.APIVersion,
+					Kind:       twinInterface.Kind,
+					Name:       twinInterface.Name,
+					UID:        twinInterface.UID,
+				},
+			},
 		})
 
 	}
-
-	// // Real to Event Store
-	// trigger = e.createTrigger(triggerParameters{
-	// 	triggerName:   e.getRealToEventStoreTriggerName(twinInterface.Name),
-	// 	namespace:     twinInterface.Namespace,
-	// 	brokerName:    broker.EVENT_BROKER_NAME,
-	// 	eventType:     e.getEventTypeRealGenerated(twinInterface.Name),
-	// 	subscriber:    eventStore.EVENT_STORE_SERVICE,
-	// 	interfaceName: twinInterface.Name,
-	// })
-	// twinTriggers = append(twinTriggers, trigger)
-
-	// // Virtual to Event Store
-	// trigger = e.createTrigger(triggerParameters{
-	// 	triggerName:   e.getVirtualToEventStoreTriggerName(twinInterface.Name),
-	// 	namespace:     twinInterface.Namespace,
-	// 	brokerName:    broker.EVENT_BROKER_NAME,
-	// 	eventType:     e.getEventTypeVirtualGenerated(twinInterface.Name),
-	// 	subscriber:    eventStore.EVENT_STORE_SERVICE,
-	// 	interfaceName: twinInterface.Name,
-	// })
-	// twinTriggers = append(twinTriggers, trigger)
-
-	//e.populateTwinInstanceEventStructure(twinInstance, twinTriggers)
 
 	return twinInterfaceTrigger
 }
@@ -336,29 +314,30 @@ func (e *twinEvent) populateTwinInstanceEventStructure(twinInstance *dtdv0.TwinI
 	return twinInstance
 }
 
-func (e *twinEvent) createTrigger(triggerParameters triggerParameters) kEventing.Trigger {
+func (e *twinEvent) createTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
 	return kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Trigger",
 			APIVersion: "eventing.knative.dev/v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name:      triggerParameters.triggerName,
-			Namespace: triggerParameters.namespace,
-			Labels:    e.getTriggerLabels(triggerParameters.interfaceName),
+			Name:            triggerParameters.TriggerName,
+			Namespace:       triggerParameters.Namespace,
+			Labels:          e.getTriggerLabels(triggerParameters.InterfaceName),
+			OwnerReferences: triggerParameters.OwnerReference,
 		},
 		Spec: kEventing.TriggerSpec{
-			Broker: triggerParameters.brokerName,
+			Broker: triggerParameters.BrokerName,
 			Filter: &kEventing.TriggerFilter{
 				Attributes: map[string]string{
-					"type": triggerParameters.eventType,
+					"type": triggerParameters.EventType,
 				},
 			},
 			Subscriber: duckv1.Destination{
 				Ref: &duckv1.KReference{
 					Kind:       "Service",
 					APIVersion: "serving.knative.dev/v1",
-					Name:       triggerParameters.subscriber,
+					Name:       triggerParameters.Subscriber,
 				},
 			},
 		},

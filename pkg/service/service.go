@@ -43,6 +43,14 @@ func (t *twinService) GetService(twinInterface *dtdv0.TwinInterface) *kserving.S
 			Name:      twinInterface.ObjectMeta.Name,
 			Namespace: twinInterface.ObjectMeta.Namespace,
 			Labels:    t.getServiceLabels(twinInterfaceName),
+			OwnerReferences: []v1.OwnerReference{
+				{
+					APIVersion: twinInterface.APIVersion,
+					Kind:       twinInterface.Kind,
+					Name:       twinInterface.Name,
+					UID:        twinInterface.UID,
+				},
+			},
 		},
 		Spec: kserving.ServiceSpec{
 			ConfigurationSpec: kserving.ConfigurationSpec{
