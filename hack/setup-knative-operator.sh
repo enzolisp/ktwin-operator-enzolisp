@@ -8,7 +8,6 @@ KNATIVE_VERSION=v1.10.0
 KNATIVE_OPERATOR_VERSION=v1.11.3
 
 # Install Knative Operator
-kubectl create namespace knative
 kubectl apply -f https://github.com/knative/operator/releases/download/knative-${KNATIVE_OPERATOR_VERSION}/operator.yaml
 kubectl wait --for=condition=available --timeout=200s --all deployments
 
