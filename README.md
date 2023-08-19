@@ -111,7 +111,7 @@ kubebuilder create api --group core --version v0 --kind EventStore
 ```sh
 sh hack/create-kind-cluster.sh && \
 sh hack/pre-setup-ktwin.sh && \
-sh hack/setup-knative.sh && \
+sh hack/setup-knative-operator.sh && \
 sh hack/setup-brokers.sh && \
 sh hack/setup-scylla-db.sh
 ```
