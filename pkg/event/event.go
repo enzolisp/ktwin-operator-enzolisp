@@ -22,7 +22,6 @@ type TwinEvent interface {
 	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance) []rabbitmqv1beta1.Binding
-	GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
 	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
@@ -246,11 +245,6 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 		}
 	}
 
-	return rabbitMQBindings
-}
-
-func (e *twinEvent) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding {
-	rabbitMQBindings := []rabbitmqv1beta1.Binding{}
 	return rabbitMQBindings
 }
 
