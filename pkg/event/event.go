@@ -3,7 +3,6 @@ package event
 import (
 	"fmt"
 	dtdv0 "ktwin/operator/api/dtd/v0"
-	broker "ktwin/operator/pkg/broker"
 	"ktwin/operator/pkg/third-party/rabbitmq"
 	"strings"
 
@@ -268,7 +267,7 @@ func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) 
 		twinInterfaceTrigger = e.createTrigger(TriggerParameters{
 			TriggerName:   e.getTwinInterfaceTrigger(twinInterface.Name),
 			Namespace:     twinInterface.Namespace,
-			BrokerName:    broker.EVENT_BROKER_NAME,
+			BrokerName:    EVENT_BROKER_NAME,
 			EventType:     twinInterfaceEventType,
 			Subscriber:    virtualTwinService,
 			InterfaceName: twinInterface.Name,

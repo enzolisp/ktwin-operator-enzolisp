@@ -17,3 +17,7 @@ const (
 	CLOUD_EVENT_DISPATCHER_QUEUE string = "cloud-event-dispatcher-queue"
 	MQTT_DISPATCHER_QUEUE        string = "mqtt-dispatcher-queue"
 )
+
+const (
+	EVENT_BROKER_NAME string = "ktwin"
+)
