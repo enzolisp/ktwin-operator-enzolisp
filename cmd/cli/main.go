@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -53,7 +52,7 @@ func main() {
 
 // Process all files in the specified folder
 func processAllFilesInFolder(inputFolderPath string, outputFolderPath string, dtdlGraph graph.TwinInterfaceGraph, processedFiles []ProcessedFile) (graph.TwinInterfaceGraph, []ProcessedFile) {
-	files, err := ioutil.ReadDir(inputFolderPath)
+	files, err := os.ReadDir(inputFolderPath)
 
 	if err != nil {
 		log.Fatal(err)
