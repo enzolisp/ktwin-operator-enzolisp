@@ -112,7 +112,7 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface, 
 		},
 		Spec: apiv0.TwinInstanceSpec{
 			Interface:                 normalizeTwinInterfacedId,
-			TwinInstanceRelationships: r.getTwinInstanceRelationships(twinInterface),
+			TwinInstanceRelationships: r.getTwinInstanceRelationships(parentTwinInterfaces),
 			//Events: r.getEventFilters(twinInterface),
 			Data: r.getTwinData(parentTwinInterfaces),
 		},
@@ -121,19 +121,21 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface, 
 	return twinInstance
 }
 
-func (r *resourceBuilder) getTwinInstanceRelationships(twinInterface apiv0.TwinInterface) []apiv0.TwinInstanceRelationship {
+func (r *resourceBuilder) getTwinInstanceRelationships(parentTwinInterfaces []apiv0.TwinInterface) []apiv0.TwinInstanceRelationship {
 	var twinInstanceRelationship []apiv0.TwinInstanceRelationship
 
-	if len(twinInterface.Spec.Relationships) == 0 {
-		return twinInstanceRelationship
-	}
+	for _, twinInterface := range parentTwinInterfaces {
+		if len(twinInterface.Spec.Relationships) == 0 {
+			continue
+		}
 
-	for _, twinRelationship := range twinInterface.Spec.Relationships {
-		twinInstanceRelationship = append(twinInstanceRelationship, apiv0.TwinInstanceRelationship{
-			Name:      twinRelationship.Name + INSTANCE_SUFFIX,
-			Interface: twinRelationship.Interface,
-			Instance:  twinRelationship.Interface + INSTANCE_SUFFIX,
-		})
+		for _, twinRelationship := range twinInterface.Spec.Relationships {
+			twinInstanceRelationship = append(twinInstanceRelationship, apiv0.TwinInstanceRelationship{
+				Name:      twinRelationship.Name + INSTANCE_SUFFIX,
+				Interface: twinRelationship.Interface,
+				Instance:  twinRelationship.Interface + INSTANCE_SUFFIX,
+			})
+		}
 	}
 
 	return twinInstanceRelationship
