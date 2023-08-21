@@ -18,7 +18,7 @@ const (
 
 type ResourceBuilder interface {
 	CreateTwinInterface(tInterface dtdl.Interface) apiv0.TwinInterface
-	CreateTwinInstance(twinInterface apiv0.TwinInterface) apiv0.TwinInstance
+	CreateTwinInstance(twinInterface apiv0.TwinInterface, parentTwinInterfaces []apiv0.TwinInterface) apiv0.TwinInstance
 }
 
 func NewResourceBuilder() ResourceBuilder {
@@ -97,7 +97,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 	return twinInterface
 }
 
-func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) apiv0.TwinInstance {
+func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface, parentTwinInterfaces []apiv0.TwinInterface) apiv0.TwinInstance {
 	normalizeTwinInterfacedId := r.hostUtils.ParseHostName(string(twinInterface.Spec.Id))
 	normalizeTwinInstanceId := normalizeTwinInterfacedId + INSTANCE_SUFFIX
 
@@ -114,7 +114,7 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface) 
 			Interface:                 normalizeTwinInterfacedId,
 			TwinInstanceRelationships: r.getTwinInstanceRelationships(twinInterface),
 			//Events: r.getEventFilters(twinInterface),
-			//Data:   r.getTwinData(twinInterface),
+			Data: r.getTwinData(parentTwinInterfaces),
 		},
 	}
 
@@ -214,27 +214,31 @@ func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []a
 	return twinInterfaceEvents
 }
 
-func (r *resourceBuilder) getTwinData(twinInterface apiv0.TwinInterface) *apiv0.TwinInstanceDataSpec {
+func (r *resourceBuilder) getTwinData(twinInterfaces []apiv0.TwinInterface) *apiv0.TwinInstanceDataSpec {
 	var twinInstanceData *apiv0.TwinInstanceDataSpec
 
-	if len(twinInterface.Spec.Properties) == 0 && len(twinInterface.Spec.Telemetries) == 0 {
-		return twinInstanceData
-	}
+	for _, twinInterface := range twinInterfaces {
+		if len(twinInterface.Spec.Properties) == 0 && len(twinInterface.Spec.Telemetries) == 0 {
+			continue
+		}
 
-	twinInstanceData = &apiv0.TwinInstanceDataSpec{}
+		if twinInstanceData == nil {
+			twinInstanceData = &apiv0.TwinInstanceDataSpec{}
+		}
 
-	for _, twinProperty := range twinInterface.Spec.Properties {
-		twinInstanceData.Properties = append(twinInstanceData.Properties, apiv0.TwinInstancePropertyData{
-			Id:   twinProperty.Id,
-			Name: twinProperty.Name,
-		})
-	}
+		for _, twinProperty := range twinInterface.Spec.Properties {
+			twinInstanceData.Properties = append(twinInstanceData.Properties, apiv0.TwinInstancePropertyData{
+				Id:   twinProperty.Id,
+				Name: twinProperty.Name,
+			})
+		}
 
-	for _, twinTelemetry := range twinInterface.Spec.Telemetries {
-		twinInstanceData.Telemetries = append(twinInstanceData.Telemetries, apiv0.TwinInstanceTelemetryData{
-			Id:   twinTelemetry.Id,
-			Name: twinTelemetry.Name,
-		})
+		for _, twinTelemetry := range twinInterface.Spec.Telemetries {
+			twinInstanceData.Telemetries = append(twinInstanceData.Telemetries, apiv0.TwinInstanceTelemetryData{
+				Id:   twinTelemetry.Id,
+				Name: twinTelemetry.Name,
+			})
+		}
 	}
 
 	return twinInstanceData

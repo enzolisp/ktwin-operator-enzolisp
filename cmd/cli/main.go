@@ -128,9 +128,33 @@ func generateOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInt
 			continue
 		}
 
-		twinInstance := pkg.NewResourceBuilder().CreateTwinInstance(*twinInterface)
+		parentTwinInterfaces := getParentTwinInterfaces(*twinInterface, dtdlGraph)
+		twinInstance := pkg.NewResourceBuilder().CreateTwinInstance(*twinInterface, parentTwinInterfaces)
 		writeOutputFile(processedFile.outputFilePath, *twinInterface, twinInstance)
 	}
+}
+
+// Return a list of TwinInterfaces that contains the TwinInterface being processed and all the parent TwinInterfaces
+func getParentTwinInterfaces(twinInterface v0.TwinInterface, dtdlGraph graph.TwinInterfaceGraph) []v0.TwinInterface {
+	var parentTwinInterfaces []v0.TwinInterface
+
+	parentTwinInterfaces = append(parentTwinInterfaces, twinInterface)
+
+	if twinInterface.Spec.ExtendsInterface != "" {
+		parentInterface := dtdlGraph.GetVertex(twinInterface.Spec.ExtendsInterface)
+
+		if parentInterface == nil {
+			return parentTwinInterfaces
+		}
+
+		parentInterfaceChain := getParentTwinInterfaces(*parentInterface, dtdlGraph)
+
+		if parentInterfaceChain != nil {
+			parentTwinInterfaces = append(parentTwinInterfaces, parentInterfaceChain...)
+		}
+	}
+
+	return parentTwinInterfaces
 }
 
 func writeOutputFile(outputFilePath string, twinInterface v0.TwinInterface, twinInstance v0.TwinInstance) {
