@@ -75,7 +75,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 							Containers: []corev1.Container{
 								{
 									Name:            "ktwin-event-store",
-									Image:           naming.GetContainerRegistry("event-store:0.1"),
+									Image:           naming.GetContainerRegistry("ktwin-event-store:0.1"),
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									Env: []corev1.EnvVar{
 										{

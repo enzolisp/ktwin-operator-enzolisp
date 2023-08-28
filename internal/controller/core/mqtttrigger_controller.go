@@ -192,7 +192,7 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 					Containers: []v1.Container{
 						{
 							Name:            "mqtt-dispatcher",
-							Image:           naming.GetContainerRegistry("mqtt-dispatcher:0.1"),
+							Image:           naming.GetContainerRegistry("ktwin-mqtt-dispatcher:0.1"),
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Ports: []v1.ContainerPort{
 								{
@@ -343,7 +343,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 					Containers: []v1.Container{
 						{
 							Name:            event.CLOUD_EVENT_DISPATCHER,
-							Image:           naming.GetContainerRegistry("cloud-event-dispatcher:0.1"),
+							Image:           naming.GetContainerRegistry("ktwin-cloud-event-dispatcher:0.1"),
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Ports: []v1.ContainerPort{
 								{

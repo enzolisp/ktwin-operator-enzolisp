@@ -6,8 +6,8 @@ import (
 
 const (
 	LOCAL_ENV              = "local"
-	LOCAL_CONTAINER_PREFIX = "dev.local/ktwin/"
-	CONTAINER_REGISTRY     = "ghcr.io/ktwins/"
+	LOCAL_CONTAINER_PREFIX = "dev.local/open-digital-twin/"
+	CONTAINER_REGISTRY     = "ghcr.io/open-digital-twin/"
 )
 
 func GetContainerRegistry(container string) string {

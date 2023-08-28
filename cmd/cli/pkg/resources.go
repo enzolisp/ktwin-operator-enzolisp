@@ -85,7 +85,7 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 					Spec: corev1.PodSpec{Containers: []corev1.Container{
 						{
 							Name:            normalizedInterfaceId,
-							Image:           naming.GetContainerRegistry("edge-service:0.1"),
+							Image:           naming.GetContainerRegistry("ktwin-edge-service:0.1"),
 							ImagePullPolicy: corev1.PullIfNotPresent,
 						},
 					}},
