@@ -116,6 +116,7 @@ func processInheritContents(dtdlGraph graph.TwinInterfaceGraph) graph.TwinInterf
 }
 
 func generateOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInterfaceGraph) {
+	//var outputString string
 
 	fmt.Println("Generating output files...")
 
@@ -131,7 +132,51 @@ func generateOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInt
 		parentTwinInterfaces := getParentTwinInterfaces(*twinInterface, dtdlGraph)
 		twinInstance := pkg.NewResourceBuilder().CreateTwinInstance(*twinInterface, parentTwinInterfaces)
 		writeOutputFile(processedFile.outputFilePath, *twinInterface, twinInstance)
+		// outputString += getTwinInstanceStringFields(twinInstance, parentTwinInterfaces)
 	}
+
+	// fmt.Printf(outputString)
+}
+
+func getTwinInstanceStringFields(twinInstance v0.TwinInstance, parentTwinInterfaces []v0.TwinInterface) string {
+	var outputString string
+
+	for _, twinInterface := range parentTwinInterfaces {
+		twinInterfaceName := parentTwinInterfaces[0].Name
+
+		for _, property := range twinInterface.Spec.Properties {
+			var propertyList []string
+			propertyList = append(propertyList, twinInterfaceName)
+			propertyList = append(propertyList, "property")
+			propertyList = append(propertyList, property.Name)
+			propertyList = append(propertyList, property.Description)
+
+			outputString = outputString + strings.Join(propertyList, ";;") + "\n"
+		}
+
+		for _, telemetry := range twinInterface.Spec.Telemetries {
+			var telemetryList []string
+			telemetryList = append(telemetryList, twinInterfaceName)
+			telemetryList = append(telemetryList, "telemetry")
+			telemetryList = append(telemetryList, telemetry.Name)
+			telemetryList = append(telemetryList, telemetry.Description)
+
+			outputString = outputString + strings.Join(telemetryList, ";;") + "\n"
+		}
+
+		for _, relationship := range twinInterface.Spec.Relationships {
+			var relationshipList []string
+			relationshipList = append(relationshipList, twinInterfaceName)
+			relationshipList = append(relationshipList, "relationship")
+			relationshipList = append(relationshipList, relationship.Name)
+			relationshipList = append(relationshipList, relationship.Description)
+
+			outputString = outputString + strings.Join(relationshipList, ";;") + "\n"
+		}
+
+	}
+
+	return outputString
 }
 
 // Return a list of TwinInterfaces that contains the TwinInterface being processed and all the parent TwinInterfaces
