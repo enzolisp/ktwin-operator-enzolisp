@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	EVENT_STORE_SERVICE string = "event-store"
+	EVENT_STORE_SERVICE string = "ktwin-event-store"
 )
 
 func NewEventStore() EventStore {
@@ -74,8 +74,8 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 						PodSpec: corev1.PodSpec{
 							Containers: []corev1.Container{
 								{
-									Name:            "ktwin-event-store",
-									Image:           naming.GetContainerRegistry("ktwin-event-store:0.1"),
+									Name:            EVENT_STORE_SERVICE + "-v1",
+									Image:           naming.GetContainerRegistry(EVENT_STORE_SERVICE + ":0.1"),
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									Env: []corev1.EnvVar{
 										{

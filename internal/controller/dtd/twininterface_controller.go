@@ -21,6 +21,8 @@ import (
 	"fmt"
 
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
+	eventingv1 "knative.dev/eventing/pkg/apis/eventing/v1"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -76,8 +78,30 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 
 	// Create Service Instance and Trigger, if pod is specified
 	if twinInterface.Spec.Service != nil {
-		kService := r.TwinService.GetService(twinInterface)
-		err := r.Create(ctx, kService, &client.CreateOptions{})
+		// Get Broker
+		broker := eventingv1.Broker{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: "ktwin", Name: "ktwin"}, &broker)
+
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while getting Broker"))
+			resultErrors = append(resultErrors, err)
+		}
+
+		// Get Event Store
+		eventStoreService := servingv1.Service{}
+		err = r.Get(ctx, types.NamespacedName{Namespace: "ktwin", Name: "event-store"}, &eventStoreService)
+
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while getting event store"))
+			resultErrors = append(resultErrors, err)
+		}
+
+		kService := r.TwinService.GetService(twinservice.TwinServiceParameters{
+			TwinInterface: twinInterface,
+			Broker:        broker,
+			Service:       eventStoreService,
+		})
+		err = r.Create(ctx, kService, &client.CreateOptions{})
 
 		if err != nil && !errors.IsAlreadyExists(err) {
 			logger.Error(err, fmt.Sprintf("Error while creating Knative Service %s", twinInterfaceName))

@@ -4,17 +4,24 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 
 	dtdv0 "ktwin/operator/api/dtd/v0"
 )
+
+type TwinServiceParameters struct {
+	TwinInterface *dtdv0.TwinInterface
+	Broker        keventing.Broker
+	Service       kserving.Service
+}
 
 func NewTwinService() TwinService {
 	return &twinService{}
 }
 
 type TwinService interface {
-	GetService(twinInterface *dtdv0.TwinInterface) *kserving.Service
+	GetService(twinServiceParameters TwinServiceParameters) *kserving.Service
 	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
@@ -30,9 +37,37 @@ func (e *twinService) GetServiceDeletionCriteria(namespacedName types.Namespaced
 	return e.getServiceLabels(namespacedName.Name)
 }
 
-func (t *twinService) GetService(twinInterface *dtdv0.TwinInterface) *kserving.Service {
+func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServiceParameters) []corev1.Container {
+	var containers []corev1.Container
+
+	brokerUrl := twinServiceParameters.Broker.Status.Address.URL.URL()
+	eventStoreUrl := twinServiceParameters.Service.Status.URL.URL()
+
+	for _, container := range twinServiceParameters.TwinInterface.Spec.Service.Template.Spec.Containers {
+		containers = append(containers, corev1.Container{
+			Name:            container.Name,
+			Image:           container.Image,
+			ImagePullPolicy: container.ImagePullPolicy,
+			Env: []corev1.EnvVar{
+				{
+					Name:  "KTWIN_BROKER",
+					Value: brokerUrl.String(),
+				},
+				{
+					Name:  "KTWIN_EVENT_STORE",
+					Value: eventStoreUrl.String(),
+				},
+			},
+		})
+	}
+
+	return containers
+}
+
+func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *kserving.Service {
+	twinInterface := twinServiceParameters.TwinInterface
 	twinInterfaceName := twinInterface.ObjectMeta.Name
-	podSpec := twinInterface.Spec.Service.Template.Spec
+	containers := t.getTwinInterfaceContainers(twinServiceParameters)
 
 	service := &kserving.Service{
 		TypeMeta: v1.TypeMeta{
@@ -64,7 +99,7 @@ func (t *twinService) GetService(twinInterface *dtdv0.TwinInterface) *kserving.S
 					},
 					Spec: kserving.RevisionSpec{
 						PodSpec: corev1.PodSpec{
-							Containers: podSpec.Containers,
+							Containers: containers,
 						},
 					},
 				},
