@@ -19,5 +19,7 @@ const (
 )
 
 const (
-	EVENT_BROKER_NAME string = "ktwin"
+	EVENT_BROKER_NAME               string = "ktwin"
+	RABBITMQ_VHOST                  string = "/"
+	CLOUD_EVENT_DISPATCHER_EXCHANGE string = "amq.topic"
 )
