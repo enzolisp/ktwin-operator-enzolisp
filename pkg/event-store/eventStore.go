@@ -31,7 +31,7 @@ func NewEventStore() EventStore {
 type EventStore interface {
 	GetEventStoreService(eventStore *corev0.EventStore) *kserving.Service
 	GetEventStoreTrigger(eventStore *corev0.EventStore) kEventing.Trigger
-	GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
+	GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 }
 
 type eventStore struct{}
@@ -122,67 +122,12 @@ func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventi
 	})
 }
 
-func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding {
+func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding {
 	var eventStoreBindings []rabbitmqv1beta1.Binding
 
-	realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-		Name:      strings.ToLower(twinInterface.Name) + "-real-event-store-" + uuid.NewString(),
-		Namespace: twinInterface.Namespace,
-		Owner: []v1.OwnerReference{
-			{
-				APIVersion: twinInterface.APIVersion,
-				Kind:       twinInterface.Kind,
-				Name:       twinInterface.Name,
-				UID:        twinInterface.UID,
-			},
-		},
-		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
-			Name:      "rabbitmq",
-			Namespace: "ktwin",
-		},
-		RabbitMQVhost: "/",
-		Source:        brokerExchange.Spec.Name,
-		Destination:   eventStoreQueue.Spec.Name,
-		Filters: map[string]string{
-			"type":              naming.GetEventTypeRealGenerated(twinInterface.Name),
-			"x-knative-trigger": "event-store-trigger",
-			"x-match":           "all",
-		},
-		Labels: map[string]string{},
-	})
-
-	virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-		Name:      strings.ToLower(twinInterface.Name) + "-virtual-event-store-" + uuid.NewString(),
-		Namespace: twinInterface.Namespace,
-		Owner: []v1.OwnerReference{
-			{
-				APIVersion: twinInterface.APIVersion,
-				Kind:       twinInterface.Kind,
-				Name:       twinInterface.Name,
-				UID:        twinInterface.UID,
-			},
-		},
-		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
-			Name:      "rabbitmq",
-			Namespace: "ktwin",
-		},
-		RabbitMQVhost: "/",
-		Source:        brokerExchange.Spec.Name,
-		Destination:   eventStoreQueue.Spec.Name,
-		Filters: map[string]string{
-			"type":              naming.GetEventTypeVirtualGenerated(twinInterface.Name),
-			"x-knative-trigger": "event-store-trigger",
-			"x-match":           "all",
-		},
-		Labels: map[string]string{},
-	})
-
-	eventStoreBindings = append(eventStoreBindings, realEventBinding)
-	eventStoreBindings = append(eventStoreBindings, virtualEventBinding)
-
-	for _, relationship := range twinInterface.Spec.Relationships {
+	if twinInterface.Spec.EventStore.PersistRealEvent {
 		realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-			Name:      strings.ToLower(relationship.Name) + "-real-event-store-" + uuid.NewString(),
+			Name:      strings.ToLower(twinInterface.Name) + "-real-event-store-" + uuid.NewString(),
 			Namespace: twinInterface.Namespace,
 			Owner: []v1.OwnerReference{
 				{
@@ -200,40 +145,41 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 			Source:        brokerExchange.Spec.Name,
 			Destination:   eventStoreQueue.Spec.Name,
 			Filters: map[string]string{
-				"type":              naming.GetEventTypeRealGenerated(relationship.Interface),
+				"type":              naming.GetEventTypeRealGenerated(twinInterface.Name),
 				"x-knative-trigger": "event-store-trigger",
 				"x-match":           "all",
 			},
 			Labels: map[string]string{},
 		})
-
-		virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-			Name:      strings.ToLower(relationship.Name) + "-virtual-event-store-" + uuid.NewString(),
-			Namespace: twinInterface.Namespace,
-			Owner: []v1.OwnerReference{
-				{
-					APIVersion: twinInterface.APIVersion,
-					Kind:       twinInterface.Kind,
-					Name:       twinInterface.Name,
-					UID:        twinInterface.UID,
-				},
-			},
-			RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
-				Name:      "rabbitmq",
-				Namespace: "ktwin",
-			},
-			RabbitMQVhost: "/",
-			Source:        brokerExchange.Spec.Name,
-			Destination:   eventStoreQueue.Spec.Name,
-			Filters: map[string]string{
-				"type":              naming.GetEventTypeVirtualGenerated(relationship.Interface),
-				"x-knative-trigger": "event-store-trigger",
-				"x-match":           "all",
-			},
-			Labels: map[string]string{},
-		})
-
 		eventStoreBindings = append(eventStoreBindings, realEventBinding)
+	}
+
+	if twinInterface.Spec.EventStore.PersistVirtualEvent {
+		virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+			Name:      strings.ToLower(twinInterface.Name) + "-virtual-event-store-" + uuid.NewString(),
+			Namespace: twinInterface.Namespace,
+			Owner: []v1.OwnerReference{
+				{
+					APIVersion: twinInterface.APIVersion,
+					Kind:       twinInterface.Kind,
+					Name:       twinInterface.Name,
+					UID:        twinInterface.UID,
+				},
+			},
+			RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+				Name:      "rabbitmq",
+				Namespace: "ktwin",
+			},
+			RabbitMQVhost: "/",
+			Source:        brokerExchange.Spec.Name,
+			Destination:   eventStoreQueue.Spec.Name,
+			Filters: map[string]string{
+				"type":              naming.GetEventTypeVirtualGenerated(twinInterface.Name),
+				"x-knative-trigger": "event-store-trigger",
+				"x-match":           "all",
+			},
+			Labels: map[string]string{},
+		})
 		eventStoreBindings = append(eventStoreBindings, virtualEventBinding)
 	}
 

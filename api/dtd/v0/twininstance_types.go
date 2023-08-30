@@ -64,8 +64,6 @@ type TwinInstanceRelationship struct {
 	Interface string `json:"interface,omitempty"`
 	// The Target TwinInstance of the Relationship
 	Instance string `json:"instance,omitempty"`
-	// Indicates if the data from the relationship must be aggregated in the twin instance
-	AggregateData bool `json:"aggregateData,omitempty"`
 }
 
 // TODO: Configure as read-only

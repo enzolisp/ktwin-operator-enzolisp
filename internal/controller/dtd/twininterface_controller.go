@@ -19,6 +19,7 @@ package dtd
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	eventingv1 "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -74,6 +75,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 	twinInterfaceName := twinInterface.ObjectMeta.Name
 
 	var resultErrors []error
+	var twinInterfaceTrigger eventingv1.Trigger
 	logger := log.FromContext(ctx)
 
 	// Create Service Instance and Trigger, if pod is specified
@@ -109,78 +111,61 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		}
 
 		// Create Trigger
-		trigger := r.TwinEvent.GetTwinInterfaceTrigger(twinInterface)
-		err = r.Create(ctx, &trigger, &client.CreateOptions{})
+		twinInterfaceTrigger = r.TwinEvent.GetTwinInterfaceTrigger(twinInterface)
+		err = r.Create(ctx, &twinInterfaceTrigger, &client.CreateOptions{})
 		if err != nil && !errors.IsAlreadyExists(err) {
 			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
 		}
 
 		// Get Created Trigger
-		err = r.Get(ctx, types.NamespacedName{Namespace: trigger.Namespace, Name: trigger.Name}, &trigger, &client.GetOptions{})
+		err = r.Get(ctx, types.NamespacedName{Namespace: twinInterfaceTrigger.Namespace, Name: twinInterfaceTrigger.Name}, &twinInterfaceTrigger, &client.GetOptions{})
 		if err != nil && !errors.IsAlreadyExists(err) {
-			logger.Error(err, fmt.Sprintf("Error while getting trigger %s", trigger.Name))
+			logger.Error(err, fmt.Sprintf("Error while getting trigger %s", twinInterfaceTrigger.Name))
 			resultErrors = append(resultErrors, err)
 		}
 
-		// Create Relationship RabbitMQ bindings to existing Queue and Eventing
-		// RabbitMQ exchange (Broker): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/broker/broker.go#L133
-		// RabbitMQ Queue (Trigger): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/trigger/trigger.go#L233
-		// Deletion: Can use ownerReferences for deletion in cascade
+	}
 
-		eventStoreQueuesList := rabbitmqv1beta1.QueueList{}
-		queueListOptions := []client.ListOption{
-			client.InNamespace(twinInterface.Namespace),
-			client.MatchingLabels(client.MatchingFields{
-				"eventing.knative.dev/trigger": "event-store-trigger",
-			}),
+	// Create Relationship RabbitMQ bindings to existing Queue and Eventing
+	// RabbitMQ exchange (Broker): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/broker/broker.go#L133
+	// RabbitMQ Queue (Trigger): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/trigger/trigger.go#L233
+	// Deletion: Can use ownerReferences for deletion in cascade
+
+	eventStoreQueue, err := r.getEventStoreQueue(ctx, req, twinInterface)
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("No Queue found for event store %s", twinInterfaceName))
+		resultErrors = append(resultErrors, err)
+		return ctrl.Result{}, err
+	}
+
+	brokerExchange, err := r.getBrokerExchange(ctx, req, twinInterface)
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("No Broker Exchange found for TwinInterface %s", twinInterfaceName))
+		resultErrors = append(resultErrors, err)
+	} else {
+
+		bindings := r.EventStore.GetEventStoreBrokerBindings(twinInterface, brokerExchange, eventStoreQueue)
+
+		for _, binding := range bindings {
+			err = r.Create(ctx, &binding, &client.CreateOptions{})
+			if err != nil && !errors.IsAlreadyExists(err) {
+				logger.Error(err, fmt.Sprintf("Error while creating EventStore TwinInterface Bindings %s", binding.Name))
+				resultErrors = append(resultErrors, err)
+			}
 		}
 
-		err = r.List(ctx, &eventStoreQueuesList, queueListOptions...)
-
-		if len(eventStoreQueuesList.Items) == 0 {
-			logger.Error(err, fmt.Sprintf("No Queue found for event store %s", twinInterfaceName))
-			resultErrors = append(resultErrors, err)
-			return ctrl.Result{}, err
-		}
-
-		exchangeList := rabbitmqv1beta1.ExchangeList{}
-		exchangeListOptions := []client.ListOption{
-			client.InNamespace(twinInterface.Namespace),
-			client.MatchingLabels(client.MatchingFields{
-				"eventing.knative.dev/broker": "ktwin",
-			}),
-		}
-
-		err = r.List(ctx, &exchangeList, exchangeListOptions...)
+		twinInterfaceQueue, err := r.getTwinInterfaceQueue(ctx, req, twinInterface)
 
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while getting default broker exchange"))
-			resultErrors = append(resultErrors, err)
-		}
-
-		if len(exchangeList.Items) == 0 {
-			logger.Error(err, fmt.Sprintf("No Broker Exchange found for TwinInterface %s", twinInterfaceName))
-			resultErrors = append(resultErrors, err)
-		} else {
-			queueList := rabbitmqv1beta1.QueueList{}
-			queueListOptions := []client.ListOption{
-				client.InNamespace(twinInterface.Namespace),
-				client.MatchingLabels(client.MatchingFields{
-					"eventing.knative.dev/broker":  "ktwin",
-					"eventing.knative.dev/trigger": twinInterface.Name,
-				}),
-			}
-
-			err = r.List(ctx, &queueList, queueListOptions...)
-
-			if len(queueList.Items) == 0 {
-				logger.Error(err, fmt.Sprintf("No Broker Queue found for TwinInterface %s", twinInterfaceName))
+			if !errors.IsNotFound(err) {
+				logger.Error(err, fmt.Sprintf("Error while getting TwinInterface %s Queue", twinInterfaceName))
 				resultErrors = append(resultErrors, err)
-			} else {
-				brokerExchange := exchangeList.Items[0]
-				twinInterfaceQueue := queueList.Items[0]
-				bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, trigger, brokerExchange, twinInterfaceQueue)
+			}
+		} else {
+			if !reflect.DeepEqual(eventingv1.Trigger{}, twinInterfaceTrigger) {
+				bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, twinInterfaceTrigger, brokerExchange, twinInterfaceQueue)
 
 				for _, binding := range bindings {
 					err = r.Create(ctx, &binding, &client.CreateOptions{})
@@ -189,18 +174,6 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 						resultErrors = append(resultErrors, err)
 					}
 				}
-
-				eventStoreQueue := eventStoreQueuesList.Items[0]
-				bindings = r.EventStore.GetEventStoreBrokerBindings(twinInterface, trigger, brokerExchange, eventStoreQueue)
-
-				for _, binding := range bindings {
-					err = r.Create(ctx, &binding, &client.CreateOptions{})
-					if err != nil && !errors.IsAlreadyExists(err) {
-						logger.Error(err, fmt.Sprintf("Error while creating EventStore TwinInterface Bindings %s", binding.Name))
-						resultErrors = append(resultErrors, err)
-					}
-				}
-
 			}
 		}
 	}
@@ -217,13 +190,75 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 	}
 
 	// Update Status for Running or Failed
-	_, err := r.updateTwinInterface(ctx, req, twinInterface)
+	_, err = r.updateTwinInterface(ctx, req, twinInterface)
 
 	if err != nil {
 		return ctrl.Result{}, nil
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *TwinInterfaceReconciler) getEventStoreQueue(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (rabbitmqv1beta1.Queue, error) {
+	logger := log.FromContext(ctx)
+	eventStoreQueuesList := rabbitmqv1beta1.QueueList{}
+	queueListOptions := []client.ListOption{
+		client.InNamespace(twinInterface.Namespace),
+		client.MatchingLabels(client.MatchingFields{
+			"eventing.knative.dev/trigger": "event-store-trigger",
+		}),
+	}
+
+	err := r.List(ctx, &eventStoreQueuesList, queueListOptions...)
+
+	if len(eventStoreQueuesList.Items) == 0 {
+		logger.Error(err, fmt.Sprintf("No Queue found for event store %s", twinInterface.Name))
+		return rabbitmqv1beta1.Queue{}, err
+	}
+	return eventStoreQueuesList.Items[0], nil
+}
+
+func (r *TwinInterfaceReconciler) getBrokerExchange(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (rabbitmqv1beta1.Exchange, error) {
+	logger := log.FromContext(ctx)
+	exchangeList := rabbitmqv1beta1.ExchangeList{}
+	exchangeListOptions := []client.ListOption{
+		client.InNamespace(twinInterface.Namespace),
+		client.MatchingLabels(client.MatchingFields{
+			"eventing.knative.dev/broker": "ktwin",
+		}),
+	}
+
+	err := r.List(ctx, &exchangeList, exchangeListOptions...)
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while getting default broker exchange"))
+		return rabbitmqv1beta1.Exchange{}, err
+	}
+
+	return exchangeList.Items[0], nil
+}
+
+func (r *TwinInterfaceReconciler) getTwinInterfaceQueue(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (rabbitmqv1beta1.Queue, error) {
+	queueList := rabbitmqv1beta1.QueueList{}
+	queueListOptions := []client.ListOption{
+		client.InNamespace(twinInterface.Namespace),
+		client.MatchingLabels(client.MatchingFields{
+			"eventing.knative.dev/broker":  "ktwin",
+			"eventing.knative.dev/trigger": twinInterface.Name,
+		}),
+	}
+
+	err := r.List(ctx, &queueList, queueListOptions...)
+
+	if err != nil {
+		return rabbitmqv1beta1.Queue{}, err
+	}
+
+	if len(queueList.Items) == 0 {
+		return rabbitmqv1beta1.Queue{}, errors.NewNotFound(rabbitmqv1beta1.Resource("rabbitmqv1beta1.Queue"), twinInterface.Name)
+	}
+
+	return queueList.Items[0], nil
 }
 
 func (r *TwinInterfaceReconciler) updateTwinInterface(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {

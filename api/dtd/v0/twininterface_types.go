@@ -47,20 +47,26 @@ const (
 
 // TwinInterfaceSpec defines the desired state of TwinInterface
 type TwinInterfaceSpec struct {
-	Id               string                `json:"id,omitempty"`
-	DisplayName      string                `json:"displayName,omitempty"`
-	Description      string                `json:"description,omitempty"`
-	Comment          string                `json:"comment,omitempty"`
-	Properties       []TwinProperty        `json:"properties,omitempty"`
-	Commands         []TwinCommand         `json:"commands,omitempty"`
-	Relationships    []TwinRelationship    `json:"relationships,omitempty"`
-	Telemetries      []TwinTelemetry       `json:"telemetries,omitempty"`
-	ExtendsInterface string                `json:"extendsInterface,omitempty"`
-	Service          *TwinInterfaceService `json:"service,omitempty"` // Must be a pointer because Containers[] field is required
+	Id               string                  `json:"id,omitempty"`
+	DisplayName      string                  `json:"displayName,omitempty"`
+	Description      string                  `json:"description,omitempty"`
+	Comment          string                  `json:"comment,omitempty"`
+	Properties       []TwinProperty          `json:"properties,omitempty"`
+	Commands         []TwinCommand           `json:"commands,omitempty"`
+	Relationships    []TwinRelationship      `json:"relationships,omitempty"`
+	Telemetries      []TwinTelemetry         `json:"telemetries,omitempty"`
+	ExtendsInterface string                  `json:"extendsInterface,omitempty"`
+	EventStore       TwinInterfaceEventStore `json:"eventStore,omitempty"`
+	Service          *TwinInterfaceService   `json:"service,omitempty"` // Must be a pointer because Containers[] field is required
 }
 
 type TwinInterfaceService struct {
 	Template corev1.PodTemplateSpec `json:"template,omitempty"`
+}
+
+type TwinInterfaceEventStore struct {
+	PersistRealEvent    bool `json:"persistRealEvent,omitempty"`
+	PersistVirtualEvent bool `json:"persistVirtualEvent,omitempty"`
 }
 
 type TwinProperty struct {
@@ -110,7 +116,10 @@ type TwinRelationship struct {
 	Interface       string         `json:"interface,omitempty"`
 	Schema          *TwinSchema    `json:"schema,omitempty"`
 	Writeable       bool           `json:"writeable,omitempty"`
-	AggregateData   bool           `json:"aggregateData,omitempty"`
+	// Indicate if the data must be aggregated in the relationship parent
+	AggregateData bool `json:"aggregateData,omitempty"`
+	// // Indicate if the data must be persisted in the event store before reaching the custom service
+	// PersistInEventStore bool `json:"persistInEventStore,omitempty"`
 }
 
 type TwinTelemetry struct {

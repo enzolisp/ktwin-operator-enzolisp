@@ -118,10 +118,6 @@ spec:
               twinInstanceRelationships:
                 items:
                   properties:
-                    aggregateData:
-                      description: Indicates if the data from the relationship must
-                        be aggregated in the twin instance
-                      type: boolean
                     instance:
                       description: The Target TwinInstance of the Relationship
                       type: string

@@ -21,7 +21,7 @@ func NewTwinEvent() TwinEvent {
 type TwinEvent interface {
 	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
-	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance) []rabbitmqv1beta1.Binding
+	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
 	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
@@ -73,6 +73,7 @@ func (e *twinEvent) GetTriggersDeletionFilterCriteria(namespacedName types.Names
 
 func (e *twinEvent) GetMQQTDispatcherBindings(
 	twinInstance *dtdv0.TwinInstance,
+	twinInterface *dtdv0.TwinInterface,
 ) []rabbitmqv1beta1.Binding {
 	var rabbitMQBindings []rabbitmqv1beta1.Binding
 
@@ -100,30 +101,32 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 
 	rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
 
-	for _, relationship := range twinInstance.Spec.TwinInstanceRelationships {
-		if relationship.AggregateData {
-			rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-				Name:      strings.ToLower(relationship.Name) + "-real-" + uuid.NewString(),
-				Namespace: twinInstance.Namespace,
-				Owner: []v1.OwnerReference{
-					{
-						APIVersion: twinInstance.APIVersion,
-						Kind:       twinInstance.Kind,
-						Name:       twinInstance.Name,
-						UID:        twinInstance.UID,
+	for _, twinInstanceRelationship := range twinInstance.Spec.TwinInstanceRelationships {
+		for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
+			if twinInterfaceRelationship.Name == twinInstanceRelationship.Name && twinInterfaceRelationship.AggregateData {
+				rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+					Name:      strings.ToLower(twinInstanceRelationship.Name) + "-real-" + uuid.NewString(),
+					Namespace: twinInstance.Namespace,
+					Owner: []v1.OwnerReference{
+						{
+							APIVersion: twinInstance.APIVersion,
+							Kind:       twinInstance.Kind,
+							Name:       twinInstance.Name,
+							UID:        twinInstance.UID,
+						},
 					},
-				},
-				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
-					Name:      "rabbitmq",
-					Namespace: "ktwin",
-				},
-				RabbitMQVhost: RABBITMQ_VHOST,
-				Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
-				Destination:   MQTT_DISPATCHER_QUEUE,
-				Labels:        map[string]string{},
-				RoutingKey:    e.getEventTypeRealGenerated(relationship.Interface + "." + relationship.Instance),
-			})
-			rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
+					RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+						Name:      "rabbitmq",
+						Namespace: "ktwin",
+					},
+					RabbitMQVhost: RABBITMQ_VHOST,
+					Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
+					Destination:   MQTT_DISPATCHER_QUEUE,
+					Labels:        map[string]string{},
+					RoutingKey:    e.getEventTypeRealGenerated(twinInstanceRelationship.Interface + "." + twinInstanceRelationship.Instance),
+				})
+				rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
+			}
 		}
 	}
 

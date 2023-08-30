@@ -121,6 +121,13 @@ spec:
                 type: string
               displayName:
                 type: string
+              eventStore:
+                properties:
+                  persistRealEvent:
+                    type: boolean
+                  persistVirtualEvent:
+                    type: boolean
+                type: object
               extendsInterface:
                 type: string
               id:
@@ -167,6 +174,8 @@ spec:
                 items:
                   properties:
                     aggregateData:
+                      description: Indicate if the data must be aggregated in the
+                        relationship parent
                       type: boolean
                     comment:
                       type: string
