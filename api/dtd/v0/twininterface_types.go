@@ -118,8 +118,6 @@ type TwinRelationship struct {
 	Writeable       bool           `json:"writeable,omitempty"`
 	// Indicate if the data must be aggregated in the relationship parent
 	AggregateData bool `json:"aggregateData,omitempty"`
-	// // Indicate if the data must be persisted in the event store before reaching the custom service
-	// PersistInEventStore bool `json:"persistInEventStore,omitempty"`
 }
 
 type TwinTelemetry struct {
