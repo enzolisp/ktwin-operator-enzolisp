@@ -7,7 +7,7 @@ layout:
 - go.kubebuilder.io/v4
 multigroup: true
 projectName: ktwin-operator
-repo: ktwin/operator
+repo: github.com/Open-Digital-Twin/ktwin-operator
 resources:
 - api:
     crdVersion: v1
@@ -16,7 +16,7 @@ resources:
   domain: ktwin
   group: dtd
   kind: TwinInterface
-  path: ktwin/operator/api/dtd/v0
+  path: github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0
   version: v0
 - api:
     crdVersion: v1
@@ -25,7 +25,7 @@ resources:
   domain: ktwin
   group: dtd
   kind: TwinInstance
-  path: ktwin/operator/api/dtd/v0
+  path: github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0
   version: v0
 - api:
     crdVersion: v1
@@ -34,7 +34,7 @@ resources:
   domain: ktwin
   group: core
   kind: Gateway
-  path: ktwin/operator/api/core/v0
+  path: github.com/Open-Digital-Twin/ktwin-operator/api/core/v0
   version: v0
 - api:
     crdVersion: v1
@@ -43,7 +43,7 @@ resources:
   domain: ktwin
   group: core
   kind: MQTTTrigger
-  path: ktwin/operator/api/core/v0
+  path: github.com/Open-Digital-Twin/ktwin-operator/api/core/v0
   version: v0
 - api:
     crdVersion: v1
@@ -52,6 +52,6 @@ resources:
   domain: ktwin
   group: core
   kind: EventStore
-  path: ktwin/operator/api/core/v0
+  path: github.com/Open-Digital-Twin/ktwin-operator/api/core/v0
   version: v0
 version: "3"

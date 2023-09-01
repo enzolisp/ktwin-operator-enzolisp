@@ -1,6 +1,6 @@
 package dtdl
 
-import "ktwin/operator/cmd/cli/types"
+import "github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/types"
 
 // This file stores the `Digital Twins Definition Language` Models in JSON Format
 // https://github.com/Azure/opendigitaltwins-dtdl

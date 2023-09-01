@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	corev0 "ktwin/operator/api/core/v0"
+	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
 )
 
 // GatewayReconciler reconciles a Gateway object

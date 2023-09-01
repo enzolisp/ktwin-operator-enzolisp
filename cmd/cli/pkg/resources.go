@@ -1,15 +1,16 @@
 package pkg
 
 import (
-	apiv0 "ktwin/operator/api/dtd/v0"
-	dtdl "ktwin/operator/cmd/cli/dtdl"
-	"ktwin/operator/pkg/naming"
 	"reflect"
+
+	apiv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	dtdl "github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/dtdl"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/naming"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"ktwin/operator/cmd/cli/utils"
+	"github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/utils"
 )
 
 const (

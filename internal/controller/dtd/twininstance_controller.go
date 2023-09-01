@@ -20,9 +20,9 @@ import (
 	"context"
 	"fmt"
 
-	twinevent "ktwin/operator/pkg/event"
-	eventStore "ktwin/operator/pkg/event-store"
-	twinservice "ktwin/operator/pkg/service"
+	twinevent "github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
+	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
+	twinservice "github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	dtdv0 "ktwin/operator/api/dtd/v0"
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 )
 
 // TwinInstanceReconciler reconciles a TwinInstance object

@@ -30,7 +30,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	corev0 "ktwin/operator/api/core/v0"
+	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
 	//+kubebuilder:scaffold:imports
 )
 

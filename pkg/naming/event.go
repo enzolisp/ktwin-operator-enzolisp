@@ -2,7 +2,8 @@ package naming
 
 import (
 	"fmt"
-	"ktwin/operator/pkg/event"
+
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 )
 
 func GetEventTypeVirtualGenerated(twinInterfaceName string) string {

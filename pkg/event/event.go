@@ -2,9 +2,10 @@ package event
 
 import (
 	"fmt"
-	dtdv0 "ktwin/operator/api/dtd/v0"
-	"ktwin/operator/pkg/third-party/rabbitmq"
 	"strings"
+
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/rabbitmq"
 
 	"github.com/google/uuid"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"

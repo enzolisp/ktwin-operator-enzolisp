@@ -13,10 +13,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	corev0 "ktwin/operator/api/core/v0"
-	"ktwin/operator/pkg/event"
-	"ktwin/operator/pkg/naming"
-	"ktwin/operator/pkg/third-party/rabbitmq"
+	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/naming"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/rabbitmq"
 
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"

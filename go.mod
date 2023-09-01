@@ -1,4 +1,4 @@
-module ktwin/operator
+module github.com/Open-Digital-Twin/ktwin-operator
 
 go 1.19
 

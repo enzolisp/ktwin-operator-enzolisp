@@ -11,8 +11,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	corev0 "ktwin/operator/api/core/v0"
-	eventStore "ktwin/operator/pkg/event-store"
+	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
+	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
 )
 
 // EventStoreReconciler reconciles a EventStore object

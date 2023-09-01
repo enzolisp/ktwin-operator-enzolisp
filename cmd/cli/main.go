@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	v0 "ktwin/operator/api/dtd/v0"
-	dtdl "ktwin/operator/cmd/cli/dtdl"
-	"ktwin/operator/cmd/cli/graph"
-	pkg "ktwin/operator/cmd/cli/pkg"
+	v0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	dtdl "github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/dtdl"
+	"github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/graph"
+	pkg "github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/pkg"
 
 	k8sJson "k8s.io/apimachinery/pkg/runtime/serializer/json"
 )

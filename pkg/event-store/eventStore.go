@@ -6,11 +6,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	corev0 "ktwin/operator/api/core/v0"
-	dtdv0 "ktwin/operator/api/dtd/v0"
-	"ktwin/operator/pkg/naming"
-	knative "ktwin/operator/pkg/third-party/knative"
-	"ktwin/operator/pkg/third-party/rabbitmq"
+	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/naming"
+	knative "github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/knative"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/rabbitmq"
 
 	"github.com/google/uuid"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"

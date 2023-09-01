@@ -105,7 +105,7 @@ limitations under the License.
 ## Create Project Steps
 
 ```sh
-go mod init ktwin/operator
+go mod init github.com/Open-Digital-Twin/ktwin-operator
 kubebuilder init --domain ktwin --plugins=go/v4
 kubebuilder edit --multigroup=true
 kubebuilder create api --group dtd --version v0 --kind TwinInterface

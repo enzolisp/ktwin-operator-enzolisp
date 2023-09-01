@@ -3,7 +3,8 @@ package graph
 import (
 	"errors"
 	"fmt"
-	dtdv0 "ktwin/operator/api/dtd/v0"
+
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 )
 
 const (
