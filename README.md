@@ -115,7 +115,7 @@ kubebuilder create api --group core --version v0 --kind MQTTTrigger
 kubebuilder create api --group core --version v0 --kind EventStore
 ```
 
-## Setup Local enviroment
+## Setup Local environment
 
 ```sh
 sh hack/create-kind-cluster.sh && \
