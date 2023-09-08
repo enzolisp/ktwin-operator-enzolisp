@@ -5,3 +5,8 @@ metadata:
     app.kubernetes.io/name: event-store
   name: event-store
   namespace: ktwin
+spec:
+  autoScaling:
+    maxScale: 25
+    minScale: 3
+    target: 50

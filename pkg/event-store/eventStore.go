@@ -1,6 +1,8 @@
 package eventStore
 
 import (
+	"reflect"
+	"strconv"
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
@@ -38,6 +40,23 @@ type eventStore struct{}
 
 func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kserving.Service {
 	eventStoreName := eventStore.ObjectMeta.Name
+	var autoScalingAnnotations map[string]string = make(map[string]string)
+
+	if !reflect.DeepEqual(eventStore.Spec.AutoScaling, corev0.EventStoreScaling{}) {
+		autoScaling := eventStore.Spec.AutoScaling
+		autoScalingAnnotations = make(map[string]string)
+		if autoScaling.MaxScale != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/maxScale"] = strconv.Itoa(*autoScaling.MaxScale)
+		}
+
+		if autoScaling.MinScale != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/minScale"] = strconv.Itoa(*autoScaling.MinScale)
+		}
+
+		if autoScaling.Target != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/target"] = strconv.Itoa(*autoScaling.Target)
+		}
+	}
 
 	service := &kserving.Service{
 		TypeMeta: v1.TypeMeta{
@@ -63,12 +82,8 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
 					ObjectMeta: v1.ObjectMeta{
-						Name: eventStoreName + "-v1",
-						Annotations: map[string]string{
-							"autoscaling.knative.dev/target":   "2",
-							"autoscaling.knative.dev/minScale": "1",
-							"autoscaling.knative.dev/maxScale": "10",
-						},
+						Name:        eventStoreName + "-v1",
+						Annotations: autoScalingAnnotations,
 					},
 					Spec: kserving.RevisionSpec{
 						PodSpec: corev1.PodSpec{

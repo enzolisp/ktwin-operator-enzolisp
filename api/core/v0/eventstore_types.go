@@ -6,6 +6,13 @@ import (
 
 // EventStoreSpec defines the desired state of EventStore
 type EventStoreSpec struct {
+	AutoScaling EventStoreScaling `json:"autoScaling,omitempty"`
+}
+
+type EventStoreScaling struct {
+	MinScale *int `json:"minScale,omitempty"`
+	MaxScale *int `json:"maxScale,omitempty"`
+	Target   *int `json:"target,omitempty"`
 }
 
 // EventStoreStatus defines the observed state of EventStore
