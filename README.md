@@ -22,13 +22,13 @@ kubectl apply -f config/samples/
 2. Build and push your image to the location specified by `IMG`:
 
 ```sh
-make docker-build docker-push IMG=<some-registry>/ktwin-operator:tag
+make docker-build docker-push IMG=ghcr.io/open-digital-twin/ktwin-operator:0.1
 ```
 
 3. Deploy the controller to the cluster with the image specified by `IMG`:
 
 ```sh
-make deploy IMG=<some-registry>/ktwin-operator:tag
+make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator:0.1
 ```
 
 ### Uninstall CRDs
