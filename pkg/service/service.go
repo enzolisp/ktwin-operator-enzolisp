@@ -79,7 +79,7 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 		if autoScaling.MaxScale != nil {
 			autoScalingAnnotations["autoscaling.knative.dev/maxScale"] = strconv.Itoa(*autoScaling.MaxScale)
 		} else {
-			autoScalingAnnotations["autoscaling.knative.dev/minScale"] = strconv.Itoa(1)
+			autoScalingAnnotations["autoscaling.knative.dev/maxScale"] = strconv.Itoa(1)
 		}
 
 		if autoScaling.MinScale != nil {
