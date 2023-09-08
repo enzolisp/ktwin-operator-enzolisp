@@ -78,10 +78,14 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 		autoScalingAnnotations = make(map[string]string)
 		if autoScaling.MaxScale != nil {
 			autoScalingAnnotations["autoscaling.knative.dev/maxScale"] = strconv.Itoa(*autoScaling.MaxScale)
+		} else {
+			autoScalingAnnotations["autoscaling.knative.dev/minScale"] = strconv.Itoa(1)
 		}
 
 		if autoScaling.MinScale != nil {
 			autoScalingAnnotations["autoscaling.knative.dev/minScale"] = strconv.Itoa(*autoScaling.MinScale)
+		} else {
+			autoScalingAnnotations["autoscaling.knative.dev/minScale"] = strconv.Itoa(0)
 		}
 
 		if autoScaling.Target != nil {
