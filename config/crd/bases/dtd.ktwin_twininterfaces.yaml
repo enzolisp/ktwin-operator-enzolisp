@@ -258,6 +258,15 @@ spec:
                 type: array
               service:
                 properties:
+                  autoScaling:
+                    properties:
+                      maxScale:
+                        type: integer
+                      minScale:
+                        type: integer
+                      target:
+                        type: integer
+                    type: object
                   template:
                     description: PodTemplateSpec describes the data a pod should have
                       when created from a template

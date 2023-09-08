@@ -42,7 +42,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 	eventStoreName := eventStore.ObjectMeta.Name
 	var autoScalingAnnotations map[string]string = make(map[string]string)
 
-	if !reflect.DeepEqual(eventStore.Spec.AutoScaling, corev0.EventStoreScaling{}) {
+	if !reflect.DeepEqual(eventStore.Spec.AutoScaling, corev0.EventStoreAutoScaling{}) {
 		autoScaling := eventStore.Spec.AutoScaling
 		autoScalingAnnotations = make(map[string]string)
 		if autoScaling.MaxScale != nil {

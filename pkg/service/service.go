@@ -1,6 +1,9 @@
 package service
 
 import (
+	"reflect"
+	"strconv"
+
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -68,6 +71,23 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 	twinInterface := twinServiceParameters.TwinInterface
 	twinInterfaceName := twinInterface.ObjectMeta.Name
 	containers := t.getTwinInterfaceContainers(twinServiceParameters)
+	var autoScalingAnnotations map[string]string = make(map[string]string)
+
+	if !reflect.DeepEqual(twinInterface.Spec.Service.AutoScaling, dtdv0.TwinInterfaceAutoScaling{}) {
+		autoScaling := twinInterface.Spec.Service.AutoScaling
+		autoScalingAnnotations = make(map[string]string)
+		if autoScaling.MaxScale != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/maxScale"] = strconv.Itoa(*autoScaling.MaxScale)
+		}
+
+		if autoScaling.MinScale != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/minScale"] = strconv.Itoa(*autoScaling.MinScale)
+		}
+
+		if autoScaling.Target != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/target"] = strconv.Itoa(*autoScaling.Target)
+		}
+	}
 
 	service := &kserving.Service{
 		TypeMeta: v1.TypeMeta{
@@ -91,11 +111,8 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
 					ObjectMeta: v1.ObjectMeta{
-						Name: twinInterfaceName + "-v1",
-						Annotations: map[string]string{
-							"autoscaling.knative.dev/target":   "1",
-							"autoscaling.knative.dev/maxScale": "1",
-						},
+						Name:        twinInterfaceName + "-v1",
+						Annotations: autoScalingAnnotations,
 					},
 					Spec: kserving.RevisionSpec{
 						PodSpec: corev1.PodSpec{

@@ -61,7 +61,14 @@ type TwinInterfaceSpec struct {
 }
 
 type TwinInterfaceService struct {
-	Template corev1.PodTemplateSpec `json:"template,omitempty"`
+	Template    corev1.PodTemplateSpec   `json:"template,omitempty"`
+	AutoScaling TwinInterfaceAutoScaling `json:"autoScaling,omitempty"`
+}
+
+type TwinInterfaceAutoScaling struct {
+	MinScale *int `json:"minScale,omitempty"`
+	MaxScale *int `json:"maxScale,omitempty"`
+	Target   *int `json:"target,omitempty"`
 }
 
 type TwinInterfaceEventStore struct {
