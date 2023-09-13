@@ -19,6 +19,9 @@ kubectl wait -n scylla-manager --for=condition=ready pod -l app.kubernetes.io/na
 helm install scylla scylla/scylla --values hack/scylla-operator/helm/values.cluster.yaml --create-namespace --namespace ktwin
 kubectl wait -n ktwin --for=condition=ready pod -l app.kubernetes.io/name=scylla --timeout=200s
 
+# Configure scylla cluster monitoring
+kubectl apply -f hack/scylla-operator/monitoring.yaml
+
 # Uninstall
 # helm uninstall scylla -n ktwin
 # helm uninstall scylla-manager -n scylla-manager
