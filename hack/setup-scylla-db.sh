@@ -22,6 +22,9 @@ kubectl wait -n ktwin --for=condition=ready pod -l app.kubernetes.io/name=scylla
 # Configure scylla cluster monitoring
 kubectl apply -f hack/scylla-operator/monitoring.yaml
 
+# Import Grafana Dashboards
+# https://github.com/scylladb/scylla-monitoring/tree/master/grafana
+
 # Uninstall
 # helm uninstall scylla -n ktwin
 # helm uninstall scylla-manager -n scylla-manager
