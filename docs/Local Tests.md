@@ -50,6 +50,19 @@ kubectl run curl \
     -H "content-type: application/json"  \
     -H "ce-specversion: 1.0"  \
     -H "ce-source: city-pole-001"  \
+    -H "ce-type: ktwin.real.city-pole"  \
+    -H "ce-id: fee9097e-9a5c-4ecc-acad-c8ecc61ef59a"  \
+    -d '{"temperature":{"min":21,"max":29,"unit":"celsius"},"time":1568881230}' \
+    http://ktwin-broker-ingress.ktwin.svc.cluster.local
+```
+
+```sh
+kubectl run curl \
+    --image=curlimages/curl --rm=true --restart=Never -ti -- \
+    -X POST -v \
+    -H "content-type: application/json"  \
+    -H "ce-specversion: 1.0"  \
+    -H "ce-source: city-pole-001"  \
     -H "ce-type: ktwin.virtual.city-pole"  \
     -H "ce-id: 123-abc"  \
     -d '{"data":"response"}' \
