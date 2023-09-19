@@ -35,3 +35,29 @@ rules:
       - extensions
     resources:
       - ingresses
+  - apiGroups:
+    - apps
+    resources:
+    - deployments
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - autoscaling
+    resources:
+    - horizontalpodautoscalers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - eventing.knative.dev
+    resources:
+    - brokers
+    - triggers
+    - services
+    verbs:
+    - get
+    - list
+    - patch

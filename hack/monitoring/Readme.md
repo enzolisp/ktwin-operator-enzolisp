@@ -17,8 +17,6 @@ kubectl label namespaces rabbitmq-system podMonitor=prometheus
 
 ## RabbitMQ Monitoring
 
-Resources: https://www.rabbitmq.com/kubernetes/operator/operator-monitoring.html
-
 ```sh
 kubectl apply -n ktwin -f https://raw.githubusercontent.com/rabbitmq/cluster-operator/main/observability/prometheus/monitors/rabbitmq-servicemonitor.yml
 kubectl apply -n ktwin -f https://raw.githubusercontent.com/rabbitmq/cluster-operator/main/observability/prometheus/monitors/rabbitmq-cluster-operator-podmonitor.yml
@@ -34,6 +32,10 @@ Provide Prometheus access to read resources from `ktwin` namespace.
 kubectl apply -n ktwin -f prometheus-roles-ktwin.yaml # Required for RabbitMQ Cluster
 ```
 
+### Dashboards
+
+Import the dashboards in Grafana: https://github.com/rabbitmq/cluster-operator/tree/main/observability/grafana/dashboards
+
 ### Import dashboards
 
 https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_prometheus/docker/grafana/dashboards
@@ -43,39 +45,17 @@ https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_prometheus/d
 https://github.com/knative-extensions/monitoring
 
 ```sh
-# Install Knative Service Monitor
-kubectl delete -f https://raw.githubusercontent.com/knative-sandbox/monitoring/main/servicemonitor.yaml
-
-kubectl apply -f knative-servicemonitor.yaml
-
-kubectl label ServiceMonitor controller serviceMonitor=prometheus -n knative-serving
-kubectl label ServiceMonitor autoscaler serviceMonitor=prometheus -n knative-serving
-kubectl label ServiceMonitor activator serviceMonitor=prometheus -n knative-serving
-kubectl label ServiceMonitor webhook serviceMonitor=prometheus -n knative-serving
-
-# When you use helm to install kube-prometheus-stack, it adds label release: <prometheus-installed-namespace> to Kubernetes resource.
-kubectl label ServiceMonitor controller release=prometheus -n knative-serving
-kubectl label ServiceMonitor autoscaler release=prometheus -n knative-serving
-kubectl label ServiceMonitor activator release=prometheus -n knative-serving
-kubectl label ServiceMonitor webhook release=prometheus -n knative-serving
-
-kubectl label ServiceMonitor broker-filter serviceMonitor=prometheus -n knative-eventing
-kubectl label ServiceMonitor broker-ingress serviceMonitor=prometheus -n knative-eventing
-kubectl label PodMonitor eventing-controller serviceMonitor=prometheus -n knative-eventing
-kubectl label PodMonitor imc-controller serviceMonitor=prometheus -n knative-eventing
-kubectl label PodMonitor ping-source serviceMonitor=prometheus -n knative-eventing
-kubectl label PodMonitor apiserver-source serviceMonitor=prometheus -n knative-eventing
-
-kubectl label ServiceMonitor broker-filter release=prometheus -n knative-eventing
-kubectl label ServiceMonitor broker-ingress release=prometheus -n knative-eventing
-kubectl label PodMonitor eventing-controller release=prometheus -n knative-eventing
-kubectl label PodMonitor imc-controller release=prometheus -n knative-eventing
-kubectl label PodMonitor ping-source release=prometheus -n knative-eventing
-kubectl label PodMonitor apiserver-source release=prometheus -n knative-eventing
-
-kubectl apply -n knative-eventing -f prometheus-roles-knative.yaml # Required for RabbitMQ Cluster
-kubectl apply -n knative-serving -f prometheus-roles-knative.yaml # Required for RabbitMQ Cluster
+# Install Knative Service Monitor - Source: https://raw.githubusercontent.com/knative-sandbox/monitoring/main/servicemonitor.yaml
+kubectl apply -f knative-monitoring.yaml
+kubectl apply -f prometheus-roles-knative.yaml -n knative-serving
+kubectl apply -f prometheus-roles-knative.yaml -n knative-eventing
+kubectl apply -f prometheus-roles-knative.yaml -n ktwin
 ```
+
+kubectl delete -f prometheus-roles-knative.yaml -n knative-serving
+kubectl delete -f prometheus-roles-knative.yaml -n knative-eventing
+kubectl delete -f prometheus-roles-knative.yaml -n ktwin
+kubectl delete -f knative-monitoring.yaml
 
 ### Import Grafana Dashboards
 
