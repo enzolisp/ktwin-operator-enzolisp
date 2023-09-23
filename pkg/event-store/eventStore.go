@@ -56,6 +56,10 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 		if autoScaling.Target != nil {
 			autoScalingAnnotations["autoscaling.knative.dev/target"] = strconv.Itoa(*autoScaling.Target)
 		}
+
+		if autoScaling.Metric != "" {
+			autoScalingAnnotations["autoscaling.knative.dev/metric"] = string(*&autoScaling.Metric)
+		}
 	}
 
 	service := &kserving.Service{

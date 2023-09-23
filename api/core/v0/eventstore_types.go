@@ -4,15 +4,25 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type AutoScalerType string
+
+const (
+	CONCURRENCY AutoScalerType = "concurrency"
+	RPS         AutoScalerType = "rps"
+	CPU         AutoScalerType = "cpu"
+	MEMORY      AutoScalerType = "memory"
+)
+
 // EventStoreSpec defines the desired state of EventStore
 type EventStoreSpec struct {
 	AutoScaling EventStoreAutoScaling `json:"autoScaling,omitempty"`
 }
 
 type EventStoreAutoScaling struct {
-	MinScale *int `json:"minScale,omitempty"`
-	MaxScale *int `json:"maxScale,omitempty"`
-	Target   *int `json:"target,omitempty"`
+	MinScale *int           `json:"minScale,omitempty"`
+	MaxScale *int           `json:"maxScale,omitempty"`
+	Target   *int           `json:"target,omitempty"`
+	Metric   AutoScalerType `json:"metric,omitempty"`
 }
 
 // EventStoreStatus defines the observed state of EventStore

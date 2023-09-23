@@ -39,6 +39,8 @@ spec:
                 properties:
                   maxScale:
                     type: integer
+                  metric:
+                    type: string
                   minScale:
                     type: integer
                   target:

@@ -91,6 +91,10 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 		if autoScaling.Target != nil {
 			autoScalingAnnotations["autoscaling.knative.dev/target"] = strconv.Itoa(*autoScaling.Target)
 		}
+
+		if autoScaling.Metric != "" {
+			autoScalingAnnotations["autoscaling.knative.dev/metric"] = string(*&autoScaling.Metric)
+		}
 	}
 
 	service := &kserving.Service{

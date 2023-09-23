@@ -259,9 +259,17 @@ spec:
               service:
                 properties:
                   autoScaling:
+                    description: KNative Pod Auto Scaler Settings
                     properties:
                       maxScale:
                         type: integer
+                      metric:
+                        description: 'KNative Metric values (default, if not informed:
+                          concurrency) concurrency: the number of simultaneous requests
+                          that can be processed by each replica of an application
+                          at any given time rps: requests per seconds cpu: cpu usage
+                          memory: memory usage'
+                        type: string
                       minScale:
                         type: integer
                       target:

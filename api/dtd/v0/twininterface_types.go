@@ -32,6 +32,7 @@ const (
 
 type PrimitiveType string
 type Multiplicity string
+type AutoScalerType string
 
 const (
 	Integer PrimitiveType = "integer"
@@ -43,6 +44,13 @@ const (
 const (
 	ONE  Multiplicity = "one"
 	MANY Multiplicity = "many"
+)
+
+const (
+	CONCURRENCY AutoScalerType = "concurrency"
+	RPS         AutoScalerType = "rps"
+	CPU         AutoScalerType = "cpu"
+	MEMORY      AutoScalerType = "memory"
 )
 
 // TwinInterfaceSpec defines the desired state of TwinInterface
@@ -65,10 +73,17 @@ type TwinInterfaceService struct {
 	AutoScaling TwinInterfaceAutoScaling `json:"autoScaling,omitempty"`
 }
 
+// KNative Pod Auto Scaler Settings
 type TwinInterfaceAutoScaling struct {
 	MinScale *int `json:"minScale,omitempty"`
 	MaxScale *int `json:"maxScale,omitempty"`
 	Target   *int `json:"target,omitempty"`
+	// KNative Metric values (default, if not informed: concurrency)
+	// concurrency: the number of simultaneous requests that can be processed by each replica of an application at any given time
+	// rps: requests per seconds
+	// cpu: cpu usage
+	// memory: memory usage
+	Metric AutoScalerType `json:"metric,omitempty"`
 }
 
 type TwinInterfaceEventStore struct {

@@ -10,3 +10,4 @@ spec:
     maxScale: 25
     minScale: 3
     target: 50
+    metric: "concurrency"
