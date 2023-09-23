@@ -16,48 +16,30 @@ kind: Role
 metadata:
   name: prometheus-k8s
 rules:
-  - verbs:
-      - get
-      - list
-      - watch
-    apiGroups:
-      - ''
-    resources:
-      - services
-      - endpoints
-      - pods
-      - events
-  - verbs:
-      - get
-      - list
-      - watch
-    apiGroups:
-      - extensions
-    resources:
-      - ingresses
-  - apiGroups:
-    - apps
-    resources:
-    - deployments
-    verbs:
-    - get
-    - list
-    - watch
-  - apiGroups:
-    - autoscaling
-    resources:
-    - horizontalpodautoscalers
-    verbs:
-    - get
-    - list
-    - watch
-  - apiGroups:
-    - eventing.knative.dev
-    resources:
-    - brokers
-    - triggers
-    - services
-    verbs:
-    - get
-    - list
-    - patch
+  - verbs: ["get", "list", "watch"]
+    apiGroups: [""]
+    resources: ["pods", "namespaces", "secrets", "configmaps", "endpoints", "services", "events", "serviceaccounts"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["extensions"]
+    resources: ["ingresses"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["apps"]
+    resources: ["deployments", "deployments/finalizers"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["serving.knative.dev", "networking.internal.knative.dev", "autoscaling.internal.knative.dev", "caching.internal.knative.dev"]
+    resources: ["*", "*/status", "*/finalizers"]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions", "customresourcedefinitions/status"]
+    verbs: ["get", "list", "watch"]
+  - verbs: ["get", "list", "watch"]
+    apiGroups: ["eventing.knative.dev", "messaging.knative.dev", "sources.knative.dev", "flows.knative.dev", "bindings.knative.dev"]
+    resources: ["*"]
