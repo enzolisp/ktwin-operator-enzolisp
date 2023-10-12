@@ -61,6 +61,12 @@ kubectl delete -f knative-monitoring.yaml
 
 https://github.com/knative-extensions/monitoring/tree/main/grafana
 
+## Expose Prometheus Port
+
+```sh
+kubectl port-forward -n default svc/prometheus-operated 9090 -n monitoring
+```
+
 ## Resources
 
 - https://www.rabbitmq.com/kubernetes/operator/operator-monitoring.html
