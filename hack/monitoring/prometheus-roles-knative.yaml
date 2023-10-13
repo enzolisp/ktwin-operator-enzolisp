@@ -36,7 +36,7 @@ rules:
     resources: ["leases"]
   - verbs: ["get", "list", "watch"]
     apiGroups: ["serving.knative.dev", "networking.internal.knative.dev", "autoscaling.internal.knative.dev", "caching.internal.knative.dev"]
-    resources: ["*", "*/status", "*/finalizers"]
+    resources: ["*"]
   - apiGroups: ["apiextensions.k8s.io"]
     resources: ["customresourcedefinitions", "customresourcedefinitions/status"]
     verbs: ["get", "list", "watch"]
