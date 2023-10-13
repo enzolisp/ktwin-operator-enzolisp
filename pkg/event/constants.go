@@ -4,7 +4,6 @@ const (
 	// Cloud Event Types
 	EVENT_REAL_TO_VIRTUAL    string = "ktwin.real.%s"
 	EVENT_VIRTUAL_TO_REAL    string = "ktwin.virtual.%s"
-	EVENT_TO_EVENT_STORE     string = "ktwin.event.store"
 	EVENT_VIRTUAL_TO_VIRTUAL string = "ktwin.virtual.virtual" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
 )
 
