@@ -7,17 +7,17 @@ import (
 )
 
 func GetEventTypeVirtualGenerated(twinInterfaceName string) string {
-	return fmt.Sprintf(event.EVENT_VIRTUAL_TO_REAL, twinInterfaceName)
+	return fmt.Sprintf(event.EVENT_TYPE_VIRTUAL_GENERATED, twinInterfaceName)
 }
 
 func GetEventTypeRealGenerated(twinInterfaceName string) string {
-	return fmt.Sprintf(event.EVENT_REAL_TO_VIRTUAL, twinInterfaceName)
+	return fmt.Sprintf(event.EVENT_TYPE_REAL_GENERATED, twinInterfaceName)
 }
 
 func GetNewCloudEventEventBinding(twinInterfaceName string) string {
-	return fmt.Sprintf(event.EVENT_REAL_TO_VIRTUAL, twinInterfaceName)
+	return fmt.Sprintf(event.EVENT_TYPE_REAL_GENERATED, twinInterfaceName)
 }
 
 func GetNewMQQTEventBinding(twinInterfaceName string) string {
-	return fmt.Sprintf(event.EVENT_REAL_TO_VIRTUAL, twinInterfaceName)
+	return fmt.Sprintf(event.EVENT_TYPE_REAL_GENERATED, twinInterfaceName)
 }

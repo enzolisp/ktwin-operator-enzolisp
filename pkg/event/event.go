@@ -39,11 +39,11 @@ type TriggerParameters struct {
 }
 
 func (e *twinEvent) getEventTypeRealGenerated(twinInterfaceName string) string {
-	return fmt.Sprintf(EVENT_REAL_TO_VIRTUAL, twinInterfaceName)
+	return fmt.Sprintf(EVENT_TYPE_REAL_GENERATED, twinInterfaceName)
 }
 
 func (e *twinEvent) getEventTypeVirtualGenerated(twinInterfaceName string) string {
-	return fmt.Sprintf(EVENT_VIRTUAL_TO_REAL, twinInterfaceName)
+	return fmt.Sprintf(EVENT_TYPE_VIRTUAL_GENERATED, twinInterfaceName)
 }
 
 func (e *twinEvent) getVirtualToVirtualTriggerName(sourceTwinInstanceName string, targetTwinInstanceName string) string {

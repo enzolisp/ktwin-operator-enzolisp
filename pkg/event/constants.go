@@ -2,9 +2,9 @@ package event
 
 const (
 	// Cloud Event Types
-	EVENT_REAL_TO_VIRTUAL    string = "ktwin.real.%s"
-	EVENT_VIRTUAL_TO_REAL    string = "ktwin.virtual.%s"
-	EVENT_VIRTUAL_TO_VIRTUAL string = "ktwin.virtual.virtual" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
+	EVENT_TYPE_REAL_GENERATED    string = "ktwin.real.%s"
+	EVENT_TYPE_VIRTUAL_GENERATED string = "ktwin.virtual.%s"
+	EVENT_VIRTUAL_TO_VIRTUAL     string = "ktwin.virtual.virtual" // TODO: what if someone wants to send an event to a relationship (post processing - use command)
 )
 
 const (
