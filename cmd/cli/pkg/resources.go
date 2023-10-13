@@ -114,8 +114,7 @@ func (r *resourceBuilder) CreateTwinInstance(twinInterface apiv0.TwinInterface, 
 		Spec: apiv0.TwinInstanceSpec{
 			Interface:                 normalizeTwinInterfacedId,
 			TwinInstanceRelationships: r.getTwinInstanceRelationships(parentTwinInterfaces),
-			//Events: r.getEventFilters(twinInterface),
-			Data: r.getTwinData(parentTwinInterfaces),
+			Data:                      r.getTwinData(parentTwinInterfaces),
 		},
 	}
 
@@ -140,81 +139,6 @@ func (r *resourceBuilder) getTwinInstanceRelationships(parentTwinInterfaces []ap
 	}
 
 	return twinInstanceRelationship
-}
-
-func (r *resourceBuilder) getEventFilters(twinInterface apiv0.TwinInterface) []apiv0.TwinInstanceEvents {
-	normalizeTwinInterfacedId := r.hostUtils.ParseHostName(string(twinInterface.Spec.Id))
-
-	var twinInterfaceEvents []apiv0.TwinInstanceEvents
-
-	realToVirtualEventFilter := apiv0.TwinInstanceEvents{
-		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
-				"Type": "ktwin.real" + normalizeTwinInterfacedId + ".generated",
-			},
-		},
-		Sink: apiv0.TwinInterfaceEventsSink{
-			InstanceId: normalizeTwinInterfacedId + "-integrator",
-		},
-	}
-
-	virtualToRealEventFilter := apiv0.TwinInstanceEvents{
-		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
-				"Type": "ktwin.virtual" + normalizeTwinInterfacedId + ".generated",
-			},
-		},
-		Sink: apiv0.TwinInterfaceEventsSink{
-			InstanceId: normalizeTwinInterfacedId,
-		},
-	}
-
-	realToEventStore := apiv0.TwinInstanceEvents{
-		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
-				"Type": "ktwin.real.store.generated",
-			},
-		},
-		Sink: apiv0.TwinInterfaceEventsSink{
-			InstanceId: "event-store",
-		},
-	}
-
-	virtualToEventStore := apiv0.TwinInstanceEvents{
-		Filters: apiv0.TwinInstanceEventsFilters{
-			Exact: apiv0.TwinInstanceEventsFiltersAttributes{
-				"Type": "ktwin.virtual.store.generated",
-			},
-		},
-		Sink: apiv0.TwinInterfaceEventsSink{
-			InstanceId: "event-store",
-		},
-	}
-
-	twinInterfaceEvents = append(twinInterfaceEvents, realToVirtualEventFilter)
-	twinInterfaceEvents = append(twinInterfaceEvents, virtualToRealEventFilter)
-	twinInterfaceEvents = append(twinInterfaceEvents, realToEventStore)
-	twinInterfaceEvents = append(twinInterfaceEvents, virtualToEventStore)
-
-	for _, command := range twinInterface.Spec.Commands {
-		if command.CommandType == "asynchronous" {
-			commandName := r.hostUtils.ParseHostName(command.Name)
-
-			commandEvent := apiv0.TwinInstanceEvents{
-				Filters: apiv0.TwinInstanceEventsFilters{
-					Exact: apiv0.TwinInstanceEventsFiltersAttributes{
-						"Type": "ktwin.command." + normalizeTwinInterfacedId + "." + commandName + ".generated",
-					},
-				},
-				Sink: apiv0.TwinInterfaceEventsSink{
-					InstanceId: normalizeTwinInterfacedId,
-				},
-			}
-			twinInterfaceEvents = append(twinInterfaceEvents, commandEvent)
-		}
-	}
-
-	return twinInterfaceEvents
 }
 
 func (r *resourceBuilder) getTwinData(twinInterfaces []apiv0.TwinInterface) *apiv0.TwinInstanceDataSpec {
