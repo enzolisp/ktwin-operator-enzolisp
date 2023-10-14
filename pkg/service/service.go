@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"reflect"
 	"strconv"
 
@@ -13,10 +14,23 @@ import (
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 )
 
+// Used to inject settings as environment variables
+type KtwinEnvironmentSettings struct {
+	Relationships []KtwinRelationshipSettings `json:"relationships"`
+	Parent        KtwinRelationshipSettings   `json:"parent"`
+}
+
+type KtwinRelationshipSettings struct {
+	Name      string `json:"name"`
+	Interface string `json:"interface"`
+	Instance  string `json:"instance"`
+}
+
 type TwinServiceParameters struct {
 	TwinInterface *dtdv0.TwinInterface
 	Broker        keventing.Broker
 	Service       kserving.Service
+	TwinInstances []dtdv0.TwinInstance
 }
 
 func NewTwinService() TwinService {
@@ -26,6 +40,7 @@ func NewTwinService() TwinService {
 type TwinService interface {
 	GetService(twinServiceParameters TwinServiceParameters) *kserving.Service
 	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
+	GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance, twinInstanceParent dtdv0.TwinInstance) string
 }
 
 type twinService struct{}
@@ -60,11 +75,40 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 					Name:  "KTWIN_EVENT_STORE",
 					Value: eventStoreUrl.String(),
 				},
+				{
+					Name:  "KTWIN_GRAPH",
+					Value: e.GetEnvironmentGraphSettings(twinServiceParameters.TwinInstances, dtdv0.TwinInstance{}),
+				},
 			},
 		})
 	}
 
 	return containers
+}
+
+func (t *twinService) GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance, twinInstanceParent dtdv0.TwinInstance) string {
+	environmentSettings := map[string]KtwinEnvironmentSettings{}
+
+	for _, twinInstance := range twinInstances {
+		var relationshipSettingsList []KtwinRelationshipSettings
+		for _, twinInstanceRelationship := range twinInstance.Spec.TwinInstanceRelationships {
+			relationshipSettings := KtwinRelationshipSettings{
+				Name:      twinInstanceRelationship.Name,
+				Interface: twinInstanceRelationship.Interface,
+				Instance:  twinInstanceRelationship.Instance,
+			}
+			relationshipSettingsList = append(relationshipSettingsList, relationshipSettings)
+		}
+		environmentSettings[twinInstance.Name] = KtwinEnvironmentSettings{
+			Relationships: relationshipSettingsList,
+		}
+	}
+
+	// TODO: Implement parent
+
+	environmentSettingsStr, _ := json.Marshal(environmentSettings)
+
+	return string(environmentSettingsStr)
 }
 
 func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *kserving.Service {

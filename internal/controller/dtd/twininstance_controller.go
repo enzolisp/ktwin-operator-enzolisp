@@ -76,7 +76,7 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {
-	twinInterfaceName := twinInstance.ObjectMeta.Name
+	twinInterfaceName := twinInterface.Name
 
 	var resultErrors []error
 	logger := log.FromContext(ctx)

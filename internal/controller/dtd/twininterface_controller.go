@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
@@ -98,14 +99,48 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
+		// Get all TwinInstances
+		twinInstanceList := dtdv0.TwinInstanceList{}
+		listOption := []client.ListOption{
+			client.InNamespace("ktwin"),
+			client.MatchingLabels(client.MatchingFields{
+				"ktwin/twin-interface": twinInterfaceName,
+			}),
+		}
+
+		err = r.List(ctx, &twinInstanceList, listOption...)
+
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while getting TwinInstances"))
+			resultErrors = append(resultErrors, err)
+		}
+
 		kService := r.TwinService.GetService(twinservice.TwinServiceParameters{
 			TwinInterface: twinInterface,
 			Broker:        broker,
 			Service:       eventStoreService,
+			TwinInstances: twinInstanceList.Items,
 		})
-		err = r.Create(ctx, kService, &client.CreateOptions{})
 
-		if err != nil && !errors.IsAlreadyExists(err) {
+		oldKService := servingv1.Service{}
+		err = r.Get(ctx, types.NamespacedName{Namespace: kService.Namespace, Name: kService.Name}, &oldKService)
+
+		if !reflect.DeepEqual(oldKService, servingv1.Service{}) {
+			oldContainers := oldKService.Spec.Template.Spec.Containers
+			newContainers := kService.Spec.Template.Spec.Containers
+
+			if !reflect.DeepEqual(oldContainers[0].Env, newContainers[0].Env) {
+				_, err = controllerutil.CreateOrUpdate(ctx, r.Client, kService, func() error {
+					return r.Patch(ctx, kService, client.MergeFrom(kService.DeepCopy()))
+				})
+			} else {
+				logger.Info("No changes in environment variables, so no change in the KService: " + oldKService.Name)
+			}
+		} else if err != nil && errors.IsNotFound(err) {
+			err = r.Create(ctx, kService, &client.CreateOptions{})
+		}
+
+		if err != nil {
 			logger.Error(err, fmt.Sprintf("Error while creating Knative Service %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
 		}
