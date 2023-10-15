@@ -1,0 +1,144 @@
+package graph
+
+import (
+	"errors"
+	"testing"
+
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/stretchr/testify/assert"
+)
+
+var twinInstance01 = dtdv0.TwinInstance{
+	ObjectMeta: v1.ObjectMeta{
+		Name: "TwinInstance01",
+	},
+}
+
+var twinInstance02 = dtdv0.TwinInstance{
+	ObjectMeta: v1.ObjectMeta{
+		Name: "TwinInstance02",
+	},
+}
+
+func TestTwinInstanceImplements_CreateGraph(t *testing.T) {
+	t.Run("Should implement TwinInstanceGraph", func(t *testing.T) {
+		twinInstanceGraph := NewTwinInstanceGraph()
+		assert.Implements(t, (*TwinInstanceGraph)(nil), twinInstanceGraph)
+	})
+}
+
+func TestTwinInstance_CreateGraph(t *testing.T) {
+	t.Run("Should create TwinInstance Graph", func(t *testing.T) {
+		graph := NewTwinInstanceGraph()
+		assert.Equal(t, &twinInstanceGraph{
+			NumberOfVertex: 0,
+			Vertexes:       map[string]*TwinInstanceGraphVertex{},
+		}, graph)
+	})
+}
+
+func TestTwinInstance_AddVertex(t *testing.T) {
+
+	type VertexToBeAdded struct {
+		twinInstance  dtdv0.TwinInstance
+		expectedError error
+	}
+
+	tests := []struct {
+		name            string
+		expected        twinInstanceGraph
+		vertexToBeAdded []VertexToBeAdded
+	}{
+		{
+			name: "Successful add one vertex",
+			vertexToBeAdded: []VertexToBeAdded{
+				{
+					twinInstance:  twinInstance01,
+					expectedError: nil,
+				},
+			},
+			expected: twinInstanceGraph{
+				NumberOfVertex: 1,
+				Vertexes: map[string]*TwinInstanceGraphVertex{
+					"TwinInstance01": {
+						TwinInstance:  twinInstance01,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+				},
+			},
+		},
+		{
+			name: "Successful add two vertexes",
+			vertexToBeAdded: []VertexToBeAdded{
+				{
+					twinInstance:  twinInstance01,
+					expectedError: nil,
+				},
+				{
+					twinInstance:  twinInstance02,
+					expectedError: nil,
+				},
+			},
+			expected: twinInstanceGraph{
+				NumberOfVertex: 2,
+				Vertexes: map[string]*TwinInstanceGraphVertex{
+					"TwinInstance01": {
+						TwinInstance:  twinInstance01,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+					"TwinInstance02": {
+						TwinInstance:  twinInstance02,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+				},
+			},
+		},
+		{
+			name: "Successful add two vertexes",
+			vertexToBeAdded: []VertexToBeAdded{
+				{
+					twinInstance:  twinInstance01,
+					expectedError: nil,
+				},
+				{
+					twinInstance:  twinInstance02,
+					expectedError: nil,
+				},
+				{
+					twinInstance:  twinInstance01,
+					expectedError: errors.New("TwinInstance already exist in the graph"),
+				},
+			},
+			expected: twinInstanceGraph{
+				NumberOfVertex: 2,
+				Vertexes: map[string]*TwinInstanceGraphVertex{
+					"TwinInstance01": {
+						TwinInstance:  twinInstance01,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+					"TwinInstance02": {
+						TwinInstance:  twinInstance02,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			twinInstanceGraph := twinInstanceGraph{
+				NumberOfVertex: 0,
+				Vertexes:       map[string]*TwinInstanceGraphVertex{},
+			}
+
+			for _, vertex := range tt.vertexToBeAdded {
+				_, err := twinInstanceGraph.AddVertex(vertex.twinInstance)
+				assert.Equal(t, vertex.expectedError, err)
+			}
+
+			assert.Equal(t, tt.expected, twinInstanceGraph)
+		})
+	}
+}
