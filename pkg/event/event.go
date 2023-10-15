@@ -21,6 +21,7 @@ func NewTwinEvent() TwinEvent {
 
 type TwinEvent interface {
 	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger
+	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
 	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
@@ -44,6 +45,10 @@ func (e *twinEvent) getEventTypeRealGenerated(twinInterfaceName string) string {
 
 func (e *twinEvent) getEventTypeVirtualGenerated(twinInterfaceName string) string {
 	return fmt.Sprintf(EVENT_TYPE_VIRTUAL_GENERATED, twinInterfaceName)
+}
+
+func (e *twinEvent) getEventTypeCommandExecuted(twinInterfaceName string, commandName string) string {
+	return fmt.Sprintf(EVENT_TYPE_COMMAND_EXECUTED, twinInterfaceName, commandName)
 }
 
 func (e *twinEvent) getVirtualToVirtualTriggerName(sourceTwinInstanceName string, targetTwinInstanceName string) string {
@@ -282,6 +287,42 @@ func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) 
 	}
 
 	return twinInterfaceTrigger
+}
+
+func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger {
+	var twinInterfaceTriggers []kEventing.Trigger
+
+	virtualTwinService := twinInterface.Name
+
+	// If TwinInstance has container associated, create the triggers
+	if e.hasContainerInTwinInterface(twinInterface) {
+		// Real Twin Event Type
+		for _, command := range twinInterface.Spec.Commands {
+			twinInterfaceCommandEventType := e.getEventTypeCommandExecuted(twinInterface.Name, command.Name)
+
+			twinInterfaceTrigger := e.createTrigger(TriggerParameters{
+				TriggerName:   e.getTwinInterfaceTrigger(twinInterface.Name + "-" + command.Name),
+				Namespace:     twinInterface.Namespace,
+				BrokerName:    EVENT_BROKER_NAME,
+				EventType:     twinInterfaceCommandEventType,
+				Subscriber:    virtualTwinService,
+				InterfaceName: twinInterface.Name,
+				OwnerReference: []v1.OwnerReference{
+					{
+						APIVersion: twinInterface.APIVersion,
+						Kind:       twinInterface.Kind,
+						Name:       twinInterface.Name,
+						UID:        twinInterface.UID,
+					},
+				},
+			})
+
+			twinInterfaceTriggers = append(twinInterfaceTriggers, twinInterfaceTrigger)
+		}
+
+	}
+
+	return twinInterfaceTriggers
 }
 
 func (e *twinEvent) populateTwinInstanceEventStructure(twinInstance *dtdv0.TwinInstance, twinTriggers []kEventing.Trigger) *dtdv0.TwinInstance {

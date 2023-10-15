@@ -38,8 +38,6 @@ spec:
               commands:
                 items:
                   properties:
-                    commandType:
-                      type: string
                     comment:
                       type: string
                     description:
@@ -110,9 +108,6 @@ spec:
                               type: string
                           type: object
                       type: object
-                  required:
-                  - request
-                  - response
                   type: object
                 type: array
               comment:

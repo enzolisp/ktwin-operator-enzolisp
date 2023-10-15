@@ -145,11 +145,21 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
+		// Create Command Triggers
+		twinInterfaceCommandTriggers := r.TwinEvent.GetTwinInterfaceCommandTriggers(twinInterface)
+		for _, commandTriggers := range twinInterfaceCommandTriggers {
+			err = r.Create(ctx, &commandTriggers, &client.CreateOptions{})
+			if err != nil && !errors.IsAlreadyExists(err) {
+				logger.Error(err, fmt.Sprintf("Error while creating Twin Command Trigger %s", twinInterfaceName))
+				resultErrors = append(resultErrors, err)
+			}
+		}
+
 		// Create Trigger
 		twinInterfaceTrigger = r.TwinEvent.GetTwinInterfaceTrigger(twinInterface)
 		err = r.Create(ctx, &twinInterfaceTrigger, &client.CreateOptions{})
 		if err != nil && !errors.IsAlreadyExists(err) {
-			logger.Error(err, fmt.Sprintf("Error while creating Twin Events %s", twinInterfaceName))
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Interface Trigger %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
 		}
 

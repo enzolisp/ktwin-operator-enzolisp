@@ -107,9 +107,8 @@ type TwinCommand struct {
 	Description string          `json:"description,omitempty"`
 	DisplayName string          `json:"displayName,omitempty"`
 	Name        string          `json:"name,omitempty"`
-	CommandType string          `json:"commandType,omitempty"` // async, sync
-	Request     CommandRequest  `json:"request"`
-	Response    CommandResponse `json:"response"`
+	Request     CommandRequest  `json:"request,omitempty"`
+	Response    CommandResponse `json:"response,omitempty"`
 }
 
 type CommandRequest struct {

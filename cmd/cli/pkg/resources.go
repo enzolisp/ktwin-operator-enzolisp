@@ -178,7 +178,6 @@ func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.
 		Description: string(command.Description),
 		DisplayName: string(command.DisplayName),
 		Name:        command.Name,
-		CommandType: command.CommandType,
 		Request: apiv0.CommandRequest{
 			Name:        command.Request.Name,
 			DisplayName: string(command.Request.DisplayName),
