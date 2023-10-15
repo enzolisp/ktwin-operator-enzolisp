@@ -12,7 +12,21 @@ const (
 	NO_INDEX = -1
 )
 
-// A Graph is composed by multiple vertexes connected by edges
+type twinGraphEnvironmentSettings struct {
+	TwinInstances []twinInstanceEnvironmentSettings `json:"twinInstances,omitempty"`
+}
+
+type twinInstanceEnvironmentSettings struct {
+	Name          string                             `json:"name,omitempty"`
+	Interface     string                             `json:"interface,omitempty"`
+	Relationships []twinInstanceRelationshipSettings `json:"relationships,omitempty"`
+}
+
+type twinInstanceRelationshipSettings struct {
+	Name      string `json:"name,omitempty"`
+	Interface string `json:"interface,omitempty"`
+	Instance  string `json:"instance,omitempty"`
+}
 
 type TwinInstanceGraph interface {
 	AddVertex(twinInstance dtdv0.TwinInstance) (*TwinInstanceGraphVertex, error)
@@ -167,13 +181,34 @@ func (g *twinInstanceGraph) PrintGraph() {
 
 func (g *twinInstanceGraph) MarshalJson() (string, error) {
 
-	var twinInstanceList []dtdv0.TwinInstance
+	var twinInstanceSettingsList []twinInstanceEnvironmentSettings
 
 	for _, vertex := range g.Vertexes {
-		twinInstanceList = append(twinInstanceList, vertex.TwinInstance)
+
+		var relationshipSettingList []twinInstanceRelationshipSettings
+
+		for _, relationship := range vertex.TwinInstance.Spec.TwinInstanceRelationships {
+			relationshipSettingList = append(relationshipSettingList, twinInstanceRelationshipSettings{
+				Name:      relationship.Name,
+				Interface: relationship.Interface,
+				Instance:  relationship.Instance,
+			})
+		}
+
+		twinInstanceSettings := twinInstanceEnvironmentSettings{
+			Name:          vertex.TwinInstance.Name,
+			Interface:     vertex.TwinInstance.Spec.Interface,
+			Relationships: relationshipSettingList,
+		}
+
+		twinInstanceSettingsList = append(twinInstanceSettingsList, twinInstanceSettings)
 	}
 
-	resultByte, err := json.Marshal(twinInstanceList)
+	var graphSettings = twinGraphEnvironmentSettings{
+		TwinInstances: twinInstanceSettingsList,
+	}
+
+	resultByte, err := json.Marshal(graphSettings)
 
 	if err != nil {
 		return "", err
