@@ -14,11 +14,29 @@ var twinInstance01 = dtdv0.TwinInstance{
 	ObjectMeta: v1.ObjectMeta{
 		Name: "TwinInstance01",
 	},
+	Spec: dtdv0.TwinInstanceSpec{
+		TwinInstanceRelationships: []dtdv0.TwinInstanceRelationship{
+			{
+				Name:      "NameRelationship01",
+				Interface: "InterfaceRelationship01",
+				Instance:  "InstanceRelationship02",
+			},
+		},
+	},
 }
 
 var twinInstance02 = dtdv0.TwinInstance{
 	ObjectMeta: v1.ObjectMeta{
 		Name: "TwinInstance02",
+	},
+	Spec: dtdv0.TwinInstanceSpec{
+		TwinInstanceRelationships: []dtdv0.TwinInstanceRelationship{
+			{
+				Name:      "NameRelationship02",
+				Interface: "InterfaceRelationship02",
+				Instance:  "InstanceRelationship02",
+			},
+		},
 	},
 }
 
@@ -139,6 +157,62 @@ func TestTwinInstance_AddVertex(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.expected, twinInstanceGraph)
+		})
+	}
+}
+
+func TestTwinInstance_MarshalJSON(t *testing.T) {
+
+	type VertexToBeAdded struct {
+		twinInstance  dtdv0.TwinInstance
+		expectedError error
+	}
+
+	tests := []struct {
+		name                     string
+		initialTwinInstanceGraph twinInstanceGraph
+		expectedResult           string
+	}{
+		{
+			name: "Successful add one vertex",
+			initialTwinInstanceGraph: twinInstanceGraph{
+				NumberOfVertex: 1,
+				Vertexes: map[string]*TwinInstanceGraphVertex{
+					"TwinInstance01": {
+						TwinInstance:  twinInstance01,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+				},
+			},
+			expectedResult: "[{\"metadata\":{\"name\":\"TwinInstance01\",\"creationTimestamp\":null},\"spec\":{\"twinInstanceRelationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},\"status\":{}}]",
+		},
+		{
+			name: "Successful add two vertexes",
+			initialTwinInstanceGraph: twinInstanceGraph{
+				NumberOfVertex: 2,
+				Vertexes: map[string]*TwinInstanceGraphVertex{
+					"TwinInstance01": {
+						TwinInstance:  twinInstance01,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+					"TwinInstance02": {
+						TwinInstance:  twinInstance02,
+						EdgeInstances: []*TwinInstanceGraphVertex{},
+					},
+				},
+			},
+			expectedResult: "[{\"metadata\":{\"name\":\"TwinInstance01\",\"creationTimestamp\":null},\"spec\":{\"twinInstanceRelationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},\"status\":{}},{\"metadata\":{\"name\":\"TwinInstance02\",\"creationTimestamp\":null},\"spec\":{\"twinInstanceRelationships\":[{\"name\":\"NameRelationship02\",\"interface\":\"InterfaceRelationship02\",\"instance\":\"InstanceRelationship02\"}]},\"status\":{}}]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.initialTwinInstanceGraph.MarshalJson()
+
+			if err != nil {
+				assert.Fail(t, "Error is not supposed to be different of nul")
+			}
+
+			assert.Equal(t, tt.expectedResult, result)
 		})
 	}
 }

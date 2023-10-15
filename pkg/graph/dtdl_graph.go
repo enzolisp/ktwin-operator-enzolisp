@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -20,6 +21,8 @@ type TwinInstanceGraph interface {
 	AddEdge(sourceTwinInstance dtdv0.TwinInstance, targetTwinInstance dtdv0.TwinInstance) error
 	RemoveEdge(sourceTwinInstance dtdv0.TwinInstance, targetTwinInstance dtdv0.TwinInstance) error
 	PrintGraph()
+	MarshalJson() (string, error)
+	UnmarshalJson(input string) error
 }
 
 type twinInstanceGraph struct {
@@ -160,6 +163,27 @@ func (g *twinInstanceGraph) PrintGraph() {
 
 		fmt.Println("")
 	}
+}
+
+func (g *twinInstanceGraph) MarshalJson() (string, error) {
+
+	var twinInstanceList []dtdv0.TwinInstance
+
+	for _, vertex := range g.Vertexes {
+		twinInstanceList = append(twinInstanceList, vertex.TwinInstance)
+	}
+
+	resultByte, err := json.Marshal(twinInstanceList)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(resultByte), nil
+}
+
+func (g *twinInstanceGraph) UnmarshalJson(input string) error {
+	return nil
 }
 
 func (g *twinInstanceGraph) findEdgeIndex(edgeInstances []*TwinInstanceGraphVertex, twinInstance dtdv0.TwinInstance) int {
