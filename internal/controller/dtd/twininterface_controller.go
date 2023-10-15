@@ -103,9 +103,9 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		twinInstanceList := dtdv0.TwinInstanceList{}
 		listOption := []client.ListOption{
 			client.InNamespace("ktwin"),
-			client.MatchingLabels(client.MatchingFields{
-				"ktwin/twin-interface": twinInterfaceName,
-			}),
+			// client.MatchingLabels(client.MatchingFields{
+			// 	"ktwin/twin-interface": twinInterfaceName,
+			// }),
 		}
 
 		err = r.List(ctx, &twinInstanceList, listOption...)

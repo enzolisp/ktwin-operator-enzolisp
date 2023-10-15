@@ -1,7 +1,7 @@
 package service
 
 import (
-	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 
@@ -12,6 +12,7 @@ import (
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/graph"
 )
 
 // Used to inject settings as environment variables
@@ -40,7 +41,7 @@ func NewTwinService() TwinService {
 type TwinService interface {
 	GetService(twinServiceParameters TwinServiceParameters) *kserving.Service
 	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
-	GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance, twinInstanceParent dtdv0.TwinInstance) string
+	GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance) string
 }
 
 type twinService struct{}
@@ -77,7 +78,7 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 				},
 				{
 					Name:  "KTWIN_GRAPH",
-					Value: e.GetEnvironmentGraphSettings(twinServiceParameters.TwinInstances, dtdv0.TwinInstance{}),
+					Value: e.GetEnvironmentGraphSettings(twinServiceParameters.TwinInstances),
 				},
 			},
 		})
@@ -86,27 +87,32 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 	return containers
 }
 
-func (t *twinService) GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance, twinInstanceParent dtdv0.TwinInstance) string {
-	environmentSettings := map[string]KtwinEnvironmentSettings{}
+func (t *twinService) GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance) string {
+	twin_instances_graph := graph.NewTwinInstanceGraph()
 
 	for _, twinInstance := range twinInstances {
-		var relationshipSettingsList []KtwinRelationshipSettings
-		for _, twinInstanceRelationship := range twinInstance.Spec.TwinInstanceRelationships {
-			relationshipSettings := KtwinRelationshipSettings{
-				Name:      twinInstanceRelationship.Name,
-				Interface: twinInstanceRelationship.Interface,
-				Instance:  twinInstanceRelationship.Instance,
+		twin_instances_graph.AddVertex(twinInstance)
+	}
+
+	for _, twinInstance := range twinInstances {
+		for _, relationship := range twinInstance.Spec.TwinInstanceRelationships {
+			twinInstanceVertex := twin_instances_graph.GetVertex(relationship.Instance)
+			if twinInstanceVertex != nil {
+				err := twin_instances_graph.AddEdge(twinInstance, *twinInstanceVertex)
+				if err != nil {
+					fmt.Println(err)
+					return ""
+				}
 			}
-			relationshipSettingsList = append(relationshipSettingsList, relationshipSettings)
-		}
-		environmentSettings[twinInstance.Name] = KtwinEnvironmentSettings{
-			Relationships: relationshipSettingsList,
 		}
 	}
 
-	// TODO: Implement parent
+	environmentSettingsStr, err := twin_instances_graph.MarshalJson()
 
-	environmentSettingsStr, _ := json.Marshal(environmentSettings)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
 
 	return string(environmentSettingsStr)
 }
