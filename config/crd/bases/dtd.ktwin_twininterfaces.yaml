@@ -58,6 +58,23 @@ spec:
                           type: string
                         schema:
                           properties:
+                            complexType:
+                              properties:
+                                fields:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                      schema:
+                                        properties:
+                                          primitiveType:
+                                            type: string
+                                        type: object
+                                    type: object
+                                  type: array
+                                type:
+                                  type: string
+                              type: object
                             enumType:
                               properties:
                                 enumValues:
@@ -88,6 +105,23 @@ spec:
                           type: string
                         schema:
                           properties:
+                            complexType:
+                              properties:
+                                fields:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                      schema:
+                                        properties:
+                                          primitiveType:
+                                            type: string
+                                        type: object
+                                    type: object
+                                  type: array
+                                type:
+                                  type: string
+                              type: object
                             enumType:
                               properties:
                                 enumValues:
@@ -142,6 +176,23 @@ spec:
                       type: string
                     schema:
                       properties:
+                        complexType:
+                          properties:
+                            fields:
+                              items:
+                                properties:
+                                  name:
+                                    type: string
+                                  schema:
+                                    properties:
+                                      primitiveType:
+                                        type: string
+                                    type: object
+                                type: object
+                              type: array
+                            type:
+                              type: string
+                          type: object
                         enumType:
                           properties:
                             enumValues:
@@ -203,6 +254,23 @@ spec:
                             type: string
                           schema:
                             properties:
+                              complexType:
+                                properties:
+                                  fields:
+                                    items:
+                                      properties:
+                                        name:
+                                          type: string
+                                        schema:
+                                          properties:
+                                            primitiveType:
+                                              type: string
+                                          type: object
+                                      type: object
+                                    type: array
+                                  type:
+                                    type: string
+                                type: object
                               enumType:
                                 properties:
                                   enumValues:
@@ -228,6 +296,23 @@ spec:
                       type: array
                     schema:
                       properties:
+                        complexType:
+                          properties:
+                            fields:
+                              items:
+                                properties:
+                                  name:
+                                    type: string
+                                  schema:
+                                    properties:
+                                      primitiveType:
+                                        type: string
+                                    type: object
+                                type: object
+                              type: array
+                            type:
+                              type: string
+                          type: object
                         enumType:
                           properties:
                             enumValues:
@@ -8144,6 +8229,23 @@ spec:
                       type: string
                     schema:
                       properties:
+                        complexType:
+                          properties:
+                            fields:
+                              items:
+                                properties:
+                                  name:
+                                    type: string
+                                  schema:
+                                    properties:
+                                      primitiveType:
+                                        type: string
+                                    type: object
+                                type: object
+                              type: array
+                            type:
+                              type: string
+                          type: object
                         enumType:
                           properties:
                             enumValues:

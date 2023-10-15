@@ -31,6 +31,7 @@ const (
 )
 
 type PrimitiveType string
+type ComplexType string
 type Multiplicity string
 type AutoScalerType string
 
@@ -39,6 +40,10 @@ const (
 	String  PrimitiveType = "string"
 	Boolean PrimitiveType = "boolean"
 	Double  PrimitiveType = "double"
+)
+
+const (
+	Object ComplexType = "object"
 )
 
 const (
@@ -151,8 +156,23 @@ type TwinTelemetry struct {
 }
 
 type TwinSchema struct {
-	PrimitiveType PrimitiveType   `json:"primitiveType,omitempty"`
-	EnumType      *TwinEnumSchema `json:"enumType,omitempty"`
+	PrimitiveType PrimitiveType    `json:"primitiveType,omitempty"`
+	ComplexType   *TwinComplexType `json:"complexType,omitempty"`
+	EnumType      *TwinEnumSchema  `json:"enumType,omitempty"`
+}
+
+type TwinComplexType struct {
+	Type   ComplexType             `json:"type,omitempty"`
+	Fields []TwinComplexTypeFields `json:"fields,omitempty"`
+}
+
+type TwinComplexTypeFields struct {
+	Name   string                 `json:"name,omitempty"`
+	Schema *TwinComplexTypeSchema `json:"schema,omitempty"`
+}
+
+type TwinComplexTypeSchema struct {
+	PrimitiveType PrimitiveType `json:"primitiveType,omitempty"`
 }
 
 type TwinEnumSchema struct {
