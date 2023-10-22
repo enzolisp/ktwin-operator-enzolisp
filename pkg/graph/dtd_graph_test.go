@@ -184,7 +184,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: "[{\"metadata\":{\"name\":\"TwinInstance01\",\"creationTimestamp\":null},\"spec\":{\"twinInstanceRelationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},\"status\":{}}]",
+			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]}]}",
 		},
 		{
 			name: "Successful add two vertexes",
@@ -201,7 +201,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: "[{\"metadata\":{\"name\":\"TwinInstance01\",\"creationTimestamp\":null},\"spec\":{\"twinInstanceRelationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},\"status\":{}},{\"metadata\":{\"name\":\"TwinInstance02\",\"creationTimestamp\":null},\"spec\":{\"twinInstanceRelationships\":[{\"name\":\"NameRelationship02\",\"interface\":\"InterfaceRelationship02\",\"instance\":\"InstanceRelationship02\"}]},\"status\":{}}]",
+			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},{\"name\":\"TwinInstance02\",\"relationships\":[{\"name\":\"NameRelationship02\",\"interface\":\"InterfaceRelationship02\",\"instance\":\"InstanceRelationship02\"}]}]}",
 		},
 	}
 	for _, tt := range tests {
