@@ -21,6 +21,7 @@ func NewTwinEvent() TwinEvent {
 type TwinEvent interface {
 	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger
 	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
+	GetVirtualCloudEventBrokerBinding(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange) []rabbitmqv1beta1.Binding
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
 }
@@ -133,10 +134,9 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 	return rabbitMQBindings
 }
 
-func (e *twinEvent) GetRelationshipBrokerBindings(
+func (e *twinEvent) GetVirtualCloudEventBrokerBinding(
 	twinInterface *dtdv0.TwinInterface,
 	brokerExchange rabbitmqv1beta1.Exchange,
-	twinInterfaceQueue rabbitmqv1beta1.Queue,
 ) []rabbitmqv1beta1.Binding {
 	rabbitMQBindings := []rabbitmqv1beta1.Binding{}
 	virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
@@ -170,6 +170,15 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 
 	rabbitMQBindings = append(rabbitMQBindings, virtualEventBinding)
 
+	return rabbitMQBindings
+}
+
+func (e *twinEvent) GetRelationshipBrokerBindings(
+	twinInterface *dtdv0.TwinInterface,
+	brokerExchange rabbitmqv1beta1.Exchange,
+	twinInterfaceQueue rabbitmqv1beta1.Queue,
+) []rabbitmqv1beta1.Binding {
+	rabbitMQBindings := []rabbitmqv1beta1.Binding{}
 	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
 		if twinInterfaceRelationship.AggregateData {
 			realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{

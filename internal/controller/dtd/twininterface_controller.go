@@ -184,6 +184,17 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		resultErrors = append(resultErrors, err)
 	} else {
 
+		if twinInterface.Spec.Service != nil {
+			bindings := r.TwinEvent.GetVirtualCloudEventBrokerBinding(twinInterface, brokerExchange)
+			for _, binding := range bindings {
+				err = r.Create(ctx, &binding, &client.CreateOptions{})
+				if err != nil && !errors.IsAlreadyExists(err) {
+					logger.Error(err, fmt.Sprintf("Error while creating Virtual CLoud Event Broker Bindings %s", binding.Name))
+					resultErrors = append(resultErrors, err)
+				}
+			}
+		}
+
 		bindings := r.EventStore.GetEventStoreBrokerBindings(twinInterface, brokerExchange, eventStoreQueue)
 
 		for _, binding := range bindings {
