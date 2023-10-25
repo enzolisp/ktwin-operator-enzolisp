@@ -163,13 +163,6 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
-		// Get Created Trigger
-		err = r.Get(ctx, types.NamespacedName{Namespace: twinInterfaceTrigger.Namespace, Name: twinInterfaceTrigger.Name}, &twinInterfaceTrigger, &client.GetOptions{})
-		if err != nil && !errors.IsAlreadyExists(err) {
-			logger.Error(err, fmt.Sprintf("Error while getting trigger %s", twinInterfaceTrigger.Name))
-			resultErrors = append(resultErrors, err)
-		}
-
 	}
 
 	// Create Relationship RabbitMQ bindings to existing Queue and Eventing
@@ -209,15 +202,13 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 				resultErrors = append(resultErrors, err)
 			}
 		} else {
-			if !reflect.DeepEqual(eventingv1.Trigger{}, twinInterfaceTrigger) {
-				bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, twinInterfaceTrigger, brokerExchange, twinInterfaceQueue)
+			bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, brokerExchange, twinInterfaceQueue)
 
-				for _, binding := range bindings {
-					err = r.Create(ctx, &binding, &client.CreateOptions{})
-					if err != nil && !errors.IsAlreadyExists(err) {
-						logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
-						resultErrors = append(resultErrors, err)
-					}
+			for _, binding := range bindings {
+				err = r.Create(ctx, &binding, &client.CreateOptions{})
+				if err != nil && !errors.IsAlreadyExists(err) {
+					logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+					resultErrors = append(resultErrors, err)
 				}
 			}
 		}

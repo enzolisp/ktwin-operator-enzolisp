@@ -22,7 +22,7 @@ func NewTwinEvent() TwinEvent {
 type TwinEvent interface {
 	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger
 	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
-	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, twinInterfaceTrigger kEventing.Trigger, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
+	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
 	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
 }
@@ -141,7 +141,6 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 
 func (e *twinEvent) GetRelationshipBrokerBindings(
 	twinInterface *dtdv0.TwinInterface,
-	twinInterfaceTrigger kEventing.Trigger,
 	brokerExchange rabbitmqv1beta1.Exchange,
 	twinInterfaceQueue rabbitmqv1beta1.Queue,
 ) []rabbitmqv1beta1.Binding {
@@ -165,12 +164,6 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 				Kind:       twinInterface.Kind,
 				Name:       twinInterface.Name,
 				UID:        twinInterface.UID,
-			},
-			{
-				APIVersion: twinInterfaceTrigger.APIVersion,
-				Kind:       twinInterfaceTrigger.Kind,
-				Name:       twinInterfaceTrigger.Name,
-				UID:        twinInterfaceTrigger.UID,
 			},
 		},
 		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
@@ -204,12 +197,6 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 						Kind:       twinInterface.Kind,
 						Name:       twinInterface.Name,
 						UID:        twinInterface.UID,
-					},
-					{
-						APIVersion: twinInterfaceTrigger.APIVersion,
-						Kind:       twinInterfaceTrigger.Kind,
-						Name:       twinInterfaceTrigger.Name,
-						UID:        twinInterfaceTrigger.UID,
 					},
 				},
 				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
