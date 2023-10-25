@@ -49,14 +49,14 @@ func (r *EventStoreReconciler) createOrUpdateMQTTTrigger(ctx context.Context, re
 	kservice := r.EventStore.GetEventStoreService(&eventStore)
 
 	err := r.Create(ctx, kservice, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating Event Store service %s", eventStore.Name))
 		return ctrl.Result{}, err
 	}
 
 	trigger := r.EventStore.GetEventStoreTrigger(&eventStore)
 	err = r.Create(ctx, &trigger, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating trigger for event store %s", eventStore.Name))
 		return ctrl.Result{}, err
 	}

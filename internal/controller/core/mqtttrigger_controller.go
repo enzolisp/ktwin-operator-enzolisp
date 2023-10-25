@@ -94,19 +94,19 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 	mqttDispacherService := r.getMQQTDispatcherService(mqttTrigger)
 
 	err = r.Create(ctx, mqttDispatcherQueue, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating mqtt dispatcher queue %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
 
 	err = r.Create(ctx, &mqttDispacherDeployment, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating mqtt dispatcher deployment %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
 
 	err = r.Create(ctx, &mqttDispacherService, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating mqtt dispatcher service %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
@@ -117,19 +117,19 @@ func (r *MQTTTriggerReconciler) createOrUpdateMQTTTrigger(ctx context.Context, r
 	ceDispacherService := r.geCloudEventDispatcherService(mqttTrigger)
 
 	err = r.Create(ctx, ceDispatcherQueue, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating cloud event dispatcher queue %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
 
 	err = r.Create(ctx, &ceDispacherDeployment, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating cloud event dispatcher deployment %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
 
 	err = r.Create(ctx, &ceDispacherService, &client.CreateOptions{})
-	if err != nil {
+	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating cloud event dispatcher service %s", mqttTrigger.Name))
 		return ctrl.Result{}, err
 	}
