@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -24,7 +23,6 @@ type TwinEvent interface {
 	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
-	GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
 type twinEvent struct{}
@@ -71,10 +69,6 @@ func (e *twinEvent) getTriggerLabels(twinInterfaceName string) map[string]string
 	return map[string]string{
 		"ktwin/twin-interface": twinInterfaceName,
 	}
-}
-
-func (e *twinEvent) GetTriggersDeletionFilterCriteria(namespacedName types.NamespacedName) map[string]string {
-	return e.getTriggerLabels(namespacedName.Name)
 }
 
 func (e *twinEvent) GetMQQTDispatcherBindings(
