@@ -127,6 +127,10 @@ spec:
                     name:
                       description: The TwinInstance Relationship name
                       type: string
+                  required:
+                  - instance
+                  - interface
+                  - name
                   type: object
                 type: array
             type: object

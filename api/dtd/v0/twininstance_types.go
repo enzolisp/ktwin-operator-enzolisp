@@ -59,11 +59,11 @@ type TwinInstanceTelemetryData struct {
 
 type TwinInstanceRelationship struct {
 	// The TwinInstance Relationship name
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 	// The Target TwinInterface of the Relationship
-	Interface string `json:"interface,omitempty"`
+	Interface string `json:"interface"`
 	// The Target TwinInstance of the Relationship
-	Instance string `json:"instance,omitempty"`
+	Instance string `json:"instance"`
 }
 
 // TODO: Configure as read-only
