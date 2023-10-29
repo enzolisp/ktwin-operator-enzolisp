@@ -37,6 +37,7 @@ import (
 	dtdcontroller "github.com/Open-Digital-Twin/ktwin-operator/internal/controller/dtd"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/graph"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
 
 	camelv1 "github.com/apache/camel-k/pkg/apis/camel/v1"
@@ -99,6 +100,9 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
+	// Define TwinGraph Server
+	twinGraphServer := graph.NewTwinGraphServer()
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -134,11 +138,12 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&dtdcontroller.TwinInstanceReconciler{
-		Client:      mgr.GetClient(),
-		Scheme:      mgr.GetScheme(),
-		TwinService: service.NewTwinService(),
-		TwinEvent:   event.NewTwinEvent(),
-		EventStore:  eventStore.NewEventStore(),
+		Client:          mgr.GetClient(),
+		Scheme:          mgr.GetScheme(),
+		TwinService:     service.NewTwinService(),
+		TwinEvent:       event.NewTwinEvent(),
+		EventStore:      eventStore.NewEventStore(),
+		TwinGraphServer: twinGraphServer,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInstance")
 		os.Exit(1)
@@ -175,6 +180,9 @@ func main() {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
+
+	// Expose the Twin Graph to be consumed by services
+	mgr.AddMetricsExtraHandler("/twin-graph", twinGraphServer.HandleGraphFunc())
 
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {

@@ -22,6 +22,7 @@ import (
 
 	twinevent "github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/graph"
 	twinservice "github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -37,10 +38,11 @@ import (
 // TwinInstanceReconciler reconciles a TwinInstance object
 type TwinInstanceReconciler struct {
 	client.Client
-	Scheme      *runtime.Scheme
-	TwinService twinservice.TwinService
-	TwinEvent   twinevent.TwinEvent
-	EventStore  eventStore.EventStore
+	Scheme          *runtime.Scheme
+	TwinService     twinservice.TwinService
+	TwinEvent       twinevent.TwinEvent
+	EventStore      eventStore.EventStore
+	TwinGraphServer graph.TwinGraphServer
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete
@@ -56,7 +58,7 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// Delete scenario
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return ctrl.Result{}, nil
+			return r.updateTwinGraph(ctx, req)
 		}
 		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
 		return ctrl.Result{}, err
@@ -108,6 +110,26 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	if err != nil {
 		return ctrl.Result{}, nil
 	}
+
+	return r.updateTwinGraph(ctx, req)
+}
+
+func (r *TwinInstanceReconciler) updateTwinGraph(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	// Get all TwinInstances
+	twinInstanceList := dtdv0.TwinInstanceList{}
+	listOption := []client.ListOption{
+		client.InNamespace("ktwin"),
+	}
+	err := r.List(ctx, &twinInstanceList, listOption...)
+
+	if err != nil {
+		logger.Error(err, fmt.Sprintf("Error while getting TwinInstances"))
+		return ctrl.Result{}, err
+	}
+
+	r.TwinGraphServer.UpdateGraphFunc(twinInstanceList.Items)
 
 	return ctrl.Result{}, nil
 }

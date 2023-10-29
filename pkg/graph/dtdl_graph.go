@@ -12,17 +12,17 @@ const (
 	NO_INDEX = -1
 )
 
-type twinGraphEnvironmentSettings struct {
-	TwinInstances []twinInstanceEnvironmentSettings `json:"twinInstances,omitempty"`
+type TwinGraphEnvironmentSettings struct {
+	TwinInstances []TwinInstanceEnvironmentSettings `json:"twinInstances,omitempty"`
 }
 
-type twinInstanceEnvironmentSettings struct {
+type TwinInstanceEnvironmentSettings struct {
 	Name          string                             `json:"name,omitempty"`
 	Interface     string                             `json:"interface,omitempty"`
-	Relationships []twinInstanceRelationshipSettings `json:"relationships,omitempty"`
+	Relationships []TwinInstanceRelationshipSettings `json:"relationships,omitempty"`
 }
 
-type twinInstanceRelationshipSettings struct {
+type TwinInstanceRelationshipSettings struct {
 	Name      string `json:"name,omitempty"`
 	Interface string `json:"interface,omitempty"`
 	Instance  string `json:"instance,omitempty"`
@@ -35,7 +35,7 @@ type TwinInstanceGraph interface {
 	AddEdge(sourceTwinInstance dtdv0.TwinInstance, targetTwinInstance dtdv0.TwinInstance) error
 	RemoveEdge(sourceTwinInstance dtdv0.TwinInstance, targetTwinInstance dtdv0.TwinInstance) error
 	PrintGraph()
-	MarshalJson() (string, error)
+	MarshalJson() ([]byte, error)
 	UnmarshalJson(input string) error
 }
 
@@ -53,10 +53,21 @@ type TwinInstanceGraphVertex struct {
 	HasTemporaryInstance bool
 }
 
-func NewTwinInstanceGraph() TwinInstanceGraph {
+func NewEmptyTwinInstanceGraph() TwinInstanceGraph {
 	return &twinInstanceGraph{
 		NumberOfVertex: 0,
 		Vertexes:       map[string]*TwinInstanceGraphVertex{},
+	}
+}
+
+func NewTwinInstanceGraph(twinGraph map[string]*TwinInstanceGraphVertex) TwinInstanceGraph {
+	var numberOfVertex = 0
+	if twinGraph != nil {
+		numberOfVertex = len(twinGraph)
+	}
+	return &twinInstanceGraph{
+		NumberOfVertex: numberOfVertex,
+		Vertexes:       twinGraph,
 	}
 }
 
@@ -179,23 +190,23 @@ func (g *twinInstanceGraph) PrintGraph() {
 	}
 }
 
-func (g *twinInstanceGraph) MarshalJson() (string, error) {
+func (g *twinInstanceGraph) MarshalJson() ([]byte, error) {
 
-	var twinInstanceSettingsList []twinInstanceEnvironmentSettings
+	var twinInstanceSettingsList []TwinInstanceEnvironmentSettings
 
 	for _, vertex := range g.Vertexes {
 
-		var relationshipSettingList []twinInstanceRelationshipSettings
+		var relationshipSettingList []TwinInstanceRelationshipSettings
 
 		for _, relationship := range vertex.TwinInstance.Spec.TwinInstanceRelationships {
-			relationshipSettingList = append(relationshipSettingList, twinInstanceRelationshipSettings{
+			relationshipSettingList = append(relationshipSettingList, TwinInstanceRelationshipSettings{
 				Name:      relationship.Name,
 				Interface: relationship.Interface,
 				Instance:  relationship.Instance,
 			})
 		}
 
-		twinInstanceSettings := twinInstanceEnvironmentSettings{
+		twinInstanceSettings := TwinInstanceEnvironmentSettings{
 			Name:          vertex.TwinInstance.Name,
 			Interface:     vertex.TwinInstance.Spec.Interface,
 			Relationships: relationshipSettingList,
@@ -204,17 +215,17 @@ func (g *twinInstanceGraph) MarshalJson() (string, error) {
 		twinInstanceSettingsList = append(twinInstanceSettingsList, twinInstanceSettings)
 	}
 
-	var graphSettings = twinGraphEnvironmentSettings{
+	var graphSettings = TwinGraphEnvironmentSettings{
 		TwinInstances: twinInstanceSettingsList,
 	}
 
 	resultByte, err := json.Marshal(graphSettings)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(resultByte), nil
+	return resultByte, nil
 }
 
 func (g *twinInstanceGraph) UnmarshalJson(input string) error {

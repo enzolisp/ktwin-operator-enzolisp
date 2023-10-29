@@ -42,14 +42,14 @@ var twinInstance02 = dtdv0.TwinInstance{
 
 func TestTwinInstanceImplements_CreateGraph(t *testing.T) {
 	t.Run("Should implement TwinInstanceGraph", func(t *testing.T) {
-		twinInstanceGraph := NewTwinInstanceGraph()
+		twinInstanceGraph := NewEmptyTwinInstanceGraph()
 		assert.Implements(t, (*TwinInstanceGraph)(nil), twinInstanceGraph)
 	})
 }
 
 func TestTwinInstance_CreateGraph(t *testing.T) {
 	t.Run("Should create TwinInstance Graph", func(t *testing.T) {
-		graph := NewTwinInstanceGraph()
+		graph := NewEmptyTwinInstanceGraph()
 		assert.Equal(t, &twinInstanceGraph{
 			NumberOfVertex: 0,
 			Vertexes:       map[string]*TwinInstanceGraphVertex{},

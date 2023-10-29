@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"reflect"
 	"strconv"
 
@@ -12,7 +11,6 @@ import (
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
 
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
-	"github.com/Open-Digital-Twin/ktwin-operator/pkg/graph"
 )
 
 // Used to inject settings as environment variables
@@ -31,7 +29,6 @@ type TwinServiceParameters struct {
 	TwinInterface *dtdv0.TwinInterface
 	Broker        keventing.Broker
 	Service       kserving.Service
-	TwinInstances []dtdv0.TwinInstance
 }
 
 func NewTwinService() TwinService {
@@ -41,7 +38,6 @@ func NewTwinService() TwinService {
 type TwinService interface {
 	GetService(twinServiceParameters TwinServiceParameters) *kserving.Service
 	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
-	GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance) string
 }
 
 type twinService struct{}
@@ -76,45 +72,11 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 					Name:  "KTWIN_EVENT_STORE",
 					Value: eventStoreUrl.String(),
 				},
-				{
-					Name:  "KTWIN_GRAPH",
-					Value: e.GetEnvironmentGraphSettings(twinServiceParameters.TwinInstances),
-				},
 			},
 		})
 	}
 
 	return containers
-}
-
-func (t *twinService) GetEnvironmentGraphSettings(twinInstances []dtdv0.TwinInstance) string {
-	twin_instances_graph := graph.NewTwinInstanceGraph()
-
-	for _, twinInstance := range twinInstances {
-		twin_instances_graph.AddVertex(twinInstance)
-	}
-
-	for _, twinInstance := range twinInstances {
-		for _, relationship := range twinInstance.Spec.TwinInstanceRelationships {
-			twinInstanceVertex := twin_instances_graph.GetVertex(relationship.Instance)
-			if twinInstanceVertex != nil {
-				err := twin_instances_graph.AddEdge(twinInstance, *twinInstanceVertex)
-				if err != nil {
-					fmt.Println(err)
-					return ""
-				}
-			}
-		}
-	}
-
-	environmentSettingsStr, err := twin_instances_graph.MarshalJson()
-
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-
-	return string(environmentSettingsStr)
 }
 
 func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *kserving.Service {
