@@ -212,7 +212,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 				assert.Fail(t, "Error is not supposed to be different of nul")
 			}
 
-			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedResult, string(result))
 		})
 	}
 }
