@@ -58,7 +58,6 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 
 	brokerUrl := twinServiceParameters.Broker.Status.Address.URL.URL()
 	eventStoreUrl := twinServiceParameters.EventStoreService.Status.URL.URL()
-	operatorMetricUrl := twinServiceParameters.OperatorMetricService.Status.URL.URL()
 
 	for _, container := range twinServiceParameters.TwinInterface.Spec.Service.Template.Spec.Containers {
 		containers = append(containers, corev1.Container{
@@ -76,7 +75,7 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 				},
 				{
 					Name:  "KTWIN_GRAPH_URL",
-					Value: "http://ktwin-controller-manager-metrics-service:8443/twin-graph",
+					Value: "http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local:8443/twin-graph",
 				},
 			},
 		})
