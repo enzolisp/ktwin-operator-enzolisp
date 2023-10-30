@@ -97,5 +97,5 @@ kubectl run curl \
 kubectl run curl \
     --image=curlimages/curl --rm=true --restart=Never -ti -- \
     -X GET -v \
-    http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local:8443/twin-graph
+    http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local/twin-graph
 ```

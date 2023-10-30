@@ -12,5 +12,6 @@ metadata:
 rules:
 - nonResourceURLs:
   - "/metrics"
+  - "/twin-graph"
   verbs:
   - get
