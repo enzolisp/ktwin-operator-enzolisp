@@ -90,3 +90,12 @@ kubectl run curl \
     -X GET -v \
     http://event-store.ktwin.svc.cluster.local/api/v1/twin-events
 ```
+
+### Get Twin Graph
+
+```sh
+kubectl run curl \
+    --image=curlimages/curl --rm=true --restart=Never -ti -- \
+    -X GET -v \
+    http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local:8443/twin-graph
+```

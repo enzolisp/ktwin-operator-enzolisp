@@ -97,10 +97,20 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
+		// Get Operator Metric Service
+		operatorMetricsService := servingv1.Service{}
+		err = r.Get(ctx, types.NamespacedName{Namespace: "ktwin-system", Name: "ktwin-controller-manager-metrics-service"}, &operatorMetricsService)
+
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while getting operator metric service"))
+			resultErrors = append(resultErrors, err)
+		}
+
 		kService := r.TwinService.GetService(twinservice.TwinServiceParameters{
-			TwinInterface: twinInterface,
-			Broker:        broker,
-			Service:       eventStoreService,
+			TwinInterface:         twinInterface,
+			Broker:                broker,
+			EventStoreService:     eventStoreService,
+			OperatorMetricService: operatorMetricsService,
 		})
 
 		err = r.Create(ctx, kService, &client.CreateOptions{})

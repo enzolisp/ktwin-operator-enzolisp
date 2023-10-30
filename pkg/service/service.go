@@ -26,9 +26,10 @@ type KtwinRelationshipSettings struct {
 }
 
 type TwinServiceParameters struct {
-	TwinInterface *dtdv0.TwinInterface
-	Broker        keventing.Broker
-	Service       kserving.Service
+	TwinInterface         *dtdv0.TwinInterface
+	Broker                keventing.Broker
+	EventStoreService     kserving.Service
+	OperatorMetricService kserving.Service
 }
 
 func NewTwinService() TwinService {
@@ -56,7 +57,8 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 	var containers []corev1.Container
 
 	brokerUrl := twinServiceParameters.Broker.Status.Address.URL.URL()
-	eventStoreUrl := twinServiceParameters.Service.Status.URL.URL()
+	eventStoreUrl := twinServiceParameters.EventStoreService.Status.URL.URL()
+	operatorMetricUrl := twinServiceParameters.OperatorMetricService.Status.URL.URL()
 
 	for _, container := range twinServiceParameters.TwinInterface.Spec.Service.Template.Spec.Containers {
 		containers = append(containers, corev1.Container{
@@ -71,6 +73,10 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 				{
 					Name:  "KTWIN_EVENT_STORE",
 					Value: eventStoreUrl.String(),
+				},
+				{
+					Name:  "KTWIN_GRAPH_URL",
+					Value: operatorMetricUrl.String() + ":8443/twin-graph",
 				},
 			},
 		})
