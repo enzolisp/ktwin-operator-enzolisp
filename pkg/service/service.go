@@ -76,7 +76,7 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 				},
 				{
 					Name:  "KTWIN_GRAPH_URL",
-					Value: operatorMetricUrl.String() + ":8443/twin-graph",
+					Value: "http://ktwin-controller-manager-metrics-service:8443/twin-graph",
 				},
 			},
 		})
