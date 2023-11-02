@@ -119,22 +119,18 @@ spec:
                 items:
                   properties:
                     instance:
-                      description: The Target TwinInstance of the Relation
-                      type: string
-                    instanceRelation:
-                      description: The TwinInstance Relation name
+                      description: The Target TwinInstance of the Relationship
                       type: string
                     interface:
-                      description: The Target TwinInterface of the Relation
+                      description: The Target TwinInterface of the Relationship
                       type: string
-                    interfaceRelation:
-                      description: The TwinInterface Relation name
+                    name:
+                      description: The TwinInstance Relationship name
                       type: string
                   required:
                   - instance
-                  - instanceRelation
                   - interface
-                  - interfaceRelation
+                  - name
                   type: object
                 type: array
             type: object

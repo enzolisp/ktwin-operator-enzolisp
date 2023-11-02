@@ -131,9 +131,9 @@ func (r *resourceBuilder) getTwinInstanceRelationships(parentTwinInterfaces []ap
 
 		for _, twinRelationship := range twinInterface.Spec.Relationships {
 			twinInstanceRelationship = append(twinInstanceRelationship, apiv0.TwinInstanceRelationship{
-				InstanceRelation: twinRelationship.Name + INSTANCE_SUFFIX,
-				Interface:        twinRelationship.Interface,
-				Instance:         twinRelationship.Interface + INSTANCE_SUFFIX,
+				Name:      twinRelationship.Name + INSTANCE_SUFFIX,
+				Interface: twinRelationship.Interface,
+				Instance:  twinRelationship.Interface + INSTANCE_SUFFIX,
 			})
 		}
 	}

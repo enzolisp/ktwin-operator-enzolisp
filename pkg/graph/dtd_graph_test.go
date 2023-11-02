@@ -17,9 +17,9 @@ var twinInstance01 = dtdv0.TwinInstance{
 	Spec: dtdv0.TwinInstanceSpec{
 		TwinInstanceRelationships: []dtdv0.TwinInstanceRelationship{
 			{
-				InstanceRelation: "NameRelationship01",
-				Interface:        "InterfaceRelationship01",
-				Instance:         "InstanceRelationship02",
+				Name:      "NameRelationship01",
+				Interface: "InterfaceRelationship01",
+				Instance:  "InstanceRelationship02",
 			},
 		},
 	},
@@ -32,9 +32,9 @@ var twinInstance02 = dtdv0.TwinInstance{
 	Spec: dtdv0.TwinInstanceSpec{
 		TwinInstanceRelationships: []dtdv0.TwinInstanceRelationship{
 			{
-				InstanceRelation: "NameRelationship02",
-				Interface:        "InterfaceRelationship02",
-				Instance:         "InstanceRelationship02",
+				Name:      "NameRelationship02",
+				Interface: "InterfaceRelationship02",
+				Instance:  "InstanceRelationship02",
 			},
 		},
 	},
@@ -184,7 +184,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"instanceRelation\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]}]}",
+			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]}]}",
 		},
 		{
 			name: "Successful add two vertexes",
@@ -201,7 +201,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"instanceRelation\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},{\"name\":\"TwinInstance02\",\"relationships\":[{\"instanceRelation\":\"NameRelationship02\",\"interface\":\"InterfaceRelationship02\",\"instance\":\"InstanceRelationship02\"}]}]}",
+			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},{\"name\":\"TwinInstance02\",\"relationships\":[{\"name\":\"NameRelationship02\",\"interface\":\"InterfaceRelationship02\",\"instance\":\"InstanceRelationship02\"}]}]}",
 		},
 	}
 	for _, tt := range tests {

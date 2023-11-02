@@ -58,13 +58,11 @@ type TwinInstanceTelemetryData struct {
 }
 
 type TwinInstanceRelationship struct {
-	// The TwinInstance Relation name
-	InstanceRelation string `json:"instanceRelation"`
-	// The TwinInterface Relation name
-	InterfaceRelation string `json:"interfaceRelation"`
-	// The Target TwinInterface of the Relation
+	// The TwinInstance Relationship name
+	Name string `json:"name"`
+	// The Target TwinInterface of the Relationship
 	Interface string `json:"interface"`
-	// The Target TwinInstance of the Relation
+	// The Target TwinInstance of the Relationship
 	Instance string `json:"instance"`
 }
 
