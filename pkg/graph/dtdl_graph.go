@@ -23,9 +23,10 @@ type TwinInstanceEnvironmentSettings struct {
 }
 
 type TwinInstanceRelationshipSettings struct {
-	Name      string `json:"name,omitempty"`
-	Interface string `json:"interface,omitempty"`
-	Instance  string `json:"instance,omitempty"`
+	InstanceRelation  string `json:"instanceRelation,omitempty"`
+	InterfaceRelation string `json:"interfaceRelation,omitempty"`
+	Interface         string `json:"interface,omitempty"`
+	Instance          string `json:"instance,omitempty"`
 }
 
 type TwinInstanceGraph interface {
@@ -200,9 +201,10 @@ func (g *twinInstanceGraph) MarshalJson() ([]byte, error) {
 
 		for _, relationship := range vertex.TwinInstance.Spec.TwinInstanceRelationships {
 			relationshipSettingList = append(relationshipSettingList, TwinInstanceRelationshipSettings{
-				Name:      relationship.Name,
-				Interface: relationship.Interface,
-				Instance:  relationship.Instance,
+				InstanceRelation:  relationship.InstanceRelation,
+				InterfaceRelation: relationship.InterfaceRelation,
+				Interface:         relationship.Interface,
+				Instance:          relationship.Instance,
 			})
 		}
 

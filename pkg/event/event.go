@@ -104,9 +104,9 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 
 	for _, twinInstanceRelationship := range twinInstance.Spec.TwinInstanceRelationships {
 		for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
-			if twinInterfaceRelationship.Name == twinInstanceRelationship.Name && twinInterfaceRelationship.AggregateData {
+			if twinInterfaceRelationship.Name == twinInstanceRelationship.InstanceRelation && twinInterfaceRelationship.AggregateData {
 				rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-					Name:      strings.ToLower(twinInstanceRelationship.Name) + "-real-" + uuid.NewString(),
+					Name:      strings.ToLower(twinInstanceRelationship.InstanceRelation) + "-real-" + uuid.NewString(),
 					Namespace: twinInstance.Namespace,
 					Owner: []v1.OwnerReference{
 						{
