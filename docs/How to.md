@@ -29,3 +29,11 @@ Run the following command to expose AMQP port:
 ```sh
 kubectl port-forward -n ktwin --address 0.0.0.0 svc/rabbitmq 5672:5672
 ```
+
+## Enable Node Selector Feature Flag
+
+Knative Services do not have support for Node Selector by default. You can enable the [kubernetes.podspec-nodeselector](https://knative.dev/docs/serving/configuration/feature-flags/#kubernetes-node-selector) feature flag.
+
+```sh
+kubectl edit configmap config-features -n knative-serving
+```

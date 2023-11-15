@@ -91,6 +91,9 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 					},
 					Spec: kserving.RevisionSpec{
 						PodSpec: corev1.PodSpec{
+							NodeSelector: map[string]string{
+								"kubernetes.io/arch": "amd64",
+							},
 							Containers: []corev1.Container{
 								{
 									Name:            EVENT_STORE_SERVICE + "-v1",
