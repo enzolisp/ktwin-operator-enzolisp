@@ -193,10 +193,14 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherDeployment(mqttTrigger corev0.M
 						{
 							Name:            "mqtt-dispatcher",
 							Image:           naming.GetContainerRegistry("ktwin-mqtt-dispatcher:0.1"),
-							ImagePullPolicy: v1.PullIfNotPresent,
+							ImagePullPolicy: v1.PullAlways,
 							Ports: []v1.ContainerPort{
 								{
 									ContainerPort: 5672,
+								},
+								{
+									Name:          "http-metrics",
+									ContainerPort: 8080,
 								},
 							},
 							Env: []v1.EnvVar{
@@ -299,8 +303,15 @@ func (r *MQTTTriggerReconciler) getMQQTDispatcherService(mqttTrigger corev0.MQTT
 			},
 			Ports: []v1.ServicePort{
 				{
+					Name:       "mqtt-port",
 					Port:       5672,
 					TargetPort: intstr.FromInt(5672),
+					Protocol:   "TCP",
+				},
+				{
+					Name:       "http-metrics",
+					Port:       8080,
+					TargetPort: intstr.FromInt(8080),
 					Protocol:   "TCP",
 				},
 			},

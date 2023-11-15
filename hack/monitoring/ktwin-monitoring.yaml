@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: mqtt-dispatcher
+    serviceMonitor: prometheus
+  name: mqtt-dispatcher
+  namespace: ktwin
+spec:
+  endpoints:
+  - honorLabels: true
+    interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector:
+    matchNames:
+    - ktwin
+  selector:
+    matchLabels:
+      ktwin/trigger: mqtt-dispatcher
