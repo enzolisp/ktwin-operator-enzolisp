@@ -96,8 +96,11 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 		RabbitMQVhost: RABBITMQ_VHOST,
 		Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
 		Destination:   MQTT_DISPATCHER_QUEUE,
-		Labels:        map[string]string{},
-		RoutingKey:    e.getEventTypeRealGenerated(twinInstance.Spec.Interface + "." + twinInstance.Name),
+		Labels: map[string]string{
+			"ktwin/twin-interface":         twinInterface.Name,
+			"eventing.knative.dev/trigger": twinInterface.Name,
+		},
+		RoutingKey: e.getEventTypeRealGenerated(twinInstance.Spec.Interface + "." + twinInstance.Name),
 	})
 
 	rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
@@ -123,8 +126,11 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 					RabbitMQVhost: RABBITMQ_VHOST,
 					Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
 					Destination:   MQTT_DISPATCHER_QUEUE,
-					Labels:        map[string]string{},
-					RoutingKey:    e.getEventTypeRealGenerated(twinInstanceRelationship.Interface + "." + twinInstanceRelationship.Instance),
+					Labels: map[string]string{
+						"ktwin/twin-interface":         twinInterface.Name,
+						"eventing.knative.dev/trigger": twinInterface.Name,
+					},
+					RoutingKey: e.getEventTypeRealGenerated(twinInstanceRelationship.Interface + "." + twinInstanceRelationship.Instance),
 				})
 				rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
 			}
@@ -147,9 +153,11 @@ func (e *twinEvent) GetVirtualCloudEventBrokerBinding(
 			"eventing.knative.dev/trigger": twinInterface.Name,
 		},
 		Filters: map[string]string{
-			"type":              e.getEventTypeVirtualGenerated(twinInterface.Name),
-			"x-knative-trigger": twinInterface.Name,
-			"x-match":           "all",
+			"type":                         e.getEventTypeVirtualGenerated(twinInterface.Name),
+			"x-knative-trigger":            twinInterface.Name,
+			"x-match":                      "all",
+			"ktwin/twin-interface":         twinInterface.Name,
+			"eventing.knative.dev/trigger": twinInterface.Name,
 		},
 		RabbitMQVhost: "/",
 		Owner: []v1.OwnerReference{
