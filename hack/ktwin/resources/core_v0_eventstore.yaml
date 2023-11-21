@@ -9,5 +9,6 @@ spec:
   autoScaling:
     maxScale: 25
     minScale: 3
-    target: 50
+    target: 10
+    parallelism: 1000
     metric: "concurrency"

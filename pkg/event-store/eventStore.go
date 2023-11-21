@@ -141,6 +141,10 @@ func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventi
 		Labels: map[string]string{
 			"ktwin/event-store": "event-store",
 		},
+		URL: knative.TriggerURLParameters{
+			Path: "/api/v1/twin-events",
+		},
+		Parallelism: eventStore.Spec.AutoScaling.Parallelism,
 	})
 }
 

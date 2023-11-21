@@ -1,6 +1,9 @@
 package knative
 
 import (
+	"reflect"
+	"strconv"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	"knative.dev/pkg/apis"
@@ -15,9 +18,28 @@ type TriggerParameters struct {
 	OwnerReferences []v1.OwnerReference
 	Attributes      map[string]string
 	Labels          map[string]string
+	URL             TriggerURLParameters
+	Parallelism     *int
+}
+
+type TriggerURLParameters struct {
+	Path string
 }
 
 func NewTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
+	var triggerAnnotations = make(map[string]string)
+
+	if triggerAnnotations != nil {
+		triggerAnnotations["rabbitmq.eventing.knative.dev/parallelism"] = strconv.Itoa(*triggerParameters.Parallelism)
+	}
+
+	var urlParameters *apis.URL
+	if !reflect.DeepEqual(triggerParameters.URL, TriggerURLParameters{}) {
+		urlParameters = &apis.URL{
+			Path: triggerParameters.URL.Path,
+		}
+	}
+
 	return kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Trigger",
@@ -28,6 +50,7 @@ func NewTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
 			Namespace:       triggerParameters.Namespace,
 			Labels:          triggerParameters.Labels,
 			OwnerReferences: triggerParameters.OwnerReferences,
+			Annotations:     triggerAnnotations,
 		},
 		Spec: kEventing.TriggerSpec{
 			Broker: triggerParameters.BrokerName,
@@ -40,9 +63,7 @@ func NewTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
 					APIVersion: "serving.knative.dev/v1",
 					Name:       triggerParameters.SubscriberName,
 				},
-				URI: &apis.URL{
-					Path: "/api/v1/twin-events",
-				},
+				URI: urlParameters,
 			},
 		},
 	}
