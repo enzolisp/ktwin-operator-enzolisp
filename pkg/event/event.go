@@ -362,6 +362,7 @@ func (e *twinEvent) createTrigger(triggerParameters TriggerParameters) kEventing
 			Namespace:       triggerParameters.Namespace,
 			Labels:          e.getTriggerLabels(triggerParameters.InterfaceName),
 			OwnerReferences: triggerParameters.OwnerReference,
+			Annotations:     triggerParameters.Annotations,
 		},
 		Spec: kEventing.TriggerSpec{
 			Broker: triggerParameters.BrokerName,
