@@ -26,10 +26,9 @@ type KtwinRelationshipSettings struct {
 }
 
 type TwinServiceParameters struct {
-	TwinInterface         *dtdv0.TwinInterface
-	Broker                keventing.Broker
-	EventStoreService     kserving.Service
-	OperatorMetricService kserving.Service
+	TwinInterface     *dtdv0.TwinInterface
+	Broker            keventing.Broker
+	EventStoreService kserving.Service
 }
 
 func NewTwinService() TwinService {

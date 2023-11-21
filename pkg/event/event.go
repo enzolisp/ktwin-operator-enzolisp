@@ -305,6 +305,11 @@ func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInt
 		// Real Twin Event Type
 		for _, command := range twinInterface.Spec.Commands {
 			twinInterfaceCommandEventType := e.getEventTypeCommandExecuted(twinInterface.Name, command.Name)
+			var triggerAnnotations = make(map[string]string)
+
+			if twinInterface.Spec.Service != nil && twinInterface.Spec.Service.AutoScaling.Parallelism != nil {
+				triggerAnnotations["rabbitmq.eventing.knative.dev/parallelism"] = strconv.Itoa(*twinInterface.Spec.Service.AutoScaling.Parallelism)
+			}
 
 			twinInterfaceTrigger := e.createTrigger(TriggerParameters{
 				TriggerName:   e.getTwinInterfaceTrigger(twinInterface.Name + "-" + command.Name),
@@ -321,6 +326,7 @@ func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInt
 						UID:        twinInterface.UID,
 					},
 				},
+				Annotations: triggerAnnotations,
 			})
 
 			twinInterfaceTriggers = append(twinInterfaceTriggers, twinInterfaceTrigger)
