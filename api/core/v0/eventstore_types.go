@@ -22,7 +22,7 @@ type EventStoreAutoScaling struct {
 	MinScale                    *int           `json:"minScale,omitempty"`
 	MaxScale                    *int           `json:"maxScale,omitempty"`
 	Target                      *int           `json:"target,omitempty"`
-	TargetUtilizationPercentage *float64       `json:"targetUtilizationPercentage,omitempty"`
+	TargetUtilizationPercentage string         `json:"targetUtilizationPercentage,omitempty"`
 	Metric                      AutoScalerType `json:"metric,omitempty"`
 }
 
