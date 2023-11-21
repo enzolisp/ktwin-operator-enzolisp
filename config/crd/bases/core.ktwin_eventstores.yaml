@@ -45,8 +45,6 @@ spec:
                     type: integer
                   target:
                     type: integer
-                  targetUtilizationPercentage:
-                    type: string
                 type: object
             type: object
           status:

@@ -354,6 +354,8 @@ spec:
                         type: integer
                       target:
                         type: integer
+                      targetUtilizationPercentage:
+                        type: integer
                     type: object
                   template:
                     description: PodTemplateSpec describes the data a pod should have

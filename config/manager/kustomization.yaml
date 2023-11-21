@@ -3,6 +3,6 @@ resources:
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
-- name: controller
+- digest: sha256:9afe911361e9d864e922c8a22659c1359c91ba422aefe78fffe7ab236996b273
+  name: controller
   newName: ghcr.io/open-digital-twin/ktwin-operator
-  newTag: "0.1"

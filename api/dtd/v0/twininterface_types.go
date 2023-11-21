@@ -80,9 +80,10 @@ type TwinInterfaceService struct {
 
 // KNative Pod Auto Scaler Settings
 type TwinInterfaceAutoScaling struct {
-	MinScale *int `json:"minScale,omitempty"`
-	MaxScale *int `json:"maxScale,omitempty"`
-	Target   *int `json:"target,omitempty"`
+	MinScale                    *int `json:"minScale,omitempty"`
+	MaxScale                    *int `json:"maxScale,omitempty"`
+	Target                      *int `json:"target,omitempty"`
+	TargetUtilizationPercentage *int `json:"targetUtilizationPercentage,omitempty"`
 	// KNative Metric values (default, if not informed: concurrency)
 	// concurrency: the number of simultaneous requests that can be processed by each replica of an application at any given time
 	// rps: requests per seconds

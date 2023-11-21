@@ -19,11 +19,10 @@ type EventStoreSpec struct {
 }
 
 type EventStoreAutoScaling struct {
-	MinScale                    *int           `json:"minScale,omitempty"`
-	MaxScale                    *int           `json:"maxScale,omitempty"`
-	Target                      *int           `json:"target,omitempty"`
-	TargetUtilizationPercentage string         `json:"targetUtilizationPercentage,omitempty"`
-	Metric                      AutoScalerType `json:"metric,omitempty"`
+	MinScale *int           `json:"minScale,omitempty"`
+	MaxScale *int           `json:"maxScale,omitempty"`
+	Target   *int           `json:"target,omitempty"`
+	Metric   AutoScalerType `json:"metric,omitempty"`
 }
 
 // EventStoreStatus defines the observed state of EventStore
