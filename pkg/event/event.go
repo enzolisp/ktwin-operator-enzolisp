@@ -2,6 +2,7 @@ package event
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
@@ -36,6 +37,7 @@ type TriggerParameters struct {
 	EventType      string
 	Subscriber     string
 	OwnerReference []v1.OwnerReference
+	Annotations    map[string]string
 }
 
 func (e *twinEvent) getEventTypeRealGenerated(twinInterfaceName string) string {
@@ -264,6 +266,11 @@ func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) 
 	if e.hasContainerInTwinInterface(twinInterface) {
 		// Real Twin Event Type
 		twinInterfaceEventType := e.getEventTypeRealGenerated(twinInterface.Name)
+		var triggerAnnotations = make(map[string]string)
+
+		if twinInterface.Spec.Service != nil && twinInterface.Spec.Service.AutoScaling.Parallelism != nil {
+			triggerAnnotations["rabbitmq.eventing.knative.dev/parallelism"] = strconv.Itoa(*twinInterface.Spec.Service.AutoScaling.Parallelism)
+		}
 
 		twinInterfaceTrigger = e.createTrigger(TriggerParameters{
 			TriggerName:   e.getTwinInterfaceTrigger(twinInterface.Name),
@@ -280,6 +287,7 @@ func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) 
 					UID:        twinInterface.UID,
 				},
 			},
+			Annotations: triggerAnnotations,
 		})
 
 	}

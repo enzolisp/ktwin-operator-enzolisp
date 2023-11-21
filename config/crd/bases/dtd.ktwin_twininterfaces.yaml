@@ -352,6 +352,8 @@ spec:
                         type: string
                       minScale:
                         type: integer
+                      parallelism:
+                        type: integer
                       target:
                         type: integer
                       targetUtilizationPercentage:

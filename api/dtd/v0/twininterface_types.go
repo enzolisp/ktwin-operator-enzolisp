@@ -84,6 +84,7 @@ type TwinInterfaceAutoScaling struct {
 	MaxScale                    *int `json:"maxScale,omitempty"`
 	Target                      *int `json:"target,omitempty"`
 	TargetUtilizationPercentage *int `json:"targetUtilizationPercentage,omitempty"`
+	Parallelism                 *int `json:"parallelism,omitempty"`
 	// KNative Metric values (default, if not informed: concurrency)
 	// concurrency: the number of simultaneous requests that can be processed by each replica of an application at any given time
 	// rps: requests per seconds
