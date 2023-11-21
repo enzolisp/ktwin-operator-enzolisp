@@ -18,10 +18,7 @@ kubectl label namespaces rabbitmq-system podMonitor=prometheus
 ## RabbitMQ Monitoring
 
 ```sh
-kubectl apply -n ktwin -f https://raw.githubusercontent.com/rabbitmq/cluster-operator/main/observability/prometheus/monitors/rabbitmq-servicemonitor.yml
-kubectl apply -n ktwin -f https://raw.githubusercontent.com/rabbitmq/cluster-operator/main/observability/prometheus/monitors/rabbitmq-cluster-operator-podmonitor.yml
-kubectl label ServiceMonitor rabbitmq serviceMonitor=prometheus -n ktwin
-kubectl label PodMonitor rabbitmq-cluster-operator podMonitor=prometheus -n ktwin
+kubectl apply -n ktwin -f rabbitmq-monitoring.yaml
 ```
 
 ### Creating Prometheus Cluster Roles
