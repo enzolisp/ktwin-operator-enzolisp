@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -24,23 +25,22 @@ type ProcessedFile struct {
 }
 
 func main() {
-	allArgs := os.Args
-	args := allArgs[1:]
+	inputFolderPath := flag.String("inputFolderPath", "", "the input folder path to files")
+	outputFolderPath := flag.String("outputFolderPath", "", "the output folder path to files")
 
-	if len(args) < 2 {
+	flag.Parse()
+
+	if *inputFolderPath == "" || *outputFolderPath == "" {
 		log.Fatal("Inform DTDL input and output folders path")
 	}
-
-	inputFolderPath := args[0]
-	outputFolderPath := args[1]
 
 	dtdlGraph := graph.NewTwinInterfaceGraph()
 	processedFiles := []ProcessedFile{}
 
 	// Load all DTDL interfaces files
-	fmt.Println("Processing folder " + inputFolderPath)
+	fmt.Println("Processing folder " + *inputFolderPath)
 
-	dtdlGraph, processedFiles = processAllFilesInFolder(inputFolderPath, outputFolderPath, dtdlGraph, processedFiles)
+	dtdlGraph, processedFiles = processAllFilesInFolder(*inputFolderPath, *outputFolderPath, dtdlGraph, processedFiles)
 
 	// Print Graph
 	dtdlGraph.PrintGraph()
@@ -203,14 +203,18 @@ func getParentTwinInterfaces(twinInterface v0.TwinInterface, dtdlGraph graph.Twi
 }
 
 func writeOutputFile(outputFilePath string, twinInterface v0.TwinInterface, twinInstance v0.TwinInstance) {
-	outputFolderPath := filepath.Dir(outputFilePath)
-	subFoldersPath := strings.Split(outputFolderPath, "/")
+	absOutputFolderPath, err := filepath.Abs(outputFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	subFoldersPath := strings.Split(absOutputFolderPath, "/")
 
 	fmt.Printf("Writing output files " + outputFilePath + "\n")
 
 	var outputSubFolderPath string
 	for _, subFolderPath := range subFoldersPath {
-		if subFolderPath != "" {
+		if subFolderPath != "" && !strings.Contains(subFolderPath, ".") {
 			outputSubFolderPath += "/"
 			outputSubFolderPath += subFolderPath
 			pkg.PrepareOutputFolder(outputSubFolderPath)
@@ -222,7 +226,7 @@ func writeOutputFile(outputFilePath string, twinInterface v0.TwinInterface, twin
 	yamlBuffer := new(bytes.Buffer)
 	serializer.Encode(&twinInterface, yamlBuffer)
 	interfaceFilePath := pkg.AddSuffixToFileName(outputFilePath, "01-", "-interface")
-	err := pkg.WriteToFile(interfaceFilePath, yamlBuffer.Bytes())
+	err = pkg.WriteToFile(interfaceFilePath, yamlBuffer.Bytes())
 	if err != nil {
 		log.Fatal(err)
 	}

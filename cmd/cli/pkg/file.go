@@ -13,17 +13,13 @@ func IsJsonFile(filePath string) bool {
 }
 
 func AddSuffixToFileName(filePath string, prefix string, suffix string) string {
-	fileSplit := strings.Split(filePath, ".")
-	fileWithSuffix := fileSplit[0] + suffix + "." + fileSplit[1]
+	directory, fileNameWithExtension := filepath.Split(filePath)
+	fileExtension := filepath.Ext(fileNameWithExtension)
+	fileName := strings.Split(fileNameWithExtension, ".")
 
-	if prefix == "" {
-		return fileWithSuffix
-	}
+	finalFileName := directory + prefix + fileName[0] + suffix + fileExtension
 
-	directory, fileName := filepath.Split(fileWithSuffix)
-	fileWithPrefix := directory + prefix + fileName
-
-	return fileWithPrefix
+	return finalFileName
 }
 
 func PrepareOutputFolder(dirname string) error {
