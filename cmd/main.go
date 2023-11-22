@@ -40,7 +40,6 @@ import (
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/graph"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
 
-	camelv1 "github.com/apache/camel-k/pkg/apis/camel/v1"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
@@ -61,7 +60,6 @@ func init() {
 	// Third party
 	utilruntime.Must(kserving.AddToScheme(scheme))
 	utilruntime.Must(keventing.AddToScheme(scheme))
-	utilruntime.Must(camelv1.AddToScheme(scheme))
 	utilruntime.Must(rabbitmqv1beta1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
