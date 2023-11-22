@@ -172,6 +172,8 @@ func (r *resourceBuilder) getTwinData(twinInterfaces []apiv0.TwinInterface) *api
 }
 
 func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.TwinCommand) []apiv0.TwinCommand {
+	requestTwinSchema := r.createTwinSchema(command.Request.Schema)
+	responseTwinSchema := r.createTwinSchema(command.Response.Schema)
 	newCommand := apiv0.TwinCommand{
 		Id:          string(command.Id),
 		Comment:     command.Comment,
@@ -182,12 +184,13 @@ func (r *resourceBuilder) processCommand(command dtdl.Command, commands []apiv0.
 			Name:        command.Request.Name,
 			DisplayName: string(command.Request.DisplayName),
 			Description: string(command.Request.Comment),
+			Schema:      requestTwinSchema,
 		},
 		Response: apiv0.CommandResponse{
 			Name:        command.Response.Name,
 			DisplayName: string(command.Response.DisplayName),
 			Description: string(command.Response.Comment),
-			//Schema:      command.Response.Schema,
+			Schema:      responseTwinSchema,
 		},
 	}
 	commands = append(commands, newCommand)
@@ -276,9 +279,30 @@ func (r *resourceBuilder) createTwinSchema(schema dtdl.Schema) *apiv0.TwinSchema
 		}
 	}
 
+	var twinComplexTypeFields []apiv0.TwinComplexTypeFields
+	var twinComplexTypeSchema *apiv0.TwinComplexType
+
+	for _, fieldValue := range schema.ObjectSchema.Fields {
+		twinObjectField := apiv0.TwinComplexTypeFields{
+			Name: fieldValue.Name,
+			Schema: &apiv0.TwinComplexTypeSchema{
+				PrimitiveType: apiv0.PrimitiveType(fieldValue.Schema),
+			},
+		}
+		twinComplexTypeFields = append(twinComplexTypeFields, twinObjectField)
+	}
+
+	if len(twinComplexTypeFields) > 1 || schema.ObjectSchema.Type != "" {
+		twinComplexTypeSchema = &apiv0.TwinComplexType{
+			Type:   apiv0.ComplexType(schema.ObjectSchema.Type),
+			Fields: twinComplexTypeFields,
+		}
+	}
+
 	twinSchema := &apiv0.TwinSchema{
 		PrimitiveType: apiv0.PrimitiveType(schema.DefaultSchemaValue),
 		EnumType:      twinEnumSchema,
+		ComplexType:   twinComplexTypeSchema,
 	}
 
 	return twinSchema

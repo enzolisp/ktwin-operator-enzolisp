@@ -43,7 +43,7 @@ const (
 )
 
 const (
-	Object ComplexType = "object"
+	Object ComplexType = "Object"
 )
 
 const (
@@ -186,6 +186,17 @@ type TwinEnumSchemaValues struct {
 	Name        string `json:"name,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
 	EnumValue   string `json:"enumValue,omitempty"`
+}
+
+type TwinObjectSchema struct {
+	ValueSchema PrimitiveType          `json:"valueSchema,omitempty"`
+	EnumValues  []TwinEnumSchemaValues `json:"enumValues,omitempty"`
+}
+
+type TwinObjectSchemaFields struct {
+	Name        string `json:"name,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	Schema      string `json:"enumValue,omitempty"`
 }
 
 // TwinInterfaceStatus defines the observed state of TwinInterface

@@ -5,10 +5,25 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func IsJsonFile(filePath string) bool {
 	return filepath.Ext(filePath) == ".json"
+}
+
+func AddSuffixToFileName(filePath string, prefix string, suffix string) string {
+	fileSplit := strings.Split(filePath, ".")
+	fileWithSuffix := fileSplit[0] + suffix + "." + fileSplit[1]
+
+	if prefix == "" {
+		return fileWithSuffix
+	}
+
+	directory, fileName := filepath.Split(fileWithSuffix)
+	fileWithPrefix := directory + prefix + fileName
+
+	return fileWithPrefix
 }
 
 func PrepareOutputFolder(dirname string) error {

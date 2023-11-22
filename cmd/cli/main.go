@@ -206,7 +206,7 @@ func writeOutputFile(outputFilePath string, twinInterface v0.TwinInterface, twin
 	outputFolderPath := filepath.Dir(outputFilePath)
 	subFoldersPath := strings.Split(outputFolderPath, "/")
 
-	fmt.Printf("Writing file " + outputFilePath + "\n")
+	fmt.Printf("Writing output files " + outputFilePath + "\n")
 
 	var outputSubFolderPath string
 	for _, subFolderPath := range subFoldersPath {
@@ -217,12 +217,23 @@ func writeOutputFile(outputFilePath string, twinInterface v0.TwinInterface, twin
 		}
 	}
 
+	// Write Twin Interface file
 	serializer := k8sJson.NewYAMLSerializer(k8sJson.DefaultMetaFactory, nil, nil)
 	yamlBuffer := new(bytes.Buffer)
 	serializer.Encode(&twinInterface, yamlBuffer)
-	yamlBuffer.Write([]byte("---\n"))
+	interfaceFilePath := pkg.AddSuffixToFileName(outputFilePath, "01-", "-interface")
+	err := pkg.WriteToFile(interfaceFilePath, yamlBuffer.Bytes())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Write Twin Instance files
+	serializer = k8sJson.NewYAMLSerializer(k8sJson.DefaultMetaFactory, nil, nil)
+	yamlBuffer = new(bytes.Buffer)
 	serializer.Encode(&twinInstance, yamlBuffer)
-	err := pkg.WriteToFile(outputFilePath, yamlBuffer.Bytes())
+	yamlBuffer.Write([]byte("---\n"))
+	instanceFilePath := pkg.AddSuffixToFileName(outputFilePath, "02-", "-instances")
+	err = pkg.WriteToFile(instanceFilePath, yamlBuffer.Bytes())
 	if err != nil {
 		log.Fatal(err)
 	}

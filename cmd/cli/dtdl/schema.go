@@ -43,6 +43,7 @@ type Schema struct {
 	IsDefaultSchema    bool
 	DefaultSchemaValue string
 	EnumSchema         EnumSchema
+	ObjectSchema       ObjectSchema
 }
 
 type EnumSchema struct {
@@ -55,6 +56,16 @@ type EnumSchemaValues struct {
 	Name        string `json:"name" yaml:"name,omitempty"`
 	DisplayName string `json:"displayName" yaml:"displayName,omitempty"`
 	EnumValue   string `json:"enumValue" yaml:"enumValue,omitempty"`
+}
+type ObjectSchema struct {
+	Type   string               `json:"@type" yaml:"type,omitempty"`
+	Fields []ObjectSchemaFields `json:"fields" yaml:"fields,omitempty"`
+}
+
+type ObjectSchemaFields struct {
+	Name        string `json:"name" yaml:"name,omitempty"`
+	DisplayName string `json:"displayName" yaml:"displayName,omitempty"`
+	Schema      string `json:"schema" yaml:"objectSchema,omitempty"`
 }
 
 func (s *Schema) UnmarshalJSON(data []byte) error {
@@ -76,15 +87,28 @@ func (s *Schema) UnmarshalJSON(data []byte) error {
 	case nil:
 		return nil
 	case interface{}:
-		enumSchema, err := s.processSchemaInterface(jsonObject)
+		schema, err := s.processSchemaInterface(jsonObject)
 
 		if err != nil {
 			return err
 		}
 
-		*s = Schema{
-			IsDefaultSchema: false,
-			EnumSchema:      enumSchema,
+		enumSchema, isEnumSchema := schema.(EnumSchema)
+
+		if isEnumSchema {
+			*s = Schema{
+				IsDefaultSchema: false,
+				EnumSchema:      enumSchema,
+			}
+		}
+
+		objectSchema, isObjectSchema := schema.(ObjectSchema)
+
+		if isObjectSchema {
+			*s = Schema{
+				IsDefaultSchema: false,
+				ObjectSchema:    objectSchema,
+			}
 		}
 
 		return nil
@@ -111,15 +135,16 @@ func (s Schema) MarshalYAML() (interface{}, error) {
 }
 
 // Schema
-func (s *Schema) processSchemaInterface(jsonObject interface{}) (EnumSchema, error) {
+func (s *Schema) processSchemaInterface(jsonObject interface{}) (interface{}, error) {
 
 	objectMap, isMapStringInterface := jsonObject.(map[string]interface{})
 
 	if isMapStringInterface {
 
 		schemaType := objectMap["@type"].(string)
-		if s.isValidSchemaType(schemaType) {
 
+		switch schemaType {
+		case "Enum":
 			valueSchema := objectMap["valueSchema"].(string)
 			enumValues := s.processSchemaEnumValues(objectMap["enumValues"])
 
@@ -128,12 +153,19 @@ func (s *Schema) processSchemaInterface(jsonObject interface{}) (EnumSchema, err
 				ValueSchema: valueSchema,
 				EnumValues:  enumValues,
 			}
-
 			return enumSchema, nil
-		}
+		case "Object":
+			fieldsValues := s.processSchemaObjectValues(objectMap["fields"])
 
-		log.Fatal("It was not able to process schema. Schema type is invalid: ", schemaType)
-		return EnumSchema{}, ErrInvalidSchemaType
+			objectSchema := ObjectSchema{
+				Type:   schemaType,
+				Fields: fieldsValues,
+			}
+			return objectSchema, nil
+		default:
+			log.Fatal("It was not able to process schema. Schema type is invalid: ", schemaType)
+			return EnumSchema{}, ErrInvalidSchemaType
+		}
 	}
 
 	return EnumSchema{}, ErrUnmarshalTypeNotSupported
@@ -163,6 +195,29 @@ func (s *Schema) processSchemaEnumValues(enumValuesMap interface{}) []EnumSchema
 
 }
 
+func (s *Schema) processSchemaObjectValues(objectFieldsMap interface{}) []ObjectSchemaFields {
+
+	objectValues, isValidListMap := objectFieldsMap.([]interface{})
+
+	if !isValidListMap {
+		log.Fatal("Invalid type for object values array")
+	}
+
+	var objectSchemaValues []ObjectSchemaFields = make([]ObjectSchemaFields, 0)
+
+	for _, objectValue := range objectValues {
+		objectMap := objectValue.(map[string]interface{})
+		objectSchemaValue := ObjectSchemaFields{
+			Name:        s.getStringNotNull(objectMap["name"]),
+			DisplayName: s.getStringNotNull(objectMap["displayName"]),
+			Schema:      s.getStringNotNull(objectMap["schema"]),
+		}
+		objectSchemaValues = append(objectSchemaValues, objectSchemaValue)
+	}
+
+	return objectSchemaValues
+}
+
 func (s *Schema) getStringNotNull(value interface{}) string {
 	if value == nil {
 		return ""
@@ -171,5 +226,5 @@ func (s *Schema) getStringNotNull(value interface{}) string {
 }
 
 func (s *Schema) isValidSchemaType(schemaType string) bool {
-	return schemaType == "Enum"
+	return schemaType == "Enum" || schemaType == "Object"
 }
