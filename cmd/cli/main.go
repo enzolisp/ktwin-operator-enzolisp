@@ -25,10 +25,13 @@ type ProcessedFile struct {
 }
 
 func main() {
-	inputFolderPath := flag.String("inputFolderPath", "", "the input folder path to files")
-	outputFolderPath := flag.String("outputFolderPath", "", "the output folder path to files")
+	inputFolderPath := flag.String("input-folder-path", "", "the input folder path to files")
+	outputFolderPath := flag.String("output-folder-path", "", "the output folder path to files")
+	numberOfInstances := flag.String("number-instances", "", "the number of instances to be created")
 
 	flag.Parse()
+
+	fmt.Println(*numberOfInstances)
 
 	if *inputFolderPath == "" || *outputFolderPath == "" {
 		log.Fatal("Inform DTDL input and output folders path")

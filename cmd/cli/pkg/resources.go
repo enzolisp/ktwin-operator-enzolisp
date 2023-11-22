@@ -82,11 +82,18 @@ func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.T
 			Telemetries:      telemetries,
 			ExtendsInterface: interfaceExtends,
 			Service: &apiv0.TwinInterfaceService{
+				AutoScaling: apiv0.TwinInterfaceAutoScaling{
+					MaxScale:                    newIntPtr(20),
+					Target:                      newIntPtr(10),
+					Parallelism:                 newIntPtr(100),
+					TargetUtilizationPercentage: newIntPtr(65),
+					Metric:                      "concurrency",
+				},
 				Template: corev1.PodTemplateSpec{
 					Spec: corev1.PodSpec{Containers: []corev1.Container{
 						{
 							Name:            normalizedInterfaceId,
-							Image:           naming.GetContainerRegistry("ktwin-edge-service:0.1"),
+							Image:           naming.GetContainerRegistry("ktwin-" + normalizedInterfaceId + "-service:0.1"),
 							ImagePullPolicy: corev1.PullIfNotPresent,
 						},
 					}},
@@ -306,4 +313,8 @@ func (r *resourceBuilder) createTwinSchema(schema dtdl.Schema) *apiv0.TwinSchema
 	}
 
 	return twinSchema
+}
+
+func newIntPtr(value int) *int {
+	return &value
 }
