@@ -8,10 +8,6 @@ import (
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 )
 
-const (
-	NO_INDEX = -1
-)
-
 type TwinGraphEnvironmentSettings struct {
 	TwinInstances []TwinInstanceEnvironmentSettings `json:"twinInstances,omitempty"`
 }

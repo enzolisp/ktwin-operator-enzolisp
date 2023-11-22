@@ -25,8 +25,6 @@ func AddSuffixToFileName(filePath string, prefix string, suffix string) string {
 func PrepareOutputFolder(dirname string) error {
 	fileInfo, err := os.Stat(dirname)
 
-	// fmt.Printf(dirname + "\n")
-
 	if err == nil && fileInfo.IsDir() {
 		return nil
 	}

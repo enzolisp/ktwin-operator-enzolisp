@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var twinInstance01 = dtdv0.TwinInterface{
+var twinInterface01 = dtdv0.TwinInterface{
 	Spec: dtdv0.TwinInterfaceSpec{
 		Id: "TwinInterface01",
 	},
 }
 
-var twinInstance02 = dtdv0.TwinInterface{
+var twinInterface02 = dtdv0.TwinInterface{
 	Spec: dtdv0.TwinInterfaceSpec{
 		Id: "TwinInterface02",
 	},
@@ -54,7 +54,7 @@ func TestTwinInterface_AddVertex(t *testing.T) {
 			name: "Successful add one vertex",
 			vertexToBeAdded: []VertexToBeAdded{
 				{
-					twinInterface: twinInstance01,
+					twinInterface: twinInterface01,
 					expectedError: nil,
 				},
 			},
@@ -62,7 +62,7 @@ func TestTwinInterface_AddVertex(t *testing.T) {
 				NumberOfVertex: 1,
 				Vertexes: map[string]*TwinInterfaceGraphVertex{
 					"TwinInterface01": {
-						TwinInterface:  twinInstance01,
+						TwinInterface:  twinInterface01,
 						EdgeInterfaces: []*TwinInterfaceGraphVertex{},
 					},
 				},
@@ -72,11 +72,11 @@ func TestTwinInterface_AddVertex(t *testing.T) {
 			name: "Successful add two vertexes",
 			vertexToBeAdded: []VertexToBeAdded{
 				{
-					twinInterface: twinInstance01,
+					twinInterface: twinInterface01,
 					expectedError: nil,
 				},
 				{
-					twinInterface: twinInstance02,
+					twinInterface: twinInterface02,
 					expectedError: nil,
 				},
 			},
@@ -84,11 +84,11 @@ func TestTwinInterface_AddVertex(t *testing.T) {
 				NumberOfVertex: 2,
 				Vertexes: map[string]*TwinInterfaceGraphVertex{
 					"TwinInterface01": {
-						TwinInterface:  twinInstance01,
+						TwinInterface:  twinInterface01,
 						EdgeInterfaces: []*TwinInterfaceGraphVertex{},
 					},
 					"TwinInterface02": {
-						TwinInterface:  twinInstance02,
+						TwinInterface:  twinInterface02,
 						EdgeInterfaces: []*TwinInterfaceGraphVertex{},
 					},
 				},
@@ -98,15 +98,15 @@ func TestTwinInterface_AddVertex(t *testing.T) {
 			name: "Successful add two vertexes",
 			vertexToBeAdded: []VertexToBeAdded{
 				{
-					twinInterface: twinInstance01,
+					twinInterface: twinInterface01,
 					expectedError: nil,
 				},
 				{
-					twinInterface: twinInstance02,
+					twinInterface: twinInterface02,
 					expectedError: nil,
 				},
 				{
-					twinInterface: twinInstance01,
+					twinInterface: twinInterface01,
 					expectedError: errors.New("TwinInterface already exist in the graph"),
 				},
 			},
@@ -114,11 +114,11 @@ func TestTwinInterface_AddVertex(t *testing.T) {
 				NumberOfVertex: 2,
 				Vertexes: map[string]*TwinInterfaceGraphVertex{
 					"TwinInterface01": {
-						TwinInterface:  twinInstance01,
+						TwinInterface:  twinInterface01,
 						EdgeInterfaces: []*TwinInterfaceGraphVertex{},
 					},
 					"TwinInterface02": {
-						TwinInterface:  twinInstance02,
+						TwinInterface:  twinInterface02,
 						EdgeInterfaces: []*TwinInterfaceGraphVertex{},
 					},
 				},

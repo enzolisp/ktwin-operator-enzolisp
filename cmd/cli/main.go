@@ -12,8 +12,8 @@ import (
 
 	v0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 	dtdl "github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/dtdl"
-	"github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/graph"
 	pkg "github.com/Open-Digital-Twin/ktwin-operator/cmd/cli/pkg"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/graph"
 
 	k8sJson "k8s.io/apimachinery/pkg/runtime/serializer/json"
 )
@@ -27,15 +27,15 @@ type ProcessedFile struct {
 func main() {
 	inputFolderPath := flag.String("input-folder-path", "", "the input folder path to files")
 	outputFolderPath := flag.String("output-folder-path", "", "the output folder path to files")
-	numberOfInstances := flag.String("number-instances", "", "the number of instances to be created")
+	instanceGraphFile := flag.String("instance-graph-file", "", "the instance graph file path used to generate instances file. when not informed, all interfaces are created with one instance")
 
 	flag.Parse()
-
-	fmt.Println(*numberOfInstances)
 
 	if *inputFolderPath == "" || *outputFolderPath == "" {
 		log.Fatal("Inform DTDL input and output folders path")
 	}
+
+	fmt.Println(*instanceGraphFile)
 
 	dtdlGraph := graph.NewTwinInterfaceGraph()
 	processedFiles := []ProcessedFile{}
@@ -49,8 +49,7 @@ func main() {
 	dtdlGraph.PrintGraph()
 
 	// Generate Output files with TwinInterfaces and TwinInstances examples
-	generateOutputFiles(processedFiles, dtdlGraph)
-
+	generateAllOutputFiles(processedFiles, dtdlGraph)
 }
 
 // Process all files in the specified folder
@@ -113,14 +112,8 @@ func loadDTDLFileIntoGraph(inputFilePath string) v0.TwinInterface {
 	return twinInterfaceResource
 }
 
-// Process Inherit Properties and Telemetries
-func processInheritContents(dtdlGraph graph.TwinInterfaceGraph) graph.TwinInterfaceGraph {
-	return dtdlGraph
-}
-
+// Generate output file for twin instance and twin interface based on instance-graph-file parameter
 func generateOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInterfaceGraph) {
-	//var outputString string
-
 	fmt.Println("Generating output files...")
 
 	for _, processedFile := range processedFiles {
@@ -135,51 +128,26 @@ func generateOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInt
 		parentTwinInterfaces := getParentTwinInterfaces(*twinInterface, dtdlGraph)
 		twinInstance := pkg.NewResourceBuilder().CreateTwinInstance(*twinInterface, parentTwinInterfaces)
 		writeOutputFile(processedFile.outputFilePath, *twinInterface, twinInstance)
-		// outputString += getTwinInstanceStringFields(twinInstance, parentTwinInterfaces)
 	}
-
-	// fmt.Printf(outputString)
 }
 
-func getTwinInstanceStringFields(twinInstance v0.TwinInstance, parentTwinInterfaces []v0.TwinInterface) string {
-	var outputString string
+// Generate one output file for twin instance and twin interface with just one instance
+func generateAllOutputFiles(processedFiles []ProcessedFile, dtdlGraph graph.TwinInterfaceGraph) {
+	fmt.Println("Generating output files...")
 
-	for _, twinInterface := range parentTwinInterfaces {
-		twinInterfaceName := parentTwinInterfaces[0].Name
+	for _, processedFile := range processedFiles {
 
-		for _, property := range twinInterface.Spec.Properties {
-			var propertyList []string
-			propertyList = append(propertyList, twinInterfaceName)
-			propertyList = append(propertyList, "property")
-			propertyList = append(propertyList, property.Name)
-			propertyList = append(propertyList, property.Description)
+		twinInterface := dtdlGraph.GetVertex(processedFile.TwinInterfaceId)
 
-			outputString = outputString + strings.Join(propertyList, ";;") + "\n"
+		if twinInterface == nil {
+			fmt.Printf("Twin Interface {%s} not found\n", processedFile.TwinInterfaceId)
+			continue
 		}
 
-		for _, telemetry := range twinInterface.Spec.Telemetries {
-			var telemetryList []string
-			telemetryList = append(telemetryList, twinInterfaceName)
-			telemetryList = append(telemetryList, "telemetry")
-			telemetryList = append(telemetryList, telemetry.Name)
-			telemetryList = append(telemetryList, telemetry.Description)
-
-			outputString = outputString + strings.Join(telemetryList, ";;") + "\n"
-		}
-
-		for _, relationship := range twinInterface.Spec.Relationships {
-			var relationshipList []string
-			relationshipList = append(relationshipList, twinInterfaceName)
-			relationshipList = append(relationshipList, "relationship")
-			relationshipList = append(relationshipList, relationship.Name)
-			relationshipList = append(relationshipList, relationship.Description)
-
-			outputString = outputString + strings.Join(relationshipList, ";;") + "\n"
-		}
-
+		parentTwinInterfaces := getParentTwinInterfaces(*twinInterface, dtdlGraph)
+		twinInstance := pkg.NewResourceBuilder().CreateTwinInstance(*twinInterface, parentTwinInterfaces)
+		writeOutputFile(processedFile.outputFilePath, *twinInterface, twinInstance)
 	}
-
-	return outputString
 }
 
 // Return a list of TwinInterfaces that contains the TwinInterface being processed and all the parent TwinInterfaces

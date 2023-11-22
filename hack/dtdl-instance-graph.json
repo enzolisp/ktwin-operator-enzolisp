@@ -1,0 +1,68 @@
+{
+    "twinInstances": [
+        {
+            "interface": "s4city-city-city",
+            "numberOfInstances": 1,
+            "relationships": [
+                {
+                    "interface": "s4city-city-neighborhood",
+                    "name": "refNeighborhood",
+                    "numberOfInstances": 2
+                }
+            ]
+        },
+        {
+            "interface": "s4city-city-neighborhood",
+            "numberOfInstances": 1,
+            "relationships": [
+                {
+                    "instance": "city:Pole",
+                    "name": "refCityPoles",
+                    "numberOfInstances": 50
+                },
+                {
+                    "instance": "ngsi_ld:city:OffStreetParking",
+                    "name": "refOffStreetParking",
+                    "numberOfInstances": 50
+                },
+                {
+                    "instance": "ngsi_ld:city:OnStreetParking",
+                    "name": "refOnStreetParking",
+                    "numberOfInstances": 50
+                }
+            ]
+        },
+        {
+            "interface": "city:Pole",
+            "numberOfInstances": 1,
+            "relationships": [
+                {
+                    "interface": "",
+                    "name": "refStreetlight",
+                    "numberOfInstances": 50
+                }
+            ]
+        },
+        {
+            "interface": "ngsi_ld:city:OffStreetParking",
+            "numberOfInstances": 1,
+            "relationships": [
+                {
+                    "name": "refParkingSpot",
+                    "numberOfInstances": 50
+                }
+            ]
+        }
+        ,
+        {
+            "interface": "ngsi_ld:city:OnStreetParking",
+            "numberOfInstances": 1,
+            "relationships": [
+                {
+                    "name": "refParkingSpot",
+                    "numberOfInstances": 50
+                }
+            ]
+        }
+    ]
+}

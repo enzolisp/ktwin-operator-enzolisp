@@ -161,4 +161,4 @@ $(ENVTEST): $(LOCALBIN)
 	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
 generate-dtdl:
-	go run cmd/cli/main.go -input-folder-path=$(INPUT_FOLDER) -output-folder-path=$(OUTPUT_FOLDER) -number-instances=$(NUMBER_OF_INSTANCES)
+	go run cmd/cli/main.go -input-folder-path=$(INPUT_FOLDER) -output-folder-path=$(OUTPUT_FOLDER) -instance-graph-file=$(INSTANCE_GRAPH_FILE)

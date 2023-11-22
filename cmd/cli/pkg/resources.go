@@ -32,7 +32,6 @@ type resourceBuilder struct {
 	hostUtils utils.HostUtils
 }
 
-// TODO: renew TwinInterface to TwinInstance
 func (r *resourceBuilder) CreateTwinInterface(tInterface dtdl.Interface) apiv0.TwinInterface {
 	var properties []apiv0.TwinProperty
 	var relationships []apiv0.TwinRelationship
