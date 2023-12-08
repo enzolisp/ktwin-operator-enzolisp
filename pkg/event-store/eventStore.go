@@ -57,6 +57,10 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 			autoScalingAnnotations["autoscaling.knative.dev/target"] = strconv.Itoa(*autoScaling.Target)
 		}
 
+		if autoScaling.TargetUtilizationPercentage != nil {
+			autoScalingAnnotations["autoscaling.knative.dev/target-utilization-percentage"] = strconv.Itoa(*autoScaling.TargetUtilizationPercentage)
+		}
+
 		if autoScaling.Metric != "" {
 			autoScalingAnnotations["autoscaling.knative.dev/metric"] = string(*&autoScaling.Metric)
 		}

@@ -19,11 +19,17 @@ type EventStoreSpec struct {
 }
 
 type EventStoreAutoScaling struct {
-	MinScale    *int           `json:"minScale,omitempty"`
-	MaxScale    *int           `json:"maxScale,omitempty"`
-	Target      *int           `json:"target,omitempty"`
-	Parallelism *int           `json:"parallelism,omitempty"`
-	Metric      AutoScalerType `json:"metric,omitempty"`
+	MinScale                    *int `json:"minScale,omitempty"`
+	MaxScale                    *int `json:"maxScale,omitempty"`
+	Target                      *int `json:"target,omitempty"`
+	TargetUtilizationPercentage *int `json:"targetUtilizationPercentage,omitempty"`
+	Parallelism                 *int `json:"parallelism,omitempty"`
+	// KNative Metric values (default, if not informed: concurrency)
+	// concurrency: the number of simultaneous requests that can be processed by each replica of an application at any given time
+	// rps: requests per seconds
+	// cpu: cpu usage
+	// memory: memory usage
+	Metric AutoScalerType `json:"metric,omitempty"`
 }
 
 // EventStoreStatus defines the observed state of EventStore
