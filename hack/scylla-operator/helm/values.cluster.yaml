@@ -19,12 +19,12 @@ racks:
     requests:
       cpu: 1
       memory: 1Gi
-  placement:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-            - key: ktwin/core-node
-              operator: In
-              values:
-                - "true"
+  # placement:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #           - key: ktwin/core-node
+  #             operator: In
+  #             values:
+  #               - "true"
