@@ -37,3 +37,15 @@ Knative Services do not have support for Node Selector by default. You can enabl
 ```sh
 kubectl edit configmap config-features -n knative-serving
 ```
+
+## Delete stuck resources
+
+```sh
+kubectl get binding.rabbitmq.com <resource name> -o=json | \
+jq '.metadata.finalizers = null' | kubectl apply -f -
+```
+
+```sh
+kubectl get binding.rabbitmq.com -o=json | \
+jq '.metadata.finalizers = null' | kubectl apply -f -
+```
