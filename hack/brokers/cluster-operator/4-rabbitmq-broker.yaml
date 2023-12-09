@@ -343,6 +343,8 @@ spec:
         app: rabbitmq-broker-controller
         eventing.knative.dev/release: devel
     spec:
+      nodeSelector:
+        ktwin/core-node: "true"
       serviceAccountName: eventing-controller
       containers:
         - name: rabbitmq-broker-controller
@@ -514,6 +516,8 @@ spec:
     metadata:
       labels: *labels
     spec:
+      nodeSelector:
+        ktwin/core-node: "true"
       # To avoid node becoming SPOF, spread our replicas to different nodes.
       affinity:
         podAntiAffinity:
