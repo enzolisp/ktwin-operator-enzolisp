@@ -97,6 +97,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 						PodSpec: corev1.PodSpec{
 							NodeSelector: map[string]string{
 								"kubernetes.io/arch": "amd64",
+								"ktwin/core-node":    "true",
 							},
 							Containers: []corev1.Container{
 								{

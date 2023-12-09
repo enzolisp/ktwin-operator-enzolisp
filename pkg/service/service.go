@@ -146,6 +146,7 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 						PodSpec: corev1.PodSpec{
 							NodeSelector: map[string]string{
 								"kubernetes.io/arch": "amd64",
+								"ktwin/service-node": "true",
 							},
 							Containers: containers,
 						},
