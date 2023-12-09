@@ -4,6 +4,15 @@ metadata:
   name: rabbitmq
 spec:
   replicas: 2
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: ktwin/core-node
+            operator: In
+            values:
+            - "true"
   rabbitmq:
     additionalPlugins:
       - rabbitmq_mqtt

@@ -21,8 +21,6 @@ kubectl wait --for=condition=available --timeout=200s --all deployments --namesp
 kubectl apply -f ${SCRIPT_PATH}/brokers/cluster-operator/2-cert-manager.yaml
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace cert-manager
 
-#exit
-
 #kubectl apply -f https://github.com/rabbitmq/messaging-topology-operator/releases/download/${RABBITMQ_MESSAGING_TOPOLOGY_OPERATOR_VERSION}/messaging-topology-operator-with-certmanager.yaml
 kubectl apply -f ${SCRIPT_PATH}/brokers/cluster-operator/3-messaging-topology-operator-with-certmanager.yaml
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace rabbitmq-system
