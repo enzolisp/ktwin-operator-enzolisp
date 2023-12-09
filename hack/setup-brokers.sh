@@ -37,9 +37,8 @@ kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace ktwin
 
 # RabbitMQ Eventing
 # kubectl apply -f https://github.com/knative-sandbox/eventing-rabbitmq/releases/download/knative-${KNATIVE_RABBITMQ_BROKER_VERSION}/rabbitmq-broker.yaml
-kubectl apply -f ${SCRIPT_PATH}/brokers/cluster-operator/4-rabbitmq-broker.yaml
+kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker/1-rabbitmq-broker.yaml
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
-
 
 # RabbitMQ Broker
 kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker -n ktwin
