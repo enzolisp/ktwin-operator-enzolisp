@@ -38,6 +38,14 @@ Knative Services do not have support for Node Selector by default. You can enabl
 kubectl edit configmap config-features -n knative-serving
 ```
 
+## Label nodes for KTWIN workloads
+
+```sh
+kubectl label node mac-porvir-01 ktwin/core-node=true
+kubectl label node mac-porvir-01 ktwin/service-node=true
+kubectl label node mac-porvir-01 ktwin/device-node=true
+```
+
 ## Delete stuck resources
 
 ```sh
