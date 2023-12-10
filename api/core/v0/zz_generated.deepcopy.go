@@ -54,6 +54,11 @@ func (in *EventStoreAutoScaling) DeepCopyInto(out *EventStoreAutoScaling) {
 		*out = new(int)
 		**out = **in
 	}
+	if in.TargetUtilizationPercentage != nil {
+		in, out := &in.TargetUtilizationPercentage, &out.TargetUtilizationPercentage
+		*out = new(int)
+		**out = **in
+	}
 	if in.Parallelism != nil {
 		in, out := &in.Parallelism, &out.Parallelism
 		*out = new(int)
