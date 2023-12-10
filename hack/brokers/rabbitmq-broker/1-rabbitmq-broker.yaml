@@ -532,6 +532,9 @@ spec:
       enableServiceLinks: false
       containers:
         - name: rabbitmq-broker-webhook
+          # TODO: Workaround to make broker webhook work. In case of deletion and recreation of resources in cluster secrets are not repopulated with the certificates
+          args:
+            - "--disable-ha"
           terminationMessagePolicy: FallbackToLogsOnError
           # This is the Go import path for the binary that is containerized
           # and substituted here.
