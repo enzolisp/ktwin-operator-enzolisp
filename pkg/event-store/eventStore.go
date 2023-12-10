@@ -14,7 +14,6 @@ import (
 	knative "github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/knative"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/rabbitmq"
 
-	"github.com/google/uuid"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
 	kserving "knative.dev/serving/pkg/apis/serving/v1"
@@ -158,7 +157,7 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 
 	if twinInterface.Spec.EventStore.PersistRealEvent {
 		realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-			Name:      strings.ToLower(twinInterface.Name) + "-real-event-store-" + uuid.NewString(),
+			Name:      strings.ToLower(twinInterface.Name) + "-real-event-store",
 			Namespace: twinInterface.Namespace,
 			Owner: []v1.OwnerReference{
 				{
@@ -187,7 +186,7 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 
 	if twinInterface.Spec.EventStore.PersistVirtualEvent {
 		virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-			Name:      strings.ToLower(twinInterface.Name) + "-virtual-event-store-" + uuid.NewString(),
+			Name:      strings.ToLower(twinInterface.Name) + "-virtual-event-store",
 			Namespace: twinInterface.Namespace,
 			Owner: []v1.OwnerReference{
 				{

@@ -8,7 +8,6 @@ import (
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/rabbitmq"
 
-	"github.com/google/uuid"
 	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kEventing "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -81,7 +80,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 	var rabbitMQBindings []rabbitmqv1beta1.Binding
 
 	rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-		Name:      strings.ToLower(twinInstance.Name) + "-real-" + uuid.NewString(),
+		Name:      strings.ToLower(twinInstance.Name) + "-real-mqtt-dispatcher",
 		Namespace: twinInstance.Namespace,
 		Owner: []v1.OwnerReference{
 			{
@@ -111,7 +110,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 		for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
 			if twinInterfaceRelationship.Name == twinInstanceRelationship.Name && twinInterfaceRelationship.AggregateData {
 				rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-					Name:      strings.ToLower(twinInstanceRelationship.Name) + "-real-" + uuid.NewString(),
+					Name:      strings.ToLower(twinInstance.Name) + "-" + strings.ToLower(twinInstanceRelationship.Name) + "-real-mqtt-dispatcher",
 					Namespace: twinInstance.Namespace,
 					Owner: []v1.OwnerReference{
 						{
@@ -148,7 +147,7 @@ func (e *twinEvent) GetVirtualCloudEventBrokerBinding(
 ) []rabbitmqv1beta1.Binding {
 	rabbitMQBindings := []rabbitmqv1beta1.Binding{}
 	virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-		Name:      strings.ToLower(twinInterface.Name) + "-virtual-" + uuid.NewString(),
+		Name:      strings.ToLower(twinInterface.Name) + "-virtual-cloud-event-dispatcher",
 		Namespace: twinInterface.Namespace,
 		Labels: map[string]string{
 			"ktwin/twin-interface":         twinInterface.Name,
@@ -192,7 +191,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
 		if twinInterfaceRelationship.AggregateData {
 			realEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-real-" + uuid.NewString(),
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-real-dispatcher",
 				Namespace: twinInterface.Namespace,
 				Labels: map[string]string{
 					"ktwin/twin-interface":         twinInterface.Name,
@@ -221,7 +220,7 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 			})
 
 			virtualEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-virtual-" + uuid.NewString(),
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-virtual-dispatcher",
 				Namespace: twinInterface.Namespace,
 				Labels: map[string]string{
 					"ktwin/twin-interface":         twinInterface.Name,
