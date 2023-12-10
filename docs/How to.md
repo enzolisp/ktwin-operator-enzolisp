@@ -46,6 +46,12 @@ kubectl label node mac-porvir-01 ktwin/service-node=true
 kubectl label node mac-porvir-01 ktwin/device-node=true
 ```
 
+```sh
+kubectl get nodes -l ktwin/core-node=true
+kubectl get nodes -l ktwin/service-node=true
+kubectl get nodes -l ktwin/device-node=true
+```
+
 ## Delete stuck resources
 
 ```sh
