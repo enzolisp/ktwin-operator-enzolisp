@@ -1,6 +1,7 @@
 package v0
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,7 +16,8 @@ const (
 
 // EventStoreSpec defines the desired state of EventStore
 type EventStoreSpec struct {
-	AutoScaling EventStoreAutoScaling `json:"autoScaling,omitempty"`
+	AutoScaling EventStoreAutoScaling       `json:"autoScaling,omitempty"`
+	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
 }
 
 type EventStoreAutoScaling struct {

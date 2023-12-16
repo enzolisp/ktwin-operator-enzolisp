@@ -103,6 +103,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 									Name:            EVENT_STORE_SERVICE + "-v1",
 									Image:           naming.GetContainerRegistry(EVENT_STORE_SERVICE + ":0.1"),
 									ImagePullPolicy: corev1.PullIfNotPresent,
+									Resources:       eventStore.Spec.Resources,
 									Env: []corev1.EnvVar{
 										{
 											Name:  "DB_HOST",
