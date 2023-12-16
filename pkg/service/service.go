@@ -58,26 +58,26 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 	brokerUrl := twinServiceParameters.Broker.Status.Address.URL.URL()
 	eventStoreUrl := twinServiceParameters.EventStoreService.Status.URL.URL()
 
+	environmentVariables := []corev1.EnvVar{
+		{
+			Name:  "KTWIN_BROKER",
+			Value: brokerUrl.String(),
+		},
+		{
+			Name:  "KTWIN_EVENT_STORE",
+			Value: eventStoreUrl.String(),
+		},
+		{
+			Name:  "KTWIN_GRAPH_URL",
+			Value: "http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local/twin-graph",
+		},
+	}
+
 	for _, container := range twinServiceParameters.TwinInterface.Spec.Service.Template.Spec.Containers {
-		containers = append(containers, corev1.Container{
-			Name:            container.Name,
-			Image:           container.Image,
-			ImagePullPolicy: container.ImagePullPolicy,
-			Env: []corev1.EnvVar{
-				{
-					Name:  "KTWIN_BROKER",
-					Value: brokerUrl.String(),
-				},
-				{
-					Name:  "KTWIN_EVENT_STORE",
-					Value: eventStoreUrl.String(),
-				},
-				{
-					Name:  "KTWIN_GRAPH_URL",
-					Value: "http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local/twin-graph",
-				},
-			},
-		})
+		for _, envVariable := range environmentVariables {
+			container.Env = append(container.Env, envVariable)
+		}
+		containers = append(containers, container)
 	}
 
 	return containers
