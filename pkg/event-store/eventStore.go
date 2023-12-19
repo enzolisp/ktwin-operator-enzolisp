@@ -1,6 +1,7 @@
 package eventStore
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -39,6 +40,7 @@ type eventStore struct{}
 
 func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kserving.Service {
 	eventStoreName := eventStore.ObjectMeta.Name
+	timeoutValue := fmt.Sprintf("%d", *eventStore.Spec.Timeout)
 	var autoScalingAnnotations map[string]string = make(map[string]string)
 
 	if !reflect.DeepEqual(eventStore.Spec.AutoScaling, corev0.EventStoreAutoScaling{}) {
@@ -112,6 +114,10 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 										{
 											Name:  "DB_KEYSPACE",
 											Value: "ktwin",
+										},
+										{
+											Name:  "TIMEOUT",
+											Value: timeoutValue,
 										},
 									},
 								},

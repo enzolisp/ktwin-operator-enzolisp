@@ -18,6 +18,7 @@ const (
 type EventStoreSpec struct {
 	AutoScaling EventStoreAutoScaling       `json:"autoScaling,omitempty"`
 	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
+	Timeout     *int                        `json:"timeout,omitempty"`
 }
 
 type EventStoreAutoScaling struct {
