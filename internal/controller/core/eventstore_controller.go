@@ -13,6 +13,8 @@ import (
 
 	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
 	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
+	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
+	kserving "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // EventStoreReconciler reconciles a EventStore object
@@ -46,19 +48,49 @@ func (r *EventStoreReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 func (r *EventStoreReconciler) createOrUpdateMQTTTrigger(ctx context.Context, req ctrl.Request, eventStore corev0.EventStore) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	kservice := r.EventStore.GetEventStoreService(&eventStore)
+	newKService := r.EventStore.GetEventStoreService(&eventStore)
 
-	err := r.Create(ctx, kservice, &client.CreateOptions{})
+	err := r.Create(ctx, newKService, &client.CreateOptions{})
+
 	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating Event Store service %s", eventStore.Name))
 		return ctrl.Result{}, err
+	} else if err != nil {
+		currentKService := &kserving.Service{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: eventStore.Namespace, Name: eventStore.Name}, currentKService)
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while getting current Event Store service %s", eventStore.Name))
+			return ctrl.Result{}, err
+		}
+
+		currentKService = r.EventStore.MergeEventStoreService(currentKService, newKService)
+		err = r.Update(ctx, currentKService, &client.UpdateOptions{})
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while updating Event Store service %s", eventStore.Name))
+			return ctrl.Result{}, err
+		}
 	}
 
-	trigger := r.EventStore.GetEventStoreTrigger(&eventStore)
-	err = r.Create(ctx, &trigger, &client.CreateOptions{})
+	newTrigger := r.EventStore.GetEventStoreTrigger(&eventStore)
+	err = r.Create(ctx, newTrigger, &client.CreateOptions{})
+
 	if err != nil && !errors.IsAlreadyExists(err) {
 		logger.Error(err, fmt.Sprintf("Error while creating trigger for event store %s", eventStore.Name))
 		return ctrl.Result{}, err
+	} else if err != nil {
+		currentTrigger := &keventing.Trigger{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: eventStore.Namespace, Name: eventStore.Name + "-trigger"}, currentTrigger)
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while getting current Event Store trigger %s", eventStore.Name+"-trigger"))
+			return ctrl.Result{}, err
+		}
+
+		currentTrigger = r.EventStore.MergeEventStoreTrigger(currentTrigger, newTrigger)
+		err = r.Update(ctx, currentTrigger, &client.UpdateOptions{})
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("Error while updating trigger for event store %s", eventStore.Name))
+			return ctrl.Result{}, err
+		}
 	}
 
 	return ctrl.Result{}, nil

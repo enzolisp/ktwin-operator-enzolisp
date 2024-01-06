@@ -26,7 +26,7 @@ type TriggerURLParameters struct {
 	Path string
 }
 
-func NewTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
+func NewTrigger(triggerParameters TriggerParameters) *kEventing.Trigger {
 	var triggerAnnotations = make(map[string]string)
 
 	if triggerAnnotations != nil {
@@ -40,7 +40,7 @@ func NewTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
 		}
 	}
 
-	return kEventing.Trigger{
+	return &kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Trigger",
 			APIVersion: "eventing.knative.dev/v1",

@@ -32,7 +32,9 @@ func NewEventStore() EventStore {
 // TODO: Implement creation of TwinInstance and TwinInterface in event store tables
 type EventStore interface {
 	GetEventStoreService(eventStore *corev0.EventStore) *kserving.Service
-	GetEventStoreTrigger(eventStore *corev0.EventStore) kEventing.Trigger
+	MergeEventStoreService(currentService *kserving.Service, newService *kserving.Service) *kserving.Service
+	GetEventStoreTrigger(eventStore *corev0.EventStore) *kEventing.Trigger
+	MergeEventStoreTrigger(currentTrigger *kEventing.Trigger, newTrigger *kEventing.Trigger) *kEventing.Trigger
 	GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 }
 
@@ -91,7 +93,6 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
 					ObjectMeta: v1.ObjectMeta{
-						Name:        eventStoreName + "-v1",
 						Annotations: autoScalingAnnotations,
 					},
 					Spec: kserving.RevisionSpec{
@@ -132,7 +133,15 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 	return service
 }
 
-func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventing.Trigger {
+// TODO: Merge Annotations
+// Merge Resources
+// Merge Containers
+func (t *eventStore) MergeEventStoreService(currentService *kserving.Service, newService *kserving.Service) *kserving.Service {
+	currentService.Spec.ConfigurationSpec = newService.Spec.ConfigurationSpec
+	return currentService
+}
+
+func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) *kEventing.Trigger {
 	return knative.NewTrigger(knative.TriggerParameters{
 		TriggerName:    eventStore.Name + "-trigger",
 		Namespace:      eventStore.Namespace,
@@ -157,6 +166,11 @@ func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) kEventi
 		},
 		Parallelism: eventStore.Spec.AutoScaling.Parallelism,
 	})
+}
+
+func (t *eventStore) MergeEventStoreTrigger(currentTrigger *kEventing.Trigger, newTrigger *kEventing.Trigger) *kEventing.Trigger {
+	currentTrigger.ObjectMeta.Annotations = newTrigger.ObjectMeta.Annotations
+	return currentTrigger
 }
 
 func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, eventStoreQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding {

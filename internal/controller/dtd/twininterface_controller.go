@@ -110,6 +110,14 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
+		if err != nil && errors.IsAlreadyExists(err) {
+			err = r.Update(ctx, kService, &client.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, fmt.Sprintf("Error while updating Knative Service %s", twinInterfaceName))
+				resultErrors = append(resultErrors, err)
+			}
+		}
+
 		// Create Command Triggers
 		twinInterfaceCommandTriggers := r.TwinEvent.GetTwinInterfaceCommandTriggers(twinInterface)
 		for _, commandTriggers := range twinInterfaceCommandTriggers {
