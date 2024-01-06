@@ -37,6 +37,7 @@ func NewTwinService() TwinService {
 
 type TwinService interface {
 	GetService(twinServiceParameters TwinServiceParameters) *kserving.Service
+	MergeTwinService(currentService *kserving.Service, newService *kserving.Service) *kserving.Service
 	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
@@ -156,4 +157,9 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 		},
 	}
 	return service
+}
+
+func (t *twinService) MergeTwinService(currentService *kserving.Service, newService *kserving.Service) *kserving.Service {
+	currentService.Spec.ConfigurationSpec = newService.Spec.ConfigurationSpec
+	return currentService
 }

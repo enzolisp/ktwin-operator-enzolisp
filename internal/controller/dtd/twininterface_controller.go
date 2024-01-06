@@ -35,6 +35,7 @@ import (
 	twinevent "github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
 	twinservice "github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
+	kserving "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // TwinInterfaceReconciler reconciles a TwinInterface object
@@ -97,23 +98,30 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
-		kService := r.TwinService.GetService(twinservice.TwinServiceParameters{
+		newKService := r.TwinService.GetService(twinservice.TwinServiceParameters{
 			TwinInterface:     twinInterface,
 			Broker:            broker,
 			EventStoreService: eventStoreService,
 		})
 
-		err = r.Create(ctx, kService, &client.CreateOptions{})
+		err = r.Create(ctx, newKService, &client.CreateOptions{})
 
 		if err != nil && !errors.IsAlreadyExists(err) {
-			logger.Error(err, fmt.Sprintf("Error while creating Knative Service %s", twinInterfaceName))
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Interface Service %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
-		}
-
-		if err != nil && errors.IsAlreadyExists(err) {
-			err = r.Update(ctx, kService, &client.UpdateOptions{})
+		} else if err != nil {
+			currentKService := &kserving.Service{}
+			err := r.Get(ctx, types.NamespacedName{Namespace: twinInterface.Namespace, Name: twinInterface.Name}, currentKService)
 			if err != nil {
-				logger.Error(err, fmt.Sprintf("Error while updating Knative Service %s", twinInterfaceName))
+				logger.Error(err, fmt.Sprintf("Error while getting current Twin Interface service %s", twinInterface.Name))
+				return ctrl.Result{}, err
+			}
+
+			currentKService = r.TwinService.MergeTwinService(currentKService, newKService)
+
+			err = r.Update(ctx, currentKService, &client.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, fmt.Sprintf("Error while updating Twin Interface Service %s", twinInterfaceName))
 				resultErrors = append(resultErrors, err)
 			}
 		}
