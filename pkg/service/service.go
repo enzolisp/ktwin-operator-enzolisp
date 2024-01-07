@@ -178,8 +178,20 @@ func (t *twinService) CompareTwinService(currentService *kserving.Service, newSe
 	newContainers := newService.Spec.ConfigurationSpec.Template.Spec.Containers
 	currentContainers := currentService.Spec.ConfigurationSpec.Template.Spec.Containers
 
-	if !reflect.DeepEqual(currentContainers, newContainers) {
+	if len(newContainers) != len(currentContainers) {
 		return false
+	}
+
+	for i, newContainer := range newContainers {
+		currentContainer := currentContainers[i]
+
+		if newContainer.Image != currentContainer.Image {
+			return false
+		}
+
+		if !reflect.DeepEqual(newContainer.Resources, currentContainer.Resources) {
+			return false
+		}
 	}
 
 	return true
