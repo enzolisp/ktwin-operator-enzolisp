@@ -118,11 +118,13 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			}
 
 			currentKService = r.TwinService.MergeTwinService(currentKService, newKService)
-
-			err = r.Update(ctx, currentKService, &client.UpdateOptions{})
-			if err != nil {
-				logger.Error(err, fmt.Sprintf("Error while updating Twin Interface Service %s", twinInterfaceName))
-				resultErrors = append(resultErrors, err)
+			twinServiceEqual := r.TwinService.CompareTwinService(currentKService, newKService)
+			if !twinServiceEqual {
+				err = r.Update(ctx, currentKService, &client.UpdateOptions{})
+				if err != nil {
+					logger.Error(err, fmt.Sprintf("Error while updating Twin Interface Service %s", twinInterfaceName))
+					resultErrors = append(resultErrors, err)
+				}
 			}
 		}
 

@@ -38,6 +38,7 @@ func NewTwinService() TwinService {
 type TwinService interface {
 	GetService(twinServiceParameters TwinServiceParameters) *kserving.Service
 	MergeTwinService(currentService *kserving.Service, newService *kserving.Service) *kserving.Service
+	CompareTwinService(currentService *kserving.Service, newService *kserving.Service) bool
 	GetServiceDeletionCriteria(namespacedName types.NamespacedName) map[string]string
 }
 
@@ -140,7 +141,6 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 			ConfigurationSpec: kserving.ConfigurationSpec{
 				Template: kserving.RevisionTemplateSpec{
 					ObjectMeta: v1.ObjectMeta{
-						Name:        twinInterfaceName + "-v1",
 						Annotations: autoScalingAnnotations,
 					},
 					Spec: kserving.RevisionSpec{
@@ -162,4 +162,25 @@ func (t *twinService) GetService(twinServiceParameters TwinServiceParameters) *k
 func (t *twinService) MergeTwinService(currentService *kserving.Service, newService *kserving.Service) *kserving.Service {
 	currentService.Spec.ConfigurationSpec = newService.Spec.ConfigurationSpec
 	return currentService
+}
+
+// Compare Twin Services.
+// If no changes between current and new, return true.
+// If some change was identified between current and new, return false.
+func (t *twinService) CompareTwinService(currentService *kserving.Service, newService *kserving.Service) bool {
+	newAnnotations := newService.Spec.ConfigurationSpec.Template.ObjectMeta.Annotations
+	currentAnnotations := currentService.Spec.ConfigurationSpec.Template.ObjectMeta.Annotations
+
+	if !reflect.DeepEqual(currentAnnotations, newAnnotations) {
+		return false
+	}
+
+	newContainers := newService.Spec.ConfigurationSpec.Template.Spec.Containers
+	currentContainers := currentService.Spec.ConfigurationSpec.Template.Spec.Containers
+
+	if !reflect.DeepEqual(currentContainers, newContainers) {
+		return false
+	}
+
+	return true
 }
