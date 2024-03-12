@@ -40,16 +40,55 @@ kubectl edit configmap config-features -n knative-serving
 
 ## Label nodes for KTWIN workloads
 
+Labeling core nodes:
+
+```sh
+kubectl label node acdc ktwin-node=core
+kubectl label node kiss ktwin-node=core
+kubectl label node metallica ktwin-node=core
+kubectl label node petshopboys ktwin-node=core
+kubectl label node whitesnake ktwin-node=core
+kubectl label node deeppurple ktwin-node=core
+kubectl label node blacksabbath ktwin-node=core
+kubectl label node molejo ktwin-node=core
+kubectl get nodes -l ktwin-node=core
+```
+
+Labeling service nodes:
+
+```sh
+kubectl label node mac-porvir-01 ktwin-node=service
+kubectl label node mac-porvir-02 ktwin-node=service
+kubectl label node mac-porvir-03 ktwin-node=service
+kubectl label node mac-porvir-04 ktwin-node=service
+kubectl label node mac-porvir-05 ktwin-node=service
+kubectl get nodes -l ktwin-node=core
+```
+
+Labeling service nodes:
+
+```sh
+kubectl label node brix-porvir-01 ktwin-node=device
+kubectl label node brix-porvir-02 ktwin-node=device
+kubectl label node brix-porvir-03 ktwin-node=device
+kubectl label node brix-porvir-04 ktwin-node=device
+kubectl label node brix-porvir-05 ktwin-node=device
+kubectl label node brix-porvir-06 ktwin-node=device
+kubectl get nodes -l ktwin-node=device
+```
+
 ```sh
 kubectl label node mac-porvir-01 ktwin/core-node=true
 kubectl label node mac-porvir-01 ktwin/service-node=true
-kubectl label node mac-porvir-01 ktwin/device-node=true
+kubectl label node brix-porvir-01 ktwin/device-node=true
+kubectl label node mac-porvir-01 scylla.scylladb.com/node-type=scylla
 ```
 
 ```sh
 kubectl get nodes -l ktwin/core-node=true
 kubectl get nodes -l ktwin/service-node=true
 kubectl get nodes -l ktwin/device-node=true
+kubectl get nodes -l scylla.scylladb.com/node-type=scylla
 ```
 
 ## Delete stuck resources
@@ -63,3 +102,11 @@ jq '.metadata.finalizers = null' | kubectl apply -f -
 kubectl get binding.rabbitmq.com -o=json | \
 jq '.metadata.finalizers = null' | kubectl apply -f -
 ```
+
+```sh
+kubectl get exchange.rabbitmq.com -o=json | \
+jq '.metadata.finalizers = null' | kubectl apply -f -
+```
+
+kubectl get namespace knative-eventing -o=json | \
+jq '.metadata.finalizers = null' | kubectl apply -f -

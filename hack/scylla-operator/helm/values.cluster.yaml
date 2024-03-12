@@ -24,7 +24,7 @@ racks:
   #     requiredDuringSchedulingIgnoredDuringExecution:
   #       nodeSelectorTerms:
   #         - matchExpressions:
-  #           - key: ktwin/core-node
+  #           - key: ktwin-node
   #             operator: In
   #             values:
-  #               - "true"
+  #               - "core"

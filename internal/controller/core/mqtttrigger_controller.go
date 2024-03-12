@@ -353,7 +353,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 				Spec: v1.PodSpec{
 					NodeSelector: map[string]string{
 						"kubernetes.io/arch": "amd64",
-						"ktwin/core-node":    "true",
+						"ktwin-node":         "core",
 					},
 					Containers: []v1.Container{
 						{
