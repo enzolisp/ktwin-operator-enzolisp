@@ -27,5 +27,5 @@ roleRef:
   name: prometheus
 subjects:
 - kind: ServiceAccount
-  name: prometheus-k8s
+  name: prometheus-kube-prometheus-prometheus
   namespace: monitoring

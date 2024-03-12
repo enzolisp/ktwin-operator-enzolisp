@@ -5,14 +5,11 @@
 ## Labeling namespaces
 
 ```sh
-kubectl label namespaces ktwin serviceMonitor=prometheus
-kubectl label namespaces ktwin podMonitor=prometheus
-kubectl label namespaces knative-serving serviceMonitor=prometheus
-kubectl label namespaces knative-serving podMonitor=prometheus
-kubectl label namespaces knative-eventing serviceMonitor=prometheus
-kubectl label namespaces knative-eventing podMonitor=prometheus
-kubectl label namespaces rabbitmq-system serviceMonitor=prometheus
-kubectl label namespaces rabbitmq-system podMonitor=prometheus
+kubectl label namespaces ktwin monitoring=prometheus
+kubectl label namespaces knative-serving monitoring=prometheus
+kubectl label namespaces knative-eventing monitoring=prometheus
+kubectl label namespaces rabbitmq-system monitoring=prometheus
+kubectl get namespaces -l monitoring=prometheus
 ```
 
 ## RabbitMQ Monitoring

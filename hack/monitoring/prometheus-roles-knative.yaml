@@ -1,20 +1,20 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: prometheus-k8s
+  name: prometheus
 subjects:
   - kind: ServiceAccount
-    name: prometheus-k8s
+    name: prometheus-kube-prometheus-prometheus
     namespace: monitoring
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: prometheus-k8s
+  name: prometheus
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: prometheus-k8s
+  name: prometheus
 rules:
   - verbs: ["get", "list", "watch"]
     apiGroups: [""]

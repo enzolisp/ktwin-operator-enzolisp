@@ -4,7 +4,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: controller
-    serviceMonitor: prometheus
   name: controller
   namespace: knative-serving
 spec:
@@ -26,7 +25,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: autoscaler
-    serviceMonitor: prometheus
   name: autoscaler
   namespace: knative-serving
 spec:
@@ -48,7 +46,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: activator
-    serviceMonitor: prometheus
   name: activator
   namespace: knative-serving
 spec:
@@ -70,7 +67,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: webhook
-    serviceMonitor: prometheus
   name: webhook
   namespace: knative-serving
 spec:
@@ -92,7 +88,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: broker-filter
-    serviceMonitor: prometheus
   name: broker-filter
   namespace: knative-eventing
 spec:
@@ -114,7 +109,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: broker-ingress
-    serviceMonitor: prometheus
   name: broker-ingress
   namespace: knative-eventing
 spec:
@@ -137,7 +131,6 @@ metadata:
   name: eventing-controller
   labels:
     app: eventing-controller
-    podMonitor: prometheus
   namespace: knative-eventing
 spec:
   selector:
@@ -157,8 +150,6 @@ kind: PodMonitor
 metadata:
   name: imc-controller
   namespace: knative-eventing
-  labels:
-    podMonitor: prometheus
 spec:
   selector:
     matchLabels:
@@ -177,8 +168,6 @@ kind: PodMonitor
 metadata:
   name: ping-source
   namespace: knative-eventing
-  labels:
-    podMonitor: prometheus
 spec:
   selector:
     matchLabels:
