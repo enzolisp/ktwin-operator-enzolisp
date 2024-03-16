@@ -21,7 +21,8 @@ metadata:
     app.kubernetes.io/name: knative-serving
     app.kubernetes.io/component: controller
 data:
-  config: |-
+  kubernetes.podspec-nodeselector: "enabled"
+  _example: |-
     ################################
     #                              #
     #    EXAMPLE CONFIGURATION     #
@@ -79,7 +80,7 @@ data:
     # WARNING: Cannot safely be disabled once enabled.
     # See: https://knative.dev/docs/serving/feature-flags/#kubernetes-node-selector
     # KTWIN Requires nodeselector to be enabled
-    kubernetes.podspec-nodeselector: "enabled"
+    kubernetes.podspec-nodeselector: "disabled"
 
     # Indicates whether Kubernetes tolerations support is enabled
     #
