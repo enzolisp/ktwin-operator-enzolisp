@@ -1,5 +1,8 @@
 # Installation Steps
 
+## Install in a Kubernetes Cluster
+
+
 ## Local Development
 
 1. Configure your Kubernetes cluster. You can run the platform in [Kind](https://kind.sigs.k8s.io/) in your local computer.
@@ -11,48 +14,38 @@ kind create cluster
 2. Load Docker image into cluster.
 
 ```sh
-kind load docker-image dev.local/edge-service:0.1
+sh hack/load-local-dependencies.sh
 ```
 
 3. Deploy ScillaDB for the Event Store.
 
 ```sh
-
+sh hack/setup-scylla-db.sh
 ```
 
-4. Deploy Mosquitto Mqtt Broker.
+4. Create Namespace and Pre-Dependencies
 
 ```sh
-
+sh hack/pre-setup.ktwin.sh
 ```
 
-3. Install Knative and Istio dependencies.
-
-- Knative Serving:
+5. Install Knative and Istio dependencies.
 
 ```sh
-kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.8.0/serving-crds.yaml
-kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.8.0/serving-core.yaml
-kubectl get pods --namespace knative-serving
+sh hack/setup-knative.sh
 ```
 
-- Knative Eventing:
+> Note: KTWIN uses Knative node selector features to deploy workloads to specific nodes based on node labels. The node selector feature is disabled by default in KTWIN and it can be enabled by [feature flag](https://knative.dev/docs/serving/configuration/feature-flags). You can apply with the following command in `knative-serving` namespace: `kubectl apply -f hack/knative-operator/config-features.yaml`
+
+5. Install Message Brokers.
 
 ```sh
-kubectl apply -f https://github.com/knative/eventing/releases/download/knative-v1.8.0/eventing-crds.yaml
-kubectl apply -f https://github.com/knative/eventing/releases/download/knative-v1.8.0/eventing-core.yaml
-kubectl get pods --namespace knative-eventing
+sh hack/setup-brokers.sh
 ```
 
-5. Install CDR in Cluster
+5. Install CDR in Cluster and Run the Operator locally.
 
 ```
 make install
-```
-
-4. Install Camel-k
-
-```sh
-kubectl -n default create secret docker-registry external-registry-secret --docker-username <DOCKER_USERNAME> --docker-password <DOCKER_PASSWORD> -n core
-kamel install --operator-image=docker.io/apache/camel-k:1.10.3 --olm=false -n core --global --registry docker.io --organization agwermann --registry-secret external-registry-secret --force
+make run-local
 ```
