@@ -23,7 +23,7 @@ type TwinEvent interface {
 	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
 	GetVirtualCloudEventBrokerBinding(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange) []rabbitmqv1beta1.Binding
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
-	GetMQQTDispatcherBindings(twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
+	GetMQQTDispatcherBindings(twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
 }
 
 type twinEvent struct{}
@@ -74,20 +74,19 @@ func (e *twinEvent) getTriggerLabels(twinInterfaceName string) map[string]string
 }
 
 func (e *twinEvent) GetMQQTDispatcherBindings(
-	twinInstance *dtdv0.TwinInstance,
 	twinInterface *dtdv0.TwinInterface,
 ) []rabbitmqv1beta1.Binding {
 	var rabbitMQBindings []rabbitmqv1beta1.Binding
 
 	rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-		Name:      strings.ToLower(twinInstance.Name) + "-real-mqtt-dispatcher",
-		Namespace: twinInstance.Namespace,
+		Name:      strings.ToLower(twinInterface.Name) + "-real-mqtt-dispatcher",
+		Namespace: twinInterface.Namespace,
 		Owner: []v1.OwnerReference{
 			{
-				APIVersion: twinInstance.APIVersion,
-				Kind:       twinInstance.Kind,
-				Name:       twinInstance.Name,
-				UID:        twinInstance.UID,
+				APIVersion: twinInterface.APIVersion,
+				Kind:       twinInterface.Kind,
+				Name:       twinInterface.Name,
+				UID:        twinInterface.UID,
 			},
 		},
 		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
@@ -101,40 +100,38 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 			"ktwin/twin-interface":         twinInterface.Name,
 			"eventing.knative.dev/trigger": twinInterface.Name,
 		},
-		RoutingKey: e.getEventTypeRealGenerated(twinInstance.Spec.Interface + "." + twinInstance.Name),
+		RoutingKey: e.getEventTypeRealGenerated(twinInterface.Name + ".#"),
 	})
 
 	rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
 
-	for _, twinInstanceRelationship := range twinInstance.Spec.TwinInstanceRelationships {
-		for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
-			if twinInterfaceRelationship.Name == twinInstanceRelationship.Name && twinInterfaceRelationship.AggregateData {
-				rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
-					Name:      strings.ToLower(twinInstance.Name) + "-" + strings.ToLower(twinInstanceRelationship.Name) + "-real-mqtt-dispatcher",
-					Namespace: twinInstance.Namespace,
-					Owner: []v1.OwnerReference{
-						{
-							APIVersion: twinInstance.APIVersion,
-							Kind:       twinInstance.Kind,
-							Name:       twinInstance.Name,
-							UID:        twinInstance.UID,
-						},
+	for _, twinInterfaceRelationship := range twinInterface.Spec.Relationships {
+		if twinInterfaceRelationship.AggregateData {
+			rabbitMQVirtualBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(twinInterfaceRelationship.Name) + "-real-mqtt-dispatcher",
+				Namespace: twinInterface.Namespace,
+				Owner: []v1.OwnerReference{
+					{
+						APIVersion: twinInterface.APIVersion,
+						Kind:       twinInterface.Kind,
+						Name:       twinInterface.Name,
+						UID:        twinInterface.UID,
 					},
-					RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
-						Name:      "rabbitmq",
-						Namespace: "ktwin",
-					},
-					RabbitMQVhost: RABBITMQ_VHOST,
-					Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
-					Destination:   MQTT_DISPATCHER_QUEUE,
-					Labels: map[string]string{
-						"ktwin/twin-interface":         twinInterface.Name,
-						"eventing.knative.dev/trigger": twinInterface.Name,
-					},
-					RoutingKey: e.getEventTypeRealGenerated(twinInstanceRelationship.Interface + "." + twinInstanceRelationship.Instance),
-				})
-				rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
-			}
+				},
+				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+					Name:      "rabbitmq",
+					Namespace: "ktwin",
+				},
+				RabbitMQVhost: RABBITMQ_VHOST,
+				Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
+				Destination:   MQTT_DISPATCHER_QUEUE,
+				Labels: map[string]string{
+					"ktwin/twin-interface":         twinInterface.Name,
+					"eventing.knative.dev/trigger": twinInterface.Name,
+				},
+				RoutingKey: e.getEventTypeRealGenerated(twinInterfaceRelationship.Interface + ".#"),
+			})
+			rabbitMQBindings = append(rabbitMQBindings, rabbitMQVirtualBinding)
 		}
 	}
 

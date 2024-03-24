@@ -81,17 +81,6 @@ func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, r
 	twinInterfaceName := twinInterface.Name
 
 	var resultErrors []error
-	logger := log.FromContext(ctx)
-
-	bindings := r.TwinEvent.GetMQQTDispatcherBindings(twinInstance, twinInterface)
-
-	for _, binding := range bindings {
-		err := r.Create(ctx, &binding, &client.CreateOptions{})
-		if err != nil && !errors.IsAlreadyExists(err) {
-			logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
-			resultErrors = append(resultErrors, err)
-		}
-	}
 
 	if len(resultErrors) > 0 {
 		twinInstance.Status.Status = dtdv0.TwinInstancePhaseFailed

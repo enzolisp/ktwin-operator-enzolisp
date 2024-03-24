@@ -148,6 +148,16 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			resultErrors = append(resultErrors, err)
 		}
 
+		// Create MQTT Binding Rules
+		bindings := r.TwinEvent.GetMQQTDispatcherBindings(twinInterface)
+		for _, binding := range bindings {
+			err := r.Create(ctx, &binding, &client.CreateOptions{})
+			if err != nil && !errors.IsAlreadyExists(err) {
+				logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+				resultErrors = append(resultErrors, err)
+			}
+		}
+
 	}
 
 	// Create Relationship RabbitMQ bindings to existing Queue and Eventing

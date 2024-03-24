@@ -11,6 +11,7 @@ import (
 
 	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
 	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/naming"
 	knative "github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/knative"
 	"github.com/Open-Digital-Twin/ktwin-operator/pkg/third-party/rabbitmq"
@@ -193,14 +194,10 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 				Namespace: "ktwin",
 			},
 			RabbitMQVhost: "/",
-			Source:        brokerExchange.Spec.Name,
+			Source:        event.MQTT_TOPIC,
 			Destination:   eventStoreQueue.Spec.Name,
-			Filters: map[string]string{
-				"type":              naming.GetEventTypeRealGenerated(twinInterface.Name),
-				"x-knative-trigger": "event-store-trigger",
-				"x-match":           "all",
-			},
-			Labels: map[string]string{},
+			RoutingKey:    naming.GetEventTypeRealGenerated(twinInterface.Name + ".#"),
+			Labels:        map[string]string{},
 		})
 		eventStoreBindings = append(eventStoreBindings, realEventBinding)
 	}
