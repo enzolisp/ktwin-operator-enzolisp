@@ -3,6 +3,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: mqtt-dispatcher
+    release: prometheus
   name: mqtt-dispatcher
   namespace: ktwin
 spec:

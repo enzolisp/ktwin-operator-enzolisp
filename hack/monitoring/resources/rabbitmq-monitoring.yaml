@@ -3,6 +3,9 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: rabbitmq
+  labels:
+    app: rabbitmq
+    release: prometheus
 spec:
   endpoints:
   - port: prometheus
@@ -51,6 +54,9 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: rabbitmq-cluster-operator
+  labels:
+    app: rabbitmq-cluster-operator
+    release: prometheus
 spec:
   podMetricsEndpoints:
   - port: metrics
