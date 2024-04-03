@@ -71,7 +71,7 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 		},
 		{
 			Name:  "KTWIN_GRAPH_URL",
-			Value: "http://ktwin-controller-manager-metrics-service.ktwin-system.svc.cluster.local/twin-graph",
+			Value: "http://ktwin-graph-store.ktwin.svc.cluster.local/api/v1/twin-graph",
 		},
 	}
 
