@@ -76,9 +76,7 @@ func (e *twinService) getTwinInterfaceContainers(twinServiceParameters TwinServi
 	}
 
 	for _, container := range twinServiceParameters.TwinInterface.Spec.Service.Template.Spec.Containers {
-		for _, envVariable := range environmentVariables {
-			container.Env = append(container.Env, envVariable)
-		}
+		container.Env = append(container.Env, environmentVariables...)
 		containers = append(containers, container)
 	}
 
