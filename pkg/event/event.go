@@ -333,26 +333,6 @@ func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInt
 	return twinInterfaceTriggers
 }
 
-func (e *twinEvent) populateTwinInstanceEventStructure(twinInstance *dtdv0.TwinInstance, twinTriggers []kEventing.Trigger) *dtdv0.TwinInstance {
-	var twinEvents []dtdv0.TwinInstanceEvents
-	for _, twinTrigger := range twinTriggers {
-		attributesMap := twinTrigger.Spec.Filter.Attributes
-		twinInstanceEvents := dtdv0.TwinInstanceEvents{
-			Filters: dtdv0.TwinInstanceEventsFilters{
-				Exact: dtdv0.TwinInstanceEventsFiltersAttributes(attributesMap),
-			},
-			Sink: dtdv0.TwinInterfaceEventsSink{
-				InstanceId: twinTrigger.Spec.Subscriber.Ref.Name,
-			},
-		}
-		twinEvents = append(twinEvents, twinInstanceEvents)
-	}
-
-	twinInstance.Spec.Events = twinEvents
-
-	return twinInstance
-}
-
 func (e *twinEvent) createTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
 	return kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{

@@ -28,7 +28,7 @@ make docker-build docker-push IMG=ghcr.io/open-digital-twin/ktwin-operator:0.1
 3. Deploy the controller to the cluster with the image specified by `IMG`:
 
 ```sh
-make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator@sha256:f4e285d7edcc5572d57215ce196681017bdf4fe52c39f3594b29ac2286626238
+make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator@sha256:5aaf180ad5acfdcdb81e57db6cb9b4489238e13a521999370370064c75e6c540
 ```
 
 ### Uninstall CRDs

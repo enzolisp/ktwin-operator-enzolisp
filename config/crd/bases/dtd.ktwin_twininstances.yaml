@@ -95,24 +95,6 @@ spec:
                         type: string
                     type: object
                 type: object
-              events:
-                items:
-                  properties:
-                    filters:
-                      description: 'Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters'
-                      properties:
-                        exact:
-                          additionalProperties:
-                            type: string
-                          type: object
-                      type: object
-                    sink:
-                      properties:
-                        instanceId:
-                          type: string
-                      type: object
-                  type: object
-                type: array
               interface:
                 type: string
               twinInstanceRelationships:

@@ -32,7 +32,6 @@ const (
 // TwinInstanceSpec defines the desired state of TwinInstance
 type TwinInstanceSpec struct {
 	Interface                 string                        `json:"interface,omitempty"`
-	Events                    []TwinInstanceEvents          `json:"events,omitempty"`
 	EndpointSettings          *TwinInstanceEndpointSettings `json:"endpointSettings,omitempty"`
 	Data                      *TwinInstanceDataSpec         `json:"data,omitempty"`
 	TwinInstanceRelationships []TwinInstanceRelationship    `json:"twinInstanceRelationships,omitempty"`
@@ -90,23 +89,6 @@ type TwinInstanceAmqpEndpointSettings struct {
 	PublisherTopic  string `json:"publisherTopic,omitempty"`
 	SubscriberTopic string `json:"subscriberTopic,omitempty"`
 }
-
-type TwinInstanceEvents struct {
-	Filters TwinInstanceEventsFilters `json:"filters,omitempty"`
-	Sink    TwinInterfaceEventsSink   `json:"sink,omitempty"`
-}
-
-// Based on CN Cloud Event Filters definitions: https://github.com/cloudevents/spec/blob/main/subscriptions/spec.md#324-filters
-type TwinInstanceEventsFilters struct {
-	Exact TwinInstanceEventsFiltersAttributes `json:"exact,omitempty"`
-	// Prefix TwinInstanceEventsFiltersProperties `json:"prefix,omitempty"` // Unsupported
-	// Suffix TwinInstanceEventsFiltersProperties `json:"suffix,omitempty"` // Unsupported
-	// All    TwinInstanceEventsFiltersProperties `json:"all,omitempty"` // Unsupported
-	// Any    TwinInstanceEventsFiltersProperties `json:"any,omitempty"` // Unsupported
-	// Not    TwinInstanceEventsFiltersProperties `json:"not,omitempty"` // Unsupported
-}
-
-type TwinInstanceEventsFiltersAttributes map[string]string
 
 type TwinInterfaceEventsSink struct {
 	InstanceId string `json:"instanceId,omitempty"`
