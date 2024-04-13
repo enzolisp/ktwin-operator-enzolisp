@@ -32,3 +32,6 @@ kubectl apply -f hack/scylla-operator/monitoring.yaml
 
 # Expose scylla
 # kubectl port-forward --address 0.0.0.0 svc/scylla-client 9042:9042 -n ktwin
+
+# Upgrade ScyllaDB Cluster
+# helm upgrade scylla scylla/scylla --values hack/scylla-operator/helm/values.cluster.yaml --namespace ktwin

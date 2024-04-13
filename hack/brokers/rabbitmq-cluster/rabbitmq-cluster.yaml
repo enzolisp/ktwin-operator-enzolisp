@@ -15,11 +15,11 @@ spec:
             - "core"
   resources:
     requests:
-      cpu: 1
-      memory: 2Gi
-    limits:
       cpu: 2
-      memory: 2Gi
+      memory: 12Gi
+    limits:
+      cpu: 3
+      memory: 12Gi
   rabbitmq:
     additionalPlugins:
       - rabbitmq_mqtt
