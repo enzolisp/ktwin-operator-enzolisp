@@ -359,7 +359,7 @@ func (r *MQTTTriggerReconciler) getCloudEventDispatcherDeployment(mqttTrigger co
 						{
 							Name:            event.CLOUD_EVENT_DISPATCHER,
 							Image:           naming.GetContainerRegistry("ktwin-cloud-event-dispatcher:0.1"),
-							ImagePullPolicy: v1.PullIfNotPresent,
+							ImagePullPolicy: v1.PullAlways,
 							Ports: []v1.ContainerPort{
 								{
 									ContainerPort: 5672,
