@@ -32,3 +32,10 @@ kubectl get pods --namespace knative-eventing
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 
 echo "Knative setup script has finished"
+
+# Uninstall
+# https://knative.dev/docs/install/uninstall/#uninstall-an-operator-based-knative-installation
+
+# kubectl delete KnativeServing knative-serving -n knative-serving
+# kubectl delete KnativeEventing knative-eventing -n knative-eventing
+# kubectl delete -f https://github.com/knative/operator/releases/download/knative-${KNATIVE_OPERATOR_VERSION}/operator.yaml
