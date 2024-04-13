@@ -19,7 +19,6 @@ package dtd
 import (
 	"context"
 	"fmt"
-	"time"
 
 	twinevent "github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
@@ -63,58 +62,7 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	// Get parent TwinInterface
-	twinInterface := &dtdv0.TwinInterface{}
-	twinInterfaceName := twinInstance.Spec.Interface
-	err = r.Get(ctx, types.NamespacedName{Name: twinInterfaceName, Namespace: twinInstance.Namespace}, twinInterface)
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Unexpected error while getting TwinInterface %s", twinInterfaceName))
-		return ctrl.Result{
-			Requeue:      true,
-			RequeueAfter: time.Second * 10,
-		}, err
-	}
-
-	return r.createUpdateTwinInstance(ctx, req, twinInstance, twinInterface)
-}
-
-func (r *TwinInstanceReconciler) createUpdateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance, twinInterface *dtdv0.TwinInterface) (ctrl.Result, error) {
-	twinInterfaceName := twinInterface.Name
-
-	var resultErrors []error
-
-	if len(resultErrors) > 0 {
-		twinInstance.Status.Status = dtdv0.TwinInstancePhaseFailed
-		return ctrl.Result{}, resultErrors[0]
-	} else {
-		twinInstance.Status.Status = dtdv0.TwinInstancePhaseRunning
-	}
-
-	twinInstance.Labels = map[string]string{
-		"ktwin/twin-interface": twinInterfaceName,
-	}
-
-	// Update Status for Running or Failed
-	_, err := r.updateTwinInstance(ctx, req, twinInstance)
-
-	if err != nil {
-		return ctrl.Result{}, nil
-	}
-
-	return ctrl.Result{}, nil
-}
-
-func (r *TwinInstanceReconciler) updateTwinInstance(ctx context.Context, req ctrl.Request, twinInstance *dtdv0.TwinInstance) (ctrl.Result, error) {
-	logger := log.FromContext(ctx)
-	err := r.Update(ctx, twinInstance, &client.UpdateOptions{})
-
-	if err != nil {
-		logger.Error(err, fmt.Sprintf("Error while updating TwinInstance %s", twinInstance.ObjectMeta.Name))
-		return ctrl.Result{}, err
-	}
-
-	return ctrl.Result{}, nil
+	return ctrl.Result{}, err
 }
 
 // SetupWithManager sets up the controller with the Manager.
