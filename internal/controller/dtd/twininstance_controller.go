@@ -19,6 +19,7 @@ package dtd
 import (
 	"context"
 	"fmt"
+	"time"
 
 	twinevent "github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
 	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
@@ -69,7 +70,10 @@ func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Unexpected error while getting TwinInterface %s", twinInterfaceName))
-		return ctrl.Result{}, err
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 10,
+		}, err
 	}
 
 	return r.createUpdateTwinInstance(ctx, req, twinInstance, twinInterface)
