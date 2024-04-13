@@ -17,22 +17,22 @@ kind create cluster
 sh hack/load-local-dependencies.sh
 ```
 
-3. Deploy ScillaDB for the Event Store.
+3. Create Namespace and Pre-Dependencies
+
+```sh
+sh hack/pre-setup-ktwin.sh
+```
+
+4. Deploy ScillaDB for the Event Store.
 
 ```sh
 sh hack/setup-scylla-db.sh
 ```
 
-4. Create Namespace and Pre-Dependencies
-
-```sh
-sh hack/pre-setup.ktwin.sh
-```
-
 5. Install Knative and Istio dependencies.
 
 ```sh
-sh hack/setup-knative.sh
+sh hack/setup-knative-operator.sh
 ```
 
 > Note: KTWIN uses Knative node selector features to deploy workloads to specific nodes based on node labels. The node selector feature is disabled by default in KTWIN and it can be enabled by [feature flag](https://knative.dev/docs/serving/configuration/feature-flags). You can apply with the following command in `knative-serving` namespace: `kubectl apply -f hack/knative-operator/config-features.yaml`
