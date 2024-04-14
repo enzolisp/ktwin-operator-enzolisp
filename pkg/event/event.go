@@ -19,7 +19,7 @@ func NewTwinEvent() TwinEvent {
 }
 
 type TwinEvent interface {
-	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger
+	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) *kEventing.Trigger
 	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
 	GetVirtualCloudEventBrokerBinding(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange) []rabbitmqv1beta1.Binding
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
@@ -253,8 +253,8 @@ func (e *twinEvent) GetRelationshipBrokerBindings(
 	return rabbitMQBindings
 }
 
-func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) kEventing.Trigger {
-	var twinInterfaceTrigger kEventing.Trigger
+func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) *kEventing.Trigger {
+	var twinInterfaceTrigger *kEventing.Trigger
 
 	virtualTwinService := twinInterface.Name
 
@@ -325,7 +325,7 @@ func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInt
 				Annotations: triggerAnnotations,
 			})
 
-			twinInterfaceTriggers = append(twinInterfaceTriggers, twinInterfaceTrigger)
+			twinInterfaceTriggers = append(twinInterfaceTriggers, *twinInterfaceTrigger)
 		}
 
 	}
@@ -333,8 +333,8 @@ func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInt
 	return twinInterfaceTriggers
 }
 
-func (e *twinEvent) createTrigger(triggerParameters TriggerParameters) kEventing.Trigger {
-	return kEventing.Trigger{
+func (e *twinEvent) createTrigger(triggerParameters TriggerParameters) *kEventing.Trigger {
+	return &kEventing.Trigger{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "Trigger",
 			APIVersion: "eventing.knative.dev/v1",

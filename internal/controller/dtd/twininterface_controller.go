@@ -66,8 +66,6 @@ func (r *TwinInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
-	// TODO: Create Entry in Event Store
-
 	return r.createUpdateTwinInterface(ctx, req, twinInterface)
 }
 
@@ -75,7 +73,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 	twinInterfaceName := twinInterface.ObjectMeta.Name
 
 	var resultErrors []error
-	var twinInterfaceTrigger eventingv1.Trigger
+	var twinInterfaceTrigger *eventingv1.Trigger
 	logger := log.FromContext(ctx)
 
 	// Create Service Instance and Trigger, if pod is specified
@@ -85,7 +83,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		err := r.Get(ctx, types.NamespacedName{Namespace: "ktwin", Name: "ktwin"}, &broker)
 
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while getting Broker"))
+			logger.Error(err, "Error while getting Broker")
 			resultErrors = append(resultErrors, err)
 		}
 
@@ -94,7 +92,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		err = r.Get(ctx, types.NamespacedName{Namespace: "ktwin", Name: "event-store"}, &eventStoreService)
 
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Error while getting event store"))
+			logger.Error(err, "Error while getting event store")
 			resultErrors = append(resultErrors, err)
 		}
 
@@ -133,6 +131,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		// Create Command Triggers
 		twinInterfaceCommandTriggers := r.TwinEvent.GetTwinInterfaceCommandTriggers(twinInterface)
 		for _, commandTriggers := range twinInterfaceCommandTriggers {
+			logger.Info(fmt.Sprintf("Creating Twin Command Trigger %s", commandTriggers.Name))
 			err = r.Create(ctx, &commandTriggers, &client.CreateOptions{})
 			if err != nil && !errors.IsAlreadyExists(err) {
 				logger.Error(err, fmt.Sprintf("Error while creating Twin Command Trigger %s", twinInterfaceName))
@@ -142,7 +141,8 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 
 		// Create Trigger
 		twinInterfaceTrigger = r.TwinEvent.GetTwinInterfaceTrigger(twinInterface)
-		err = r.Create(ctx, &twinInterfaceTrigger, &client.CreateOptions{})
+		logger.Info(fmt.Sprintf("Creating Twin Interface Trigger %s", twinInterfaceTrigger.Name))
+		err = r.Create(ctx, twinInterfaceTrigger, &client.CreateOptions{})
 		if err != nil && !errors.IsAlreadyExists(err) {
 			logger.Error(err, fmt.Sprintf("Error while creating Twin Interface Trigger %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
@@ -151,9 +151,10 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		// Create MQTT Binding Rules
 		bindings := r.TwinEvent.GetMQQTDispatcherBindings(twinInterface)
 		for _, binding := range bindings {
+			logger.Info(fmt.Sprintf("Creating Twin Interface MQTT Dispatcher Trigger Binding %s", binding.Name))
 			err := r.Create(ctx, &binding, &client.CreateOptions{})
 			if err != nil && !errors.IsAlreadyExists(err) {
-				logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+				logger.Error(err, fmt.Sprintf("Error while creating Twin Interface MQTT Dispatcher Trigger Binding %s", binding.Name))
 				resultErrors = append(resultErrors, err)
 			}
 		}
@@ -168,7 +169,6 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 	eventStoreQueue, err := r.getEventStoreQueue(ctx, req, twinInterface)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("No Queue found for event store %s", twinInterfaceName))
-		resultErrors = append(resultErrors, err)
 		return ctrl.Result{}, err
 	}
 
@@ -182,6 +182,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		if twinInterface.Spec.Service != nil {
 			bindings := r.TwinEvent.GetVirtualCloudEventBrokerBinding(twinInterface, brokerExchange)
 			for _, binding := range bindings {
+				logger.Info(fmt.Sprintf("Creating Twin Command Virtual Cloud Event Binding %s", binding.Name))
 				err = r.Create(ctx, &binding, &client.CreateOptions{})
 				if err != nil && !errors.IsAlreadyExists(err) {
 					logger.Error(err, fmt.Sprintf("Error while creating Virtual CLoud Event Broker Bindings %s", binding.Name))
@@ -191,8 +192,8 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 		}
 
 		bindings := r.EventStore.GetEventStoreBrokerBindings(twinInterface, brokerExchange, eventStoreQueue)
-
 		for _, binding := range bindings {
+			logger.Info(fmt.Sprintf("Creating Twin Command Event Store Binding %s", binding.Name))
 			err = r.Create(ctx, &binding, &client.CreateOptions{})
 			if err != nil && !errors.IsAlreadyExists(err) {
 				logger.Error(err, fmt.Sprintf("Error while creating EventStore TwinInterface Bindings %s", binding.Name))
@@ -200,21 +201,29 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			}
 		}
 
-		twinInterfaceQueue, err := r.getTwinInterfaceQueue(ctx, req, twinInterface)
+		if twinInterfaceTrigger != nil {
+			twinInterfaceQueue, err := r.getTwinInterfaceQueue(ctx, req, twinInterface)
 
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				logger.Error(err, fmt.Sprintf("Error while getting TwinInterface %s Queue", twinInterfaceName))
-				resultErrors = append(resultErrors, err)
-			}
-		} else {
-			bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, brokerExchange, twinInterfaceQueue)
-
-			for _, binding := range bindings {
-				err = r.Create(ctx, &binding, &client.CreateOptions{})
-				if err != nil && !errors.IsAlreadyExists(err) {
-					logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+			if err != nil {
+				if errors.IsNotFound(err) {
+					logger.Info(fmt.Sprintf("No Queue found for TwinInterface %s. Requeueing request...", twinInterfaceName))
+					return ctrl.Result{
+						Requeue: true,
+					}, err
+				}
+				if !errors.IsNotFound(err) {
+					logger.Error(err, fmt.Sprintf("Error while getting TwinInterface %s Queue", twinInterfaceName))
 					resultErrors = append(resultErrors, err)
+				}
+			} else {
+				bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, brokerExchange, twinInterfaceQueue)
+				for _, binding := range bindings {
+					logger.Info(fmt.Sprintf("Creating Twin Command Relationship Binding %s", binding.Name))
+					err = r.Create(ctx, &binding, &client.CreateOptions{})
+					if err != nil && !errors.IsAlreadyExists(err) {
+						logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+						resultErrors = append(resultErrors, err)
+					}
 				}
 			}
 		}
