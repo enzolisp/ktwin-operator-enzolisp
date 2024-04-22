@@ -231,5 +231,32 @@ func (t *eventStore) GetEventStoreBrokerBindings(twinInterface *dtdv0.TwinInterf
 		eventStoreBindings = append(eventStoreBindings, virtualEventBinding)
 	}
 
+	eventStoreEventingBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+		Name:      strings.ToLower(twinInterface.Name) + "-event-store",
+		Namespace: twinInterface.Namespace,
+		Owner: []v1.OwnerReference{
+			{
+				APIVersion: twinInterface.APIVersion,
+				Kind:       twinInterface.Kind,
+				Name:       twinInterface.Name,
+				UID:        twinInterface.UID,
+			},
+		},
+		RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+			Name:      "rabbitmq",
+			Namespace: "ktwin",
+		},
+		RabbitMQVhost: "/",
+		Source:        brokerExchange.Spec.Name,
+		Destination:   eventStoreQueue.Spec.Name,
+		Filters: map[string]string{
+			"type":              naming.GetEventTypeStoreGenerated(twinInterface.Name),
+			"x-knative-trigger": "event-store-trigger",
+			"x-match":           "all",
+		},
+		Labels: map[string]string{},
+	})
+	eventStoreBindings = append(eventStoreBindings, eventStoreEventingBinding)
+
 	return eventStoreBindings
 }
