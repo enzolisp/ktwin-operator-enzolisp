@@ -26,5 +26,5 @@ const (
 	EVENT_BROKER_NAME               string = "ktwin"
 	RABBITMQ_VHOST                  string = "/"
 	CLOUD_EVENT_DISPATCHER_EXCHANGE string = "amq.topic"
-	MQTT_TOPIC                      string = "amq.topic"
+	MQTT_EXCHANGE                   string = "amq.topic"
 )

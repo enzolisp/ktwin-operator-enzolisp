@@ -94,7 +94,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 			Namespace: "ktwin",
 		},
 		RabbitMQVhost: RABBITMQ_VHOST,
-		Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
+		Source:        MQTT_EXCHANGE,
 		Destination:   MQTT_DISPATCHER_QUEUE,
 		Labels: map[string]string{
 			"ktwin/twin-interface":         twinInterface.Name,
@@ -123,7 +123,7 @@ func (e *twinEvent) GetMQQTDispatcherBindings(
 					Namespace: "ktwin",
 				},
 				RabbitMQVhost: RABBITMQ_VHOST,
-				Source:        CLOUD_EVENT_DISPATCHER_EXCHANGE,
+				Source:        MQTT_EXCHANGE,
 				Destination:   MQTT_DISPATCHER_QUEUE,
 				Labels: map[string]string{
 					"ktwin/twin-interface":         twinInterface.Name,
