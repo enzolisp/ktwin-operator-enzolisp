@@ -42,10 +42,10 @@ func (r *EventStoreReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	return r.createOrUpdateMQTTTrigger(ctx, req, eventStore)
+	return r.createOrUpdateEventStoreResources(ctx, eventStore)
 }
 
-func (r *EventStoreReconciler) createOrUpdateMQTTTrigger(ctx context.Context, req ctrl.Request, eventStore corev0.EventStore) (ctrl.Result, error) {
+func (r *EventStoreReconciler) createOrUpdateEventStoreResources(ctx context.Context, eventStore corev0.EventStore) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	newKService := r.EventStore.GetEventStoreService(&eventStore)
@@ -69,6 +69,7 @@ func (r *EventStoreReconciler) createOrUpdateMQTTTrigger(ctx context.Context, re
 			logger.Error(err, fmt.Sprintf("Error while updating Event Store service %s", eventStore.Name))
 			return ctrl.Result{}, err
 		}
+
 	}
 
 	newTrigger := r.EventStore.GetEventStoreTrigger(&eventStore)
@@ -92,7 +93,6 @@ func (r *EventStoreReconciler) createOrUpdateMQTTTrigger(ctx context.Context, re
 			return ctrl.Result{}, err
 		}
 	}
-
 	return ctrl.Result{}, nil
 }
 

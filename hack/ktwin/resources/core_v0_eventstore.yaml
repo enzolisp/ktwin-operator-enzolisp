@@ -16,8 +16,7 @@ spec:
       cpu: "800m"
   autoScaling:
     maxScale: 25
-    minScale: 3
-    target: 5
+    minScale: 2
+    target: 80
     targetUtilizationPercentage: 65
-    parallelism: 100
     metric: "concurrency"

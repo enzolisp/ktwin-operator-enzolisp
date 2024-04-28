@@ -29,7 +29,7 @@ type TriggerURLParameters struct {
 func NewTrigger(triggerParameters TriggerParameters) *kEventing.Trigger {
 	var triggerAnnotations = make(map[string]string)
 
-	if triggerAnnotations != nil {
+	if triggerParameters.Parallelism != nil {
 		triggerAnnotations["rabbitmq.eventing.knative.dev/parallelism"] = strconv.Itoa(*triggerParameters.Parallelism)
 	}
 
