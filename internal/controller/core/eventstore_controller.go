@@ -69,7 +69,8 @@ func (r *EventStoreReconciler) createOrUpdateEventStoreResources(ctx context.Con
 			logger.Error(err, fmt.Sprintf("Error while updating Event Store service %s", eventStore.Name))
 			return ctrl.Result{}, err
 		}
-
+	} else {
+		logger.Info(fmt.Sprintf("Event Store %s created", eventStore.Name))
 	}
 
 	newTrigger := r.EventStore.GetEventStoreTrigger(&eventStore)
@@ -91,8 +92,13 @@ func (r *EventStoreReconciler) createOrUpdateEventStoreResources(ctx context.Con
 		if err != nil {
 			logger.Error(err, fmt.Sprintf("Error while updating trigger for event store %s", eventStore.Name))
 			return ctrl.Result{}, err
+		} else {
+			logger.Info(fmt.Sprintf("Event Store %s updated", eventStore.Name))
 		}
+	} else {
+		logger.Info(fmt.Sprintf("Event Store trigger %s created", eventStore.Name))
 	}
+
 	return ctrl.Result{}, nil
 }
 
