@@ -14,10 +14,17 @@ spec:
     limits:
       memory: "256Mi"
       cpu: "800m"
+  dispatcherResources:
+    requests:
+      memory: "256Mi"
+      cpu: "800m"
+    limits:
+      memory: "1Gi"
+      cpu: "4"
   autoScaling:
     maxScale: 25
-    minScale: 3
-    target: 20
-    parallelism: 200
+    minScale: 1
+    target: 5
+    parallelism: 1000
     targetUtilizationPercentage: 65
     metric: "concurrency"

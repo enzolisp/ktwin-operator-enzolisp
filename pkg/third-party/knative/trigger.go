@@ -10,6 +10,15 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
+// https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/utils/resource_requirements.go#L30C1-L33C72
+const (
+	ParallelismAnnotation   = "rabbitmq.eventing.knative.dev/parallelism"
+	CPURequestAnnotation    = "rabbitmq.eventing.knative.dev/cpu-request"
+	CPULimitAnnotation      = "rabbitmq.eventing.knative.dev/cpu-limit"
+	MemoryRequestAnnotation = "rabbitmq.eventing.knative.dev/memory-request"
+	MemoryLimitAnnotation   = "rabbitmq.eventing.knative.dev/memory-limit"
+)
+
 type TriggerParameters struct {
 	TriggerName     string
 	Namespace       string
@@ -20,6 +29,10 @@ type TriggerParameters struct {
 	Labels          map[string]string
 	URL             TriggerURLParameters
 	Parallelism     *int
+	CPURequest      string
+	CPULimit        string
+	MemoryRequest   string
+	MemoryLimit     string
 }
 
 type TriggerURLParameters struct {
@@ -30,7 +43,23 @@ func NewTrigger(triggerParameters TriggerParameters) *kEventing.Trigger {
 	var triggerAnnotations = make(map[string]string)
 
 	if triggerParameters.Parallelism != nil {
-		triggerAnnotations["rabbitmq.eventing.knative.dev/parallelism"] = strconv.Itoa(*triggerParameters.Parallelism)
+		triggerAnnotations[ParallelismAnnotation] = strconv.Itoa(*triggerParameters.Parallelism)
+	}
+
+	if triggerParameters.MemoryLimit != "" {
+		triggerAnnotations[MemoryLimitAnnotation] = triggerParameters.MemoryLimit
+	}
+
+	if triggerParameters.MemoryRequest != "" {
+		triggerAnnotations[MemoryRequestAnnotation] = triggerParameters.MemoryRequest
+	}
+
+	if triggerParameters.CPULimit != "" {
+		triggerAnnotations[CPULimitAnnotation] = triggerParameters.CPULimit
+	}
+
+	if triggerParameters.CPURequest != "" {
+		triggerAnnotations[CPURequestAnnotation] = triggerParameters.CPURequest
 	}
 
 	var urlParameters *apis.URL

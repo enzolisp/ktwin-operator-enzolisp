@@ -65,7 +65,7 @@ func (t *eventStore) GetEventStoreService(eventStore *corev0.EventStore) *kservi
 		}
 
 		if autoScaling.Metric != "" {
-			autoScalingAnnotations["autoscaling.knative.dev/metric"] = string(*&autoScaling.Metric)
+			autoScalingAnnotations["autoscaling.knative.dev/metric"] = string(autoScaling.Metric)
 		}
 	}
 
@@ -142,6 +142,27 @@ func (t *eventStore) MergeEventStoreService(currentService *kserving.Service, ne
 }
 
 func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) *kEventing.Trigger {
+	var cpuRequest string
+	var memoryRequest string
+	var cpuLimit string
+	var memoryLimit string
+
+	if eventStore.Spec.DispatcherResources.Requests.Cpu() != nil {
+		cpuRequest = eventStore.Spec.DispatcherResources.Requests.Cpu().String()
+	}
+
+	if eventStore.Spec.DispatcherResources.Requests.Memory() != nil {
+		memoryRequest = eventStore.Spec.DispatcherResources.Requests.Memory().String()
+	}
+
+	if eventStore.Spec.DispatcherResources.Limits.Cpu() != nil {
+		cpuLimit = eventStore.Spec.DispatcherResources.Limits.Cpu().String()
+	}
+
+	if eventStore.Spec.DispatcherResources.Limits.Memory() != nil {
+		memoryLimit = eventStore.Spec.DispatcherResources.Limits.Memory().String()
+	}
+
 	return knative.NewTrigger(knative.TriggerParameters{
 		TriggerName:    eventStore.Name + "-trigger",
 		Namespace:      eventStore.Namespace,
@@ -164,7 +185,11 @@ func (t *eventStore) GetEventStoreTrigger(eventStore *corev0.EventStore) *kEvent
 		URL: knative.TriggerURLParameters{
 			Path: "/api/v1/twin-events",
 		},
-		Parallelism: eventStore.Spec.AutoScaling.Parallelism,
+		Parallelism:   eventStore.Spec.AutoScaling.Parallelism,
+		CPURequest:    cpuRequest,
+		MemoryRequest: memoryRequest,
+		CPULimit:      cpuLimit,
+		MemoryLimit:   memoryLimit,
 	})
 }
 

@@ -16,9 +16,10 @@ const (
 
 // EventStoreSpec defines the desired state of EventStore
 type EventStoreSpec struct {
-	AutoScaling EventStoreAutoScaling       `json:"autoScaling,omitempty"`
-	Resources   corev1.ResourceRequirements `json:"resources,omitempty"`
-	Timeout     *int                        `json:"timeout,omitempty"`
+	AutoScaling         EventStoreAutoScaling       `json:"autoScaling,omitempty"`
+	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
+	DispatcherResources corev1.ResourceRequirements `json:"dispatcherResources,omitempty"`
+	Timeout             *int                        `json:"timeout,omitempty"`
 }
 
 type EventStoreAutoScaling struct {

@@ -113,6 +113,7 @@ func (in *EventStoreSpec) DeepCopyInto(out *EventStoreSpec) {
 	*out = *in
 	in.AutoScaling.DeepCopyInto(&out.AutoScaling)
 	in.Resources.DeepCopyInto(&out.Resources)
+	in.DispatcherResources.DeepCopyInto(&out.DispatcherResources)
 	if in.Timeout != nil {
 		in, out := &in.Timeout, &out.Timeout
 		*out = new(int)
