@@ -10,3 +10,9 @@ helm install ktwin-graph-redis bitnami/redis -f values.yaml -n ktwin
 ```sh
 helm upgrade ktwin-graph-redis bitnami/redis -f values.yaml -n ktwin
 ```
+
+### Uninstall
+
+```sh
+helm uninstall ktwin-graph-redis
+```
