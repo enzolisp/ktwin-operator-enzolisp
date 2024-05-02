@@ -147,18 +147,17 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			logger.Error(err, fmt.Sprintf("Error while creating Twin Interface Trigger %s", twinInterfaceName))
 			resultErrors = append(resultErrors, err)
 		}
+	}
 
-		// Create MQTT Binding Rules
-		bindings := r.TwinEvent.GetMQQTDispatcherBindings(twinInterface)
-		for _, binding := range bindings {
-			logger.Info(fmt.Sprintf("Creating Twin Interface MQTT Dispatcher Trigger Binding %s", binding.Name))
-			err := r.Create(ctx, &binding, &client.CreateOptions{})
-			if err != nil && !errors.IsAlreadyExists(err) {
-				logger.Error(err, fmt.Sprintf("Error while creating Twin Interface MQTT Dispatcher Trigger Binding %s", binding.Name))
-				resultErrors = append(resultErrors, err)
-			}
+	// Create MQTT Binding Rules
+	bindings := r.TwinEvent.GetMQQTDispatcherBindings(twinInterface)
+	for _, binding := range bindings {
+		logger.Info(fmt.Sprintf("Creating Twin Interface MQTT Dispatcher Trigger Binding %s", binding.Name))
+		err := r.Create(ctx, &binding, &client.CreateOptions{})
+		if err != nil && !errors.IsAlreadyExists(err) {
+			logger.Error(err, fmt.Sprintf("Error while creating Twin Interface MQTT Dispatcher Trigger Binding %s", binding.Name))
+			resultErrors = append(resultErrors, err)
 		}
-
 	}
 
 	// Create Relationship RabbitMQ bindings to existing Queue and Eventing
@@ -166,7 +165,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 	// RabbitMQ Queue (Trigger): https://github.com/knative-extensions/eventing-rabbitmq/blob/main/pkg/reconciler/trigger/trigger.go#L233
 	// Deletion: Can use ownerReferences for deletion in cascade
 
-	eventStoreQueue, err := r.getEventStoreQueue(ctx, req, twinInterface)
+	eventStoreQueue, err := r.getEventStoreQueue(ctx, twinInterface)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("No Queue found for event store %s", twinInterfaceName))
 		return ctrl.Result{}, err
@@ -250,7 +249,7 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 	return ctrl.Result{}, nil
 }
 
-func (r *TwinInterfaceReconciler) getEventStoreQueue(ctx context.Context, req ctrl.Request, twinInterface *dtdv0.TwinInterface) (rabbitmqv1beta1.Queue, error) {
+func (r *TwinInterfaceReconciler) getEventStoreQueue(ctx context.Context, twinInterface *dtdv0.TwinInterface) (rabbitmqv1beta1.Queue, error) {
 	logger := log.FromContext(ctx)
 	eventStoreQueuesList := rabbitmqv1beta1.QueueList{}
 	queueListOptions := []client.ListOption{
