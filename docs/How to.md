@@ -108,5 +108,13 @@ kubectl get exchange.rabbitmq.com -o=json | \
 jq '.metadata.finalizers = null' | kubectl apply -f -
 ```
 
+```sh
 kubectl get namespace knative-eventing -o=json | \
 jq '.metadata.finalizers = null' | kubectl apply -f -
+```
+
+```sh
+kubectl patch exchange.rabbitmq.com exchange_name -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl patch binding.rabbitmq.com binding_name -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl patch queue.rabbitmq.com queue_name -p '{"metadata":{"finalizers":[]}}' --type=merge
+```
