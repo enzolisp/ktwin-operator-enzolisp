@@ -1,8 +1,8 @@
 # Version information
 scyllaImage:
-  tag: 5.1.9
+  tag: 5.2.18
 agentImage:
-  tag: 3.1.0
+  tag: 3.2.8
 
 # Cluster information
 developerMode: true
@@ -19,12 +19,12 @@ racks:
     requests:
       cpu: 2
       memory: 8Gi
-  # placement:
-  #   nodeAffinity:
-  #     requiredDuringSchedulingIgnoredDuringExecution:
-  #       nodeSelectorTerms:
-  #         - matchExpressions:
-  #           - key: ktwin-node
-  #             operator: In
-  #             values:
-  #               - "core"
+  placement:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: ktwin-node
+              operator: In
+              values:
+                - "core"

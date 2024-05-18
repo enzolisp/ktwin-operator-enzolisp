@@ -3,7 +3,7 @@ helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stabl
 helm repo update
 
 # Configure cert-manager
-kubectl apply -f https://raw.githubusercontent.com/scylladb/scylla-operator/v1.9/examples/common/cert-manager.yaml
+kubectl apply -f https://raw.githubusercontent.com/scylladb/scylla-operator/v1.12.1/examples/common/cert-manager.yaml
 kubectl wait -n cert-manager --for=condition=ready pod -l app=cert-manager --timeout=200s
 
 # Configure operator with helm values
