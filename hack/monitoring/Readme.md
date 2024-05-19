@@ -9,6 +9,7 @@ kubectl label namespaces ktwin monitoring=prometheus
 kubectl label namespaces knative-serving monitoring=prometheus
 kubectl label namespaces knative-eventing monitoring=prometheus
 kubectl label namespaces rabbitmq-system monitoring=prometheus
+kubectl label namespaces monitoring monitoring=prometheus
 kubectl get namespaces -l monitoring=prometheus
 ```
 
