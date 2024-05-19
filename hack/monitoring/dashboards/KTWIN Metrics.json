@@ -1,47 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "bargauge",
-      "name": "Bar gauge",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "9.1.7"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -67,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 34,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -87,7 +44,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -96,6 +53,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -109,6 +67,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -171,7 +130,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(rabbitmq_ingress_event_count{namespace_name=~\"ktwin\"}[1m])) by (event_type)",
@@ -180,13 +139,13 @@
           "refId": "A"
         }
       ],
-      "title": "Event Count by Event Type",
+      "title": "Event Count /s by Event Type",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -195,6 +154,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -208,6 +168,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -266,7 +227,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(increase(rabbitmq_ingress_event_count{namespace_name=~\"ktwin\"}[$__range])) by (event_type)",
@@ -281,7 +242,207 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 14,
+        "x": 0,
+        "y": 17
+      },
+      "id": 59,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "min",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.1.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(rabbitmq_ingress_event_count{namespace_name=~\"ktwin\"}[1m]))",
+          "hide": false,
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Total Event Count / s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 17
+      },
+      "id": 60,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.1.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(increase(rabbitmq_ingress_event_count{namespace_name=~\"ktwin\"}[$__range]))",
+          "hide": false,
+          "legendFormat": "Total Events",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Total Event Count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -312,7 +473,7 @@
         "h": 6,
         "w": 10,
         "x": 0,
-        "y": 17
+        "y": 25
       },
       "id": 26,
       "options": {
@@ -327,14 +488,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -352,7 +515,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -378,7 +541,7 @@
         "h": 6,
         "w": 10,
         "x": 10,
-        "y": 17
+        "y": 25
       },
       "id": 47,
       "options": {
@@ -391,14 +554,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -416,7 +581,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -446,7 +611,7 @@
         "h": 3,
         "w": 4,
         "x": 20,
-        "y": 17
+        "y": 25
       },
       "id": 27,
       "options": {
@@ -461,14 +626,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -486,7 +653,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -516,7 +683,7 @@
         "h": 3,
         "w": 4,
         "x": 20,
-        "y": 20
+        "y": 28
       },
       "id": 28,
       "options": {
@@ -531,14 +698,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -559,7 +728,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 31
       },
       "id": 30,
       "panels": [],
@@ -569,7 +738,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -595,7 +764,7 @@
         "h": 4,
         "w": 3,
         "x": 0,
-        "y": 24
+        "y": 32
       },
       "id": 31,
       "options": {
@@ -610,14 +779,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -635,7 +806,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -661,7 +832,7 @@
         "h": 4,
         "w": 3,
         "x": 3,
-        "y": 24
+        "y": 32
       },
       "id": 42,
       "options": {
@@ -676,14 +847,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -701,7 +874,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -731,7 +904,7 @@
         "h": 4,
         "w": 3,
         "x": 6,
-        "y": 24
+        "y": 32
       },
       "id": 33,
       "options": {
@@ -746,14 +919,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -771,7 +946,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -797,7 +972,7 @@
         "h": 4,
         "w": 3,
         "x": 9,
-        "y": 24
+        "y": 32
       },
       "id": 34,
       "options": {
@@ -812,14 +987,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -837,7 +1014,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -863,7 +1040,7 @@
         "h": 4,
         "w": 3,
         "x": 12,
-        "y": 24
+        "y": 32
       },
       "id": 35,
       "options": {
@@ -878,14 +1055,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -903,7 +1082,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -929,7 +1108,7 @@
         "h": 4,
         "w": 3,
         "x": 15,
-        "y": 24
+        "y": 32
       },
       "id": 43,
       "options": {
@@ -944,14 +1123,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -969,7 +1150,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -995,7 +1176,7 @@
         "h": 4,
         "w": 3,
         "x": 18,
-        "y": 24
+        "y": 32
       },
       "id": 53,
       "options": {
@@ -1010,14 +1191,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1035,7 +1218,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1061,7 +1244,7 @@
         "h": 4,
         "w": 3,
         "x": 21,
-        "y": 24
+        "y": 32
       },
       "id": 44,
       "options": {
@@ -1076,14 +1259,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1101,7 +1286,304 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
+      },
+      "description": "Total number of client connections.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 36
+      },
+      "id": 56,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rabbitmq_connections * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{namespace=\"ktwin\"}",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "Event count",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Connections",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Total number of client connections.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 36
+      },
+      "id": 57,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(rate(rabbitmq_connections_opened_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{namespace=\"ktwin\"}) by(rabbitmq_node)",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "Event count",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Connections Opened / s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Total number of client connections.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 36
+      },
+      "id": 58,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(rate(rabbitmq_connections_closed_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{namespace=\"ktwin\"}) by(rabbitmq_node)",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "Event count",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Connections Closed / s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1110,6 +1592,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1123,6 +1606,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1161,7 +1645,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 28
+        "y": 41
       },
       "id": 6,
       "options": {
@@ -1181,13 +1665,25 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(rabbitmq_global_messages_received_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) by(rabbitmq_node)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(rabbitmq_global_messages_received_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"})",
+          "hide": false,
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "B"
         }
       ],
       "title": "RabbitMQ Messages published /s",
@@ -1196,7 +1692,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1205,6 +1701,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1218,6 +1715,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1256,102 +1754,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 28
-      },
-      "id": 46,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.1.7",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(rabbitmq_global_messages_received_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) by(rabbitmq_node)",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "RabbitMQ Messages published /s",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 36
+        "y": 41
       },
       "id": 45,
       "options": {
@@ -1371,22 +1774,34 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(increase(rabbitmq_global_messages_received_total[$__range]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) by(rabbitmq_node)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(increase(rabbitmq_global_messages_received_total[$__range]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"})",
+          "hide": false,
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "RabbitMQ Messages published",
+      "title": "Aggregated RabbitMQ Messages published",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1395,6 +1810,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1408,6 +1824,117 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 49
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.1.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(rabbitmq_global_messages_received_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) by(rabbitmq_node)",
+          "hide": true,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(\n  (rate(rabbitmq_global_messages_delivered_consume_auto_ack_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) +\n  (rate(rabbitmq_global_messages_delivered_consume_manual_ack_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"})\n) by(rabbitmq_node)",
+          "hide": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "RabbitMQ Messages delivered /s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1446,7 +1973,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 36
+        "y": 49
       },
       "id": 25,
       "options": {
@@ -1466,7 +1993,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(\n  (increase(rabbitmq_global_messages_delivered_consume_auto_ack_total[$__range]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) +\n  (increase(rabbitmq_global_messages_delivered_consume_manual_ack_total[$__range]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"})\n) by(rabbitmq_node)",
@@ -1481,7 +2008,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "The rate of messages that cannot be routed and are dropped. ",
       "fieldConfig": {
@@ -1490,6 +2017,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1503,6 +2031,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1541,7 +2070,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 44
+        "y": 57
       },
       "id": 50,
       "options": {
@@ -1561,7 +2090,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(rabbitmq_global_messages_unroutable_dropped_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) by(rabbitmq_node)",
@@ -1576,7 +2105,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "The rate of messages that cannot be routed and are dropped. ",
       "fieldConfig": {
@@ -1585,6 +2114,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1598,6 +2128,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1636,7 +2167,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 44
+        "y": 57
       },
       "id": 51,
       "options": {
@@ -1656,7 +2187,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(increase(rabbitmq_global_messages_unroutable_dropped_total[$__range]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"rabbitmq\", namespace=\"ktwin\"}) by(rabbitmq_node)",
@@ -1674,7 +2205,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 52
+        "y": 65
       },
       "id": 11,
       "panels": [],
@@ -1684,7 +2215,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1693,6 +2224,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1706,6 +2238,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1744,7 +2277,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 53
+        "y": 66
       },
       "id": 4,
       "options": {
@@ -1764,7 +2297,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(autoscaler_actual_pods{namespace_name=\"ktwin\"}) by (configuration_name)",
@@ -1775,7 +2308,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(autoscaler_actual_pods{namespace_name=\"ktwin\"})",
@@ -1791,7 +2324,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1800,6 +2333,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1813,6 +2347,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1851,7 +2386,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 53
+        "y": 66
       },
       "id": 22,
       "options": {
@@ -1871,7 +2406,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(activator_request_concurrency{namespace_name=\"ktwin\"}) by (configuration_name)",
@@ -1882,7 +2417,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(activator_request_concurrency{namespace_name=\"ktwin\"})",
@@ -1898,7 +2433,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -1907,6 +2442,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1920,6 +2456,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1958,7 +2495,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 61
+        "y": 74
       },
       "id": 14,
       "options": {
@@ -1978,13 +2515,25 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "label_replace(round(sum(rate(activator_request_count{namespace_name=\"ktwin\"}[1m])) by (revision_name), 0.001), \"revision_name\", \"$2\", \"revision_name\", \"$configuration(-+)(.*)\")",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "round(sum(rate(activator_request_count{namespace_name=\"ktwin\"}[1m])), 0.001)",
+          "hide": false,
+          "legendFormat": "All Revisions",
+          "range": true,
+          "refId": "B"
         }
       ],
       "title": "Request Volume / s",
@@ -1993,7 +2542,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2002,6 +2551,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2015,6 +2565,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2053,7 +2604,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 61
+        "y": 74
       },
       "id": 49,
       "options": {
@@ -2073,13 +2624,25 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "label_replace(round(sum(increase(activator_request_count{namespace_name=\"ktwin\"}[$__range])) by (revision_name), 0.001), \"revision_name\", \"$2\", \"revision_name\", \"$configuration(-+)(.*)\")",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "round(sum(increase(activator_request_count{namespace_name=\"ktwin\"}[$__range])), 0.001)",
+          "hide": false,
+          "legendFormat": "All Revisions",
+          "range": true,
+          "refId": "B"
         }
       ],
       "title": "Request Volume",
@@ -2088,7 +2651,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2097,6 +2660,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2110,6 +2674,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2173,7 +2738,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 70
+        "y": 83
       },
       "id": 16,
       "options": {
@@ -2193,7 +2758,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "round(sum(rate(activator_request_count{namespace_name=\"ktwin\", response_code_class=\"4xx\"}[1m])) by (configuration_name), 0.001)",
@@ -2208,7 +2773,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2217,6 +2782,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2230,6 +2796,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2262,13 +2829,38 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "event-store"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 70
+        "y": 83
       },
       "id": 15,
       "options": {
@@ -2288,7 +2880,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "round(sum(rate(activator_request_count{namespace_name=\"ktwin\", response_code_class=\"2xx\"}[1m])) by (configuration_name), 0.001)",
@@ -2303,7 +2895,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2312,6 +2904,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2325,6 +2918,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2363,7 +2957,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 79
+        "y": 92
       },
       "id": 18,
       "options": {
@@ -2383,7 +2977,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "round(sum(rate(activator_request_count{namespace_name=\"ktwin\", response_code_class=\"5xx\"}[1m])) by (configuration_name), 0.001)",
@@ -2398,7 +2992,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2407,6 +3001,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2420,6 +3015,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2458,7 +3054,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 79
+        "y": 92
       },
       "id": 52,
       "options": {
@@ -2478,7 +3074,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(increase(activator_request_count{namespace_name=\"ktwin\", response_code_class=\"5xx\"}[$__range])) by (configuration_name)",
@@ -2493,7 +3089,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2502,6 +3098,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2515,6 +3112,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2553,7 +3151,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 88
+        "y": 101
       },
       "id": 54,
       "options": {
@@ -2573,7 +3171,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(activator_request_count{namespace_name=\"ktwin\", response_code_class=\"5xx\"}[1m])) by (configuration_name) / (sum(rate(activator_request_count{namespace_name=\"ktwin\"}[1m])) by (configuration_name))",
@@ -2588,7 +3186,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2614,13 +3212,15 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 88
+        "y": 101
       },
       "id": 55,
       "options": {
         "displayMode": "gradient",
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -2629,14 +3229,16 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
-      "pluginVersion": "9.1.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum((activator_request_count{namespace_name=\"ktwin\", response_code_class=\"5xx\"})) by (configuration_name) / (sum((activator_request_count{namespace_name=\"ktwin\"})) by (configuration_name))",
@@ -2651,7 +3253,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2660,6 +3262,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2673,6 +3276,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2711,7 +3315,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 97
+        "y": 110
       },
       "id": 17,
       "options": {
@@ -2731,7 +3335,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "label_replace(histogram_quantile(0.50, sum(rate(activator_request_latencies_bucket{namespace_name=\"ktwin\"}[1m])) by (revision_name, le)), \"revision_name\", \"$2\", \"revision_name\", \"$configuration(-+)(.*)\")",
@@ -2746,7 +3350,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2755,6 +3359,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2768,6 +3373,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2806,7 +3412,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 97
+        "y": 110
       },
       "id": 19,
       "options": {
@@ -2826,7 +3432,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "label_replace(histogram_quantile(0.90, sum(rate(activator_request_latencies_bucket{namespace_name=\"ktwin\"}[1m])) by (revision_name, le)), \"revision_name\", \"$2\", \"revision_name\", \"$configuration(-+)(.*)\")",
@@ -2841,7 +3447,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2850,6 +3456,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2863,6 +3470,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2901,7 +3509,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 106
+        "y": 119
       },
       "id": 20,
       "options": {
@@ -2921,7 +3529,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "label_replace(histogram_quantile(0.95, sum(rate(activator_request_latencies_bucket{namespace_name=\"ktwin\"}[1m])) by (revision_name, le)), \"revision_name\", \"$2\", \"revision_name\", \"$configuration(-+)(.*)\")",
@@ -2936,7 +3544,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -2945,6 +3553,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2958,6 +3567,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2996,7 +3606,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 106
+        "y": 119
       },
       "id": 21,
       "options": {
@@ -3016,7 +3626,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "label_replace(histogram_quantile(0.99, sum(rate(activator_request_latencies_bucket{namespace_name=\"ktwin\"}[1m])) by (revision_name, le)), \"revision_name\", \"$2\", \"revision_name\", \"$configuration(-+)(.*)\")",
@@ -3034,7 +3644,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 115
+        "y": 128
       },
       "id": 9,
       "panels": [],
@@ -3044,7 +3654,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3053,6 +3663,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3066,6 +3677,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3104,7 +3716,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 116
+        "y": 129
       },
       "id": 2,
       "options": {
@@ -3124,10 +3736,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) by(container)",
+          "expr": "sum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) by(container)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -3135,11 +3747,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) ",
+          "expr": "sum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) ",
           "hide": false,
           "instant": false,
           "legendFormat": "Total CPU Usage",
@@ -3153,7 +3765,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3162,6 +3774,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3175,6 +3788,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -3216,7 +3830,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 116
+        "y": 129
       },
       "id": 3,
       "options": {
@@ -3236,11 +3850,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (container_memory_usage_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
+          "expr": "sum (container_memory_usage_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -3249,11 +3863,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (container_memory_usage_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
+          "expr": "sum (container_memory_usage_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Total Memory Usage",
@@ -3267,7 +3881,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3276,6 +3890,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3289,6 +3904,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3323,7 +3939,7 @@
         "h": 9,
         "w": 6,
         "x": 0,
-        "y": 125
+        "y": 138
       },
       "id": 23,
       "options": {
@@ -3343,10 +3959,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
+          "expr": "sum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -3354,11 +3970,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) ",
+          "expr": "sum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) ",
           "hide": false,
           "instant": false,
           "legendFormat": "Total CPU Usage",
@@ -3372,7 +3988,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3381,6 +3997,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3394,6 +4011,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3428,7 +4046,7 @@
         "h": 9,
         "w": 6,
         "x": 6,
-        "y": 125
+        "y": 138
       },
       "id": 36,
       "options": {
@@ -3448,10 +4066,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
+          "expr": "sum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -3459,11 +4077,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
+          "expr": "sum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Total CPU Usage",
@@ -3477,7 +4095,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3486,6 +4104,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3499,6 +4118,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -3540,7 +4160,7 @@
         "h": 9,
         "w": 6,
         "x": 12,
-        "y": 125
+        "y": 138
       },
       "id": 24,
       "options": {
@@ -3560,11 +4180,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (kube_pod_container_resource_requests{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
+          "expr": "sum (kube_pod_container_resource_requests{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -3573,11 +4193,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (kube_pod_container_resource_requests{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
+          "expr": "sum (kube_pod_container_resource_requests{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Total Memory Usage",
@@ -3591,7 +4211,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3600,6 +4220,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3613,6 +4234,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -3654,7 +4276,7 @@
         "h": 9,
         "w": 6,
         "x": 18,
-        "y": 125
+        "y": 138
       },
       "id": 37,
       "options": {
@@ -3674,11 +4296,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
+          "expr": "sum (kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -3687,11 +4309,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum (kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
+          "expr": "sum (kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Total Memory Usage",
@@ -3705,7 +4327,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3714,6 +4336,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3727,6 +4350,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3765,7 +4389,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 134
+        "y": 147
       },
       "id": 39,
       "options": {
@@ -3785,10 +4409,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) by(container)\n/\n(\nsum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)\n)\n)",
+          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) by(container)\n/\n(\nsum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)\n)\n)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -3796,10 +4420,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m]))\n/\n(\nsum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n)\n)",
+          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m]))\n/\n(\nsum (kube_pod_container_resource_requests{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n)\n)",
           "hide": false,
           "legendFormat": "Total",
           "range": true,
@@ -3812,7 +4436,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3821,6 +4445,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3834,6 +4459,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -3875,7 +4501,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 134
+        "y": 147
       },
       "id": 38,
       "options": {
@@ -3895,11 +4521,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by (container)\n      /\n    sum(kube_pod_container_resource_requests{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0) by (container)\n)",
+          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by (container)\n      /\n    sum(kube_pod_container_resource_requests{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0) by (container)\n)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -3908,10 +4534,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n      /\n    sum(kube_pod_container_resource_requests{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0)\n)",
+          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n      /\n    sum(kube_pod_container_resource_requests{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0)\n)",
           "hide": false,
           "legendFormat": "Total",
           "range": true,
@@ -3924,7 +4550,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -3933,6 +4559,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3946,6 +4573,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3984,7 +4612,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 144
+        "y": 157
       },
       "id": 40,
       "options": {
@@ -4004,10 +4632,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) by(container)\n/\n(\nsum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)\n)\n)",
+          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m])) by(container)\n/\n(\nsum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by(container)\n)\n)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -4015,10 +4643,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m]))\n/\n(\nsum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n)\n)",
+          "expr": "round (\n  100 *\nsum (rate(container_cpu_usage_seconds_total{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}[1m]))\n/\n(\nsum (kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n)\n)",
           "hide": false,
           "legendFormat": "Total",
           "range": true,
@@ -4031,7 +4659,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -4040,6 +4668,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -4053,6 +4682,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -4094,7 +4724,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 144
+        "y": 157
       },
       "id": 41,
       "options": {
@@ -4114,11 +4744,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by (container)\n      /\n    sum(kube_pod_container_resource_limits{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0) by (container)\n)",
+          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"}) by (container)\n      /\n    sum(kube_pod_container_resource_limits{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0) by (container)\n)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -4127,10 +4757,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n      /\n    sum(kube_pod_container_resource_limits{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0)\n)",
+          "expr": "round(\n  100 *\n    sum(container_memory_working_set_bytes{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\"})\n      /\n    sum(kube_pod_container_resource_limits{namespace=\"ktwin\", container!=\"POD\", container!=\"\", container!=\"grafana\", container!=\"battery-device-publisher\", container!=\"ev-charging-device-publisher\", container!=\"parking-spot-device-publisher\", container!=\"pole-air-quality-observed-device-publisher\", container!=\"pole-noise-level-observed-device-publisher\", container!=\"pole-weather-observed-device-publisher\", container!=\"ingress\", container!=\"pole-crowd-flow-observed-device-publisher\", container!=\"pole-traffic-flow-observed-device-publisher\", container!=\"streetlight-device-publisher\", container!=\"\", resource=\"memory\"} > 0)\n)",
           "hide": false,
           "legendFormat": "Total",
           "range": true,
@@ -4141,17 +4771,20 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 37,
-  "style": "dark",
+  "refresh": "",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "",
-  "title": "KTWIN Metrics Dashboard",
+  "title": "Serverless Metrics Dashboard",
   "uid": "iNB3Z-vSz",
-  "version": 39,
+  "version": 7,
   "weekStart": ""
 }
