@@ -20,7 +20,7 @@ func NewTwinEvent() TwinEvent {
 
 type TwinEvent interface {
 	GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) *kEventing.Trigger
-	GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger
+	GetTwinInterfaceCommandBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetVirtualCloudEventBrokerBinding(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange) []rabbitmqv1beta1.Binding
 	GetRelationshipBrokerBindings(twinInterface *dtdv0.TwinInterface, brokerExchange rabbitmqv1beta1.Exchange, twinInterfaceQueue rabbitmqv1beta1.Queue) []rabbitmqv1beta1.Binding
 	GetMQQTDispatcherBindings(twinInterface *dtdv0.TwinInterface) []rabbitmqv1beta1.Binding
@@ -291,30 +291,29 @@ func (e *twinEvent) GetTwinInterfaceTrigger(twinInterface *dtdv0.TwinInterface) 
 	return twinInterfaceTrigger
 }
 
-func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInterface) []kEventing.Trigger {
-	var twinInterfaceTriggers []kEventing.Trigger
-
-	virtualTwinService := twinInterface.Name
-
-	// If TwinInstance has container associated, create the triggers
+func (e *twinEvent) GetTwinInterfaceCommandBindings(
+	twinInterface *dtdv0.TwinInterface,
+	brokerExchange rabbitmqv1beta1.Exchange,
+	twinInterfaceQueue rabbitmqv1beta1.Queue,
+) []rabbitmqv1beta1.Binding {
+	var twinInterfaceCommandBindings []rabbitmqv1beta1.Binding
+	// If TwinInstance has container associated, create the binding commands
 	if e.hasContainerInTwinInterface(twinInterface) {
-		// Real Twin Event Type
 		for _, command := range twinInterface.Spec.Commands {
-			twinInterfaceCommandEventType := e.getEventTypeCommandExecuted(twinInterface.Name, command.Name)
-			var triggerAnnotations = make(map[string]string)
-
-			if twinInterface.Spec.Service != nil && twinInterface.Spec.Service.AutoScaling.Parallelism != nil {
-				triggerAnnotations["rabbitmq.eventing.knative.dev/parallelism"] = strconv.Itoa(*twinInterface.Spec.Service.AutoScaling.Parallelism)
-			}
-
-			twinInterfaceTrigger := e.createTrigger(TriggerParameters{
-				TriggerName:   e.getTwinInterfaceTrigger(twinInterface.Name + "-" + command.Name),
-				Namespace:     twinInterface.Namespace,
-				BrokerName:    EVENT_BROKER_NAME,
-				EventType:     twinInterfaceCommandEventType,
-				Subscriber:    virtualTwinService,
-				InterfaceName: twinInterface.Name,
-				OwnerReference: []v1.OwnerReference{
+			commandEventBinding, _ := rabbitmq.NewBinding(rabbitmq.BindingArgs{
+				Name:      strings.ToLower(twinInterface.Name) + "-" + strings.ToLower(command.Name) + "-command-dispatcher",
+				Namespace: twinInterface.Namespace,
+				Labels: map[string]string{
+					"ktwin/twin-interface":         twinInterface.Name,
+					"eventing.knative.dev/trigger": twinInterface.Name,
+				},
+				Filters: map[string]string{
+					"type":              e.getEventTypeCommandExecuted(twinInterface.Name, command.Name),
+					"x-knative-trigger": twinInterface.Name,
+					"x-match":           "all",
+				},
+				RabbitMQVhost: "/",
+				Owner: []v1.OwnerReference{
 					{
 						APIVersion: twinInterface.APIVersion,
 						Kind:       twinInterface.Kind,
@@ -322,15 +321,19 @@ func (e *twinEvent) GetTwinInterfaceCommandTriggers(twinInterface *dtdv0.TwinInt
 						UID:        twinInterface.UID,
 					},
 				},
-				Annotations: triggerAnnotations,
+				RabbitmqClusterReference: &rabbitmqv1beta1.RabbitmqClusterReference{
+					Name:      "rabbitmq",
+					Namespace: "ktwin",
+				},
+				Source:      brokerExchange.Spec.Name,     // broker exchange
+				Destination: twinInterfaceQueue.Spec.Name, // trigger queue
 			})
 
-			twinInterfaceTriggers = append(twinInterfaceTriggers, *twinInterfaceTrigger)
+			twinInterfaceCommandBindings = append(twinInterfaceCommandBindings, commandEventBinding)
 		}
-
 	}
 
-	return twinInterfaceTriggers
+	return twinInterfaceCommandBindings
 }
 
 func (e *twinEvent) createTrigger(triggerParameters TriggerParameters) *kEventing.Trigger {

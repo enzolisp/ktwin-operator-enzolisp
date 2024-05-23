@@ -128,17 +128,6 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 			}
 		}
 
-		// Create Command Triggers
-		twinInterfaceCommandTriggers := r.TwinEvent.GetTwinInterfaceCommandTriggers(twinInterface)
-		for _, commandTriggers := range twinInterfaceCommandTriggers {
-			logger.Info(fmt.Sprintf("Creating Twin Command Trigger %s", commandTriggers.Name))
-			err = r.Create(ctx, &commandTriggers, &client.CreateOptions{})
-			if err != nil && !errors.IsAlreadyExists(err) {
-				logger.Error(err, fmt.Sprintf("Error while creating Twin Command Trigger %s", twinInterfaceName))
-				resultErrors = append(resultErrors, err)
-			}
-		}
-
 		// Create Trigger
 		twinInterfaceTrigger = r.TwinEvent.GetTwinInterfaceTrigger(twinInterface)
 		logger.Info(fmt.Sprintf("Creating Twin Interface Trigger %s", twinInterfaceTrigger.Name))
@@ -215,12 +204,24 @@ func (r *TwinInterfaceReconciler) createUpdateTwinInterface(ctx context.Context,
 					resultErrors = append(resultErrors, err)
 				}
 			} else {
+				// Create Relationship Twin Interface
 				bindings := r.TwinEvent.GetRelationshipBrokerBindings(twinInterface, brokerExchange, twinInterfaceQueue)
 				for _, binding := range bindings {
 					logger.Info(fmt.Sprintf("Creating Twin Command Relationship Binding %s", binding.Name))
 					err = r.Create(ctx, &binding, &client.CreateOptions{})
 					if err != nil && !errors.IsAlreadyExists(err) {
 						logger.Error(err, fmt.Sprintf("Error while creating TwinInterface Binding %s", binding.Name))
+						resultErrors = append(resultErrors, err)
+					}
+				}
+
+				// Create Command Bindings
+				twinInterfaceCommandBindings := r.TwinEvent.GetTwinInterfaceCommandBindings(twinInterface, brokerExchange, twinInterfaceQueue)
+				for _, commandBindings := range twinInterfaceCommandBindings {
+					logger.Info(fmt.Sprintf("Creating Twin Command Bindings %s", commandBindings.Name))
+					err = r.Create(ctx, &commandBindings, &client.CreateOptions{})
+					if err != nil && !errors.IsAlreadyExists(err) {
+						logger.Error(err, fmt.Sprintf("Error while creating Twin Command Binding %s", twinInterfaceName))
 						resultErrors = append(resultErrors, err)
 					}
 				}
