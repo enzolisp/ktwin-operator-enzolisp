@@ -1,0 +1,30 @@
+# Version information
+scyllaImage:
+  tag: 5.2.18
+agentImage:
+  tag: 3.2.8
+
+# Cluster information
+developerMode: true
+datacenter: us-east-1
+racks:
+- name: us-east-1b
+  members: 2
+  storage:
+    capacity: 5Gi
+  resources:
+    limits:
+      cpu: 2
+      memory: 8Gi
+    requests:
+      cpu: 2
+      memory: 8Gi
+  placement:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: ktwin-node
+              operator: In
+              values:
+                - "core"

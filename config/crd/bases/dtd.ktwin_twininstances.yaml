@@ -35,13 +35,92 @@ spec:
           spec:
             description: TwinInstanceSpec defines the desired state of TwinInstance
             properties:
-              foo:
-                description: Foo is an example field of TwinInstance. Edit twininstance_types.go
-                  to remove/update
+              data:
+                properties:
+                  properties:
+                    items:
+                      description: 'TODO: read-only'
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - value
+                      type: object
+                    type: array
+                  telemetries:
+                    items:
+                      description: 'TODO: read-only'
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - value
+                      type: object
+                    type: array
+                type: object
+              endpointSettings:
+                description: 'TODO: Configure as read-only'
+                properties:
+                  amqpEndpoint:
+                    properties:
+                      publisherTopic:
+                        type: string
+                      subscriberTopic:
+                        type: string
+                      url:
+                        type: string
+                    type: object
+                  httpEndpoint:
+                    description: 'TODO: Configure as read-only'
+                    properties:
+                      url:
+                        type: string
+                    type: object
+                  mqttEndpoint:
+                    description: 'TODO: Configure as read-only'
+                    properties:
+                      publisherTopic:
+                        type: string
+                      subscriberTopic:
+                        type: string
+                      url:
+                        type: string
+                    type: object
+                type: object
+              interface:
                 type: string
+              twinInstanceRelationships:
+                items:
+                  properties:
+                    instance:
+                      description: The Target TwinInstance of the Relationship
+                      type: string
+                    interface:
+                      description: The Target TwinInterface of the Relationship
+                      type: string
+                    name:
+                      description: The TwinInstance Relationship name
+                      type: string
+                  required:
+                  - instance
+                  - interface
+                  - name
+                  type: object
+                type: array
             type: object
           status:
             description: TwinInstanceStatus defines the observed state of TwinInstance
+            properties:
+              status:
+                type: string
             type: object
         type: object
     served: true

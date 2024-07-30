@@ -18,40 +18,51 @@ package dtd
 
 import (
 	"context"
+	"fmt"
 
+	twinevent "github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
+	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
+	twinservice "github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
+
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	dtdv0 "ktwin/operator/api/dtd/v0"
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
 )
 
 // TwinInstanceReconciler reconciles a TwinInstance object
 type TwinInstanceReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme      *runtime.Scheme
+	TwinService twinservice.TwinService
+	TwinEvent   twinevent.TwinEvent
+	EventStore  eventStore.EventStore
 }
 
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=dtd.ktwin,resources=twininstances/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the TwinInstance object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.4/pkg/reconcile
 func (r *TwinInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	twinInstance := &dtdv0.TwinInstance{}
+	err := r.Get(ctx, types.NamespacedName{Name: req.Name, Namespace: req.Namespace}, twinInstance)
 
-	return ctrl.Result{}, nil
+	// Delete scenario
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, fmt.Sprintf("Unexpected error while deleting TwinInstance %s", req.Name))
+		return ctrl.Result{}, err
+	}
+
+	return ctrl.Result{}, err
 }
 
 // SetupWithManager sets up the controller with the Manager.

@@ -1,0 +1,27 @@
+# permissions for end users to view eventstores.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: eventstore-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: ktwin-operator
+    app.kubernetes.io/part-of: ktwin-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: eventstore-viewer-role
+rules:
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores/status
+  verbs:
+  - get

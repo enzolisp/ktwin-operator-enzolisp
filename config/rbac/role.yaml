@@ -6,6 +6,68 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
+  - eventstores/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - core.ktwin
   resources:
   - gateways
@@ -27,6 +89,32 @@ rules:
   - core.ktwin
   resources:
   - gateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.ktwin
+  resources:
+  - mqtttriggers/status
   verbs:
   - get
   - patch
@@ -83,3 +171,75 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - eventing.knative.dev
+  resources:
+  - brokers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - eventing.knative.dev
+  resources:
+  - triggers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rabbitmq.com
+  resources:
+  - bindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rabbitmq.com
+  resources:
+  - exchanges
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rabbitmq.com
+  resources:
+  - queues
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch

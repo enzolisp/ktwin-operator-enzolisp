@@ -1,0 +1,42 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 4
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: ktwin-node
+            operator: In
+            values:
+            - "core"
+  resources:
+    requests:
+      cpu: 2
+      memory: 12Gi
+    limits:
+      cpu: 3
+      memory: 12Gi
+  rabbitmq:
+    additionalPlugins:
+      - rabbitmq_mqtt
+    additionalConfig: |
+      # mqtt.listeners.tcp.default = 1883
+      ## Default MQTT with TLS port is 8883
+      # mqtt.listeners.ssl.default = 8883
+
+      # Anonymous connections, if allowed, will use the default
+      # credentials specified here
+      mqtt.allow_anonymous  = true
+      mqtt.default_user     = guest
+      mqtt.default_pass     = guest
+
+      mqtt.vhost            = /
+      mqtt.exchange         = amq.topic
+      
+      # 24 hours by default
+      mqtt.subscription_ttl = 86400000
+      mqtt.prefetch         = 10

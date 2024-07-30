@@ -1,0 +1,11 @@
+apiVersion: core.ktwin/v0
+kind: MQTTTrigger
+metadata:
+  labels:
+    app.kubernetes.io/name: mqtttrigger
+    app.kubernetes.io/instance: mqtttrigger-sample
+    app.kubernetes.io/part-of: ktwin-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: ktwin-operator
+  name: mqtttrigger
+  namespace: ktwin

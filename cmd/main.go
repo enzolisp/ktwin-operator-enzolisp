@@ -31,10 +31,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	corev0 "ktwin/operator/api/core/v0"
-	dtdv0 "ktwin/operator/api/dtd/v0"
-	corecontroller "ktwin/operator/internal/controller/core"
-	dtdcontroller "ktwin/operator/internal/controller/dtd"
+	corev0 "github.com/Open-Digital-Twin/ktwin-operator/api/core/v0"
+	dtdv0 "github.com/Open-Digital-Twin/ktwin-operator/api/dtd/v0"
+	corecontroller "github.com/Open-Digital-Twin/ktwin-operator/internal/controller/core"
+	dtdcontroller "github.com/Open-Digital-Twin/ktwin-operator/internal/controller/dtd"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/event"
+	eventStore "github.com/Open-Digital-Twin/ktwin-operator/pkg/event-store"
+	"github.com/Open-Digital-Twin/ktwin-operator/pkg/service"
+
+	rabbitmqv1beta1 "github.com/rabbitmq/messaging-topology-operator/api/v1beta1"
+	keventing "knative.dev/eventing/pkg/apis/eventing/v1"
+	kserving "knative.dev/serving/pkg/apis/serving/v1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -48,8 +55,30 @@ func init() {
 
 	utilruntime.Must(dtdv0.AddToScheme(scheme))
 	utilruntime.Must(corev0.AddToScheme(scheme))
+
+	// Third party
+	utilruntime.Must(kserving.AddToScheme(scheme))
+	utilruntime.Must(keventing.AddToScheme(scheme))
+	utilruntime.Must(rabbitmqv1beta1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
+
+// ClusterRole permissions
+
+// Kubernetes resources
+//+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+
+// KNative resources
+//+kubebuilder:rbac:groups=serving.knative.dev,resources=services,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=eventing.knative.dev,resources=triggers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=eventing.knative.dev,resources=brokers,verbs=get;list;watch;create;update;patch;delete
+
+// RabbitMQ Resources
+// +kubebuilder:rbac:groups=rabbitmq.com,resources=exchanges,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=rabbitmq.com,resources=queues,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=rabbitmq.com,resources=bindings,verbs=get;list;watch;create;update;patch;delete
 
 func main() {
 	var metricsAddr string
@@ -93,15 +122,21 @@ func main() {
 	}
 
 	if err = (&dtdcontroller.TwinInterfaceReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:      mgr.GetClient(),
+		Scheme:      mgr.GetScheme(),
+		TwinService: service.NewTwinService(),
+		TwinEvent:   event.NewTwinEvent(),
+		EventStore:  eventStore.NewEventStore(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInterface")
 		os.Exit(1)
 	}
 	if err = (&dtdcontroller.TwinInstanceReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:      mgr.GetClient(),
+		Scheme:      mgr.GetScheme(),
+		TwinService: service.NewTwinService(),
+		TwinEvent:   event.NewTwinEvent(),
+		EventStore:  eventStore.NewEventStore(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TwinInstance")
 		os.Exit(1)
@@ -111,6 +146,21 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Gateway")
+		os.Exit(1)
+	}
+	if err = (&corecontroller.MQTTTriggerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MQTTTrigger")
+		os.Exit(1)
+	}
+	if err = (&corecontroller.EventStoreReconciler{
+		Client:     mgr.GetClient(),
+		Scheme:     mgr.GetScheme(),
+		EventStore: eventStore.NewEventStore(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "EventStore")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

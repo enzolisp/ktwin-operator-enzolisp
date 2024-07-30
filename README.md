@@ -1,14 +1,18 @@
-# dt-operator-v4
-// TODO(user): Add simple overview of use/purpose
+# KTWIN - Kubernetes-based Platform for Digital Twins
+
+KTWIN Operator manages the creation of KTWIN resources within the Kubernetes cluster.
 
 ## Description
+
 // TODO(user): An in-depth paragraph about your project and overview of use
 
 ## Getting Started
+
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
 **Note:** Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
 
 ### Running on the cluster
+
 1. Install Instances of Custom Resources:
 
 ```sh
@@ -18,16 +22,17 @@ kubectl apply -f config/samples/
 2. Build and push your image to the location specified by `IMG`:
 
 ```sh
-make docker-build docker-push IMG=<some-registry>/dt-operator-v4:tag
+make docker-build docker-push IMG=ghcr.io/open-digital-twin/ktwin-operator:0.1
 ```
 
 3. Deploy the controller to the cluster with the image specified by `IMG`:
 
 ```sh
-make deploy IMG=<some-registry>/dt-operator-v4:tag
+make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator@sha256:f182d1d4955e4c6fc395587eb2f20580a0c009d25af69ecb3c524868666e4ffa
 ```
 
 ### Uninstall CRDs
+
 To delete the CRDs from the cluster:
 
 ```sh
@@ -35,6 +40,7 @@ make uninstall
 ```
 
 ### Undeploy controller
+
 UnDeploy the controller from the cluster:
 
 ```sh
@@ -42,15 +48,18 @@ make undeploy
 ```
 
 ## Contributing
+
 // TODO(user): Add detailed information on how you would like others to contribute to this project
 
 ### How it works
+
 This project aims to follow the Kubernetes [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
 It uses [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/),
 which provide a reconcile function responsible for synchronizing resources until the desired state is reached on the cluster.
 
 ### Test It Out
+
 1. Install the CRDs into the cluster:
 
 ```sh
@@ -66,6 +75,7 @@ make run
 **NOTE:** You can also run this in one step by running: `make install run`
 
 ### Modifying the API definitions
+
 If you are editing the API definitions, generate the manifests such as CRs or CRDs using:
 
 ```sh
@@ -95,10 +105,22 @@ limitations under the License.
 ## Create Project Steps
 
 ```sh
-go mod init ktwin/operator
+go mod init github.com/Open-Digital-Twin/ktwin-operator
 kubebuilder init --domain ktwin --plugins=go/v4
 kubebuilder edit --multigroup=true
 kubebuilder create api --group dtd --version v0 --kind TwinInterface
 kubebuilder create api --group dtd --version v0 --kind TwinInstance
 kubebuilder create api --group core --version v0 --kind Gateway
+kubebuilder create api --group core --version v0 --kind MQTTTrigger
+kubebuilder create api --group core --version v0 --kind EventStore
+```
+
+## Setup Local environment
+
+```sh
+sh hack/create-kind-cluster.sh && \
+sh hack/pre-setup-ktwin.sh && \
+sh hack/setup-knative-operator.sh && \
+sh hack/setup-brokers.sh && \
+sh hack/setup-scylla-db.sh
 ```

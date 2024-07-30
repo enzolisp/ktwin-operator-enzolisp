@@ -3,4 +3,6 @@ resources:
 - dtd_v0_twininterface.yaml
 - dtd_v0_twininstance.yaml
 - core_v0_gateway.yaml
+- core_v0_mqtttrigger.yaml
+- core_v0_eventstore.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples
