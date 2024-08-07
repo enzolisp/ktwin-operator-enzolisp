@@ -8,7 +8,9 @@ KTWIN is a Digital Twin platform built on top of Kubernetes and powered by Knati
 
 ## Getting Started
 
-You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
+You’ll need a Kubernetes cluster to run and deploy the operator. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
+
+Follow the [installation steps](./docs/Install.md) described in the repository.
 
 ### Running on the cluster
 
