@@ -4,12 +4,11 @@ KTWIN Operator manages the creation of KTWIN resources within the Kubernetes clu
 
 ## Description
 
-// TODO(user): An in-depth paragraph about your project and overview of use
+KTWIN is a Digital Twin platform built on top of Kubernetes and powered by Knative Serverless workloads. KTWIN uses Custom Resource Definitions (CRDs) to extend Digital Twin Definition Language (DTDL), providing more control and flexibility over the underlying container-based services that compose the the DT landscape and reduction of operational costs by automating manual operations.
 
 ## Getting Started
 
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
-**Note:** Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
 
 ### Running on the cluster
 
@@ -46,10 +45,6 @@ UnDeploy the controller from the cluster:
 ```sh
 make undeploy
 ```
-
-## Contributing
-
-// TODO(user): Add detailed information on how you would like others to contribute to this project
 
 ### How it works
 
@@ -101,26 +96,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-## Create Project Steps
-
-```sh
-go mod init github.com/Open-Digital-Twin/ktwin-operator
-kubebuilder init --domain ktwin --plugins=go/v4
-kubebuilder edit --multigroup=true
-kubebuilder create api --group dtd --version v0 --kind TwinInterface
-kubebuilder create api --group dtd --version v0 --kind TwinInstance
-kubebuilder create api --group core --version v0 --kind Gateway
-kubebuilder create api --group core --version v0 --kind MQTTTrigger
-kubebuilder create api --group core --version v0 --kind EventStore
-```
-
-## Setup Local environment
-
-```sh
-sh hack/create-kind-cluster.sh && \
-sh hack/pre-setup-ktwin.sh && \
-sh hack/setup-knative-operator.sh && \
-sh hack/setup-brokers.sh && \
-sh hack/setup-scylla-db.sh
-```
