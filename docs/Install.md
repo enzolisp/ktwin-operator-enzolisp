@@ -32,7 +32,7 @@ sh hack/setup-brokers.sh
 
 ```sh
 make install
-make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator
+make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator@sha256:d17285f3e2852023c0dc0d0389615ea96e81ed594d2de8fa480ca178ca2a7b08
 ```
 
 ## Local Development
