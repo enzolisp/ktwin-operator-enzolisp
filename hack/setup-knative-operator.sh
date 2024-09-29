@@ -6,12 +6,6 @@ SCRIPT_PATH=$(dirname "$0")
 
 KNATIVE_VERSION=v1.10.0
 KNATIVE_OPERATOR_VERSION=v1.11.3
-RABBITMQ_CERT_MANAGER_VERSION=v1.11.1
-
-# Install Cert Manager
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/${RABBITMQ_CERT_MANAGER_VERSION}/cert-manager.yaml
-kubectl apply -f ${SCRIPT_PATH}/brokers/cluster-operator/2-cert-manager.yaml
-kubectl wait --for=condition=available --timeout=200s --all deployments --namespace cert-manager
 
 # Install Knative Operator
 kubectl apply -f https://github.com/knative/operator/releases/download/knative-${KNATIVE_OPERATOR_VERSION}/operator.yaml
