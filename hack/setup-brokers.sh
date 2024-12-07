@@ -35,7 +35,9 @@ kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker/1-rabbitmq-broker.yaml
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 
 # RabbitMQ Broker
-kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker -n ktwin
+kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker/1-rabbitmq-broker.yaml -n knative-eventing
+kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker/2-rabbitmq-config.yaml -n ktwin
+kubectl apply -f ${SCRIPT_PATH}/brokers/rabbitmq-broker/3-rabbitmq-broker.yaml -n ktwin
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace knative-eventing
 kubectl wait --for=condition=available --timeout=200s --all deployments --namespace ktwin
 kubectl wait --for=condition=Ready --timeout=200s --all pods --namespace ktwin
@@ -46,6 +48,7 @@ echo "Setup broker script has finished"
 # kubectl delete -f ${SCRIPT_PATH}/brokers/rabbitmq-broker -n ktwin
 # kubectl delete -f ${SCRIPT_PATH}/brokers/rabbitmq-broker/1-rabbitmq-broker.yaml
 # kubectl delete -f ${SCRIPT_PATH}/brokers/rabbitmq-cluster -n ktwin
+# kubectl delete -f ${SCRIPT_PATH}/brokers/rabbitmq-cluster -n knative-eventing
 # kubectl delete -f ${SCRIPT_PATH}/brokers/cluster-operator/3-messaging-topology-operator-with-certmanager.yaml
 # kubectl delete -f ${SCRIPT_PATH}/brokers/cluster-operator/2-cert-manager.yaml
 # kubectl delete -f ${SCRIPT_PATH}/brokers/cluster-operator/1-cluster-operator.yml
