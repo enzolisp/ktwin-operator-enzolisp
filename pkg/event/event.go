@@ -151,11 +151,9 @@ func (e *twinEvent) GetVirtualCloudEventBrokerBinding(
 			"eventing.knative.dev/trigger": twinInterface.Name,
 		},
 		Filters: map[string]string{
-			"type":                         e.getEventTypeVirtualGenerated(twinInterface.Name),
-			"x-knative-trigger":            twinInterface.Name,
-			"x-match":                      "all",
-			"ktwin/twin-interface":         twinInterface.Name,
-			"eventing.knative.dev/trigger": twinInterface.Name,
+			"type":              e.getEventTypeVirtualGenerated(twinInterface.Name),
+			"x-knative-trigger": twinInterface.Name,
+			"x-match":           "all",
 		},
 		RabbitMQVhost: "/",
 		Owner: []v1.OwnerReference{
