@@ -163,11 +163,6 @@ func TestTwinInstance_AddVertex(t *testing.T) {
 
 func TestTwinInstance_MarshalJSON(t *testing.T) {
 
-	type VertexToBeAdded struct {
-		twinInstance  dtdv0.TwinInstance
-		expectedError error
-	}
-
 	tests := []struct {
 		name                     string
 		initialTwinInstanceGraph twinInstanceGraph
@@ -204,6 +199,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 			expectedResult: "{\"twinInstances\":[{\"name\":\"TwinInstance01\",\"relationships\":[{\"name\":\"NameRelationship01\",\"interface\":\"InterfaceRelationship01\",\"instance\":\"InstanceRelationship02\"}]},{\"name\":\"TwinInstance02\",\"relationships\":[{\"name\":\"NameRelationship02\",\"interface\":\"InterfaceRelationship02\",\"instance\":\"InstanceRelationship02\"}]}]}",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.initialTwinInstanceGraph.MarshalJson()
@@ -212,7 +208,7 @@ func TestTwinInstance_MarshalJSON(t *testing.T) {
 				assert.Fail(t, "Error is not supposed to be different of nul")
 			}
 
-			assert.Equal(t, tt.expectedResult, string(result))
+			assert.JSONEq(t, tt.expectedResult, string(result))
 		})
 	}
 }
