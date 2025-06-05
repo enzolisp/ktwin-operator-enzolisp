@@ -1,0 +1,5 @@
+sh hack/setup-scylla-db.sh
+
+Error: UPGRADE FAILED: failed to create resource: Internal error occurred: failed calling webhook "webhook.scylla.scylladb.com": failed to call webhook: Post "https://scylla-operator-webhook.scylla-operator.svc:443/validate?timeout=10s": dial tcp 10.96.8.93:443: connect: connection refused
+
+* Internal error occurred: failed calling webhook "webhook.cert-manager.io": failed to call webhook: Post "https://cert-manager-webhook.cert-manager.svc:443/mutate?timeout=10s": dial tcp 10.96.3.238:443: connect: connection refused

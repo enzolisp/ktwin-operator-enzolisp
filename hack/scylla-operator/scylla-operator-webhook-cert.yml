@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: scylla-operator-serving-cert
+  namespace: scylla-operator
+spec:
+  secretName: scylla-operator-serving-cert
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - scylladb.com
+  commonName: webhook-server.scylla-operator.svc
+  dnsNames:
+    - webhook-server.scylla-operator.svc
+    - webhook-server.scylla-operator.svc.cluster.local
+  issuerRef:
+    name: scylla-operator-selfsigned-issuer
+    kind: ClusterIssuer
