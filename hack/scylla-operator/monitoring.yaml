@@ -2,7 +2,7 @@ apiVersion: scylla.scylladb.com/v1alpha1
 kind: ScyllaDBMonitoring
 metadata:
   name: scylladb-monitoring
-  namespace: ktwin
+  namespace: elpeixoto
 spec:
   type: Platform
   endpointsSelector:
