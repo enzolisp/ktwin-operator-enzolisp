@@ -41,7 +41,7 @@ make deploy IMG=ghcr.io/open-digital-twin/ktwin-operator@sha256:d17285f3e2852023
 kubectl apply -Rf hack/ktwin/resources
 ```
 
-## Local Development
+## Local Development using Kind
 
 1. Configure your Kubernetes cluster. You can run the platform in [Kind](https://kind.sigs.k8s.io/) in your local computer.
 
@@ -52,7 +52,7 @@ kind create cluster
 2. Load Docker image into cluster.
 
 ```sh
-sh hack/load-local-dependencies.sh
+sh hack/setup-kind.sh
 ```
 
 3. Create Namespace and Pre-Dependencies
@@ -92,4 +92,15 @@ make run-local
 
 ```sh
 kubectl apply -Rf hack/ktwin/resources
+```
+
+## Local Development using Minikube
+1. Configure your Kubernetes cluster. You can run the platform in [Minikube](https://minikube.sigs.k8s.io/) in your local computer.
+
+```sh
+minikube start --driver=docker
+```
+
+```sh
+sh hack/setup-minikube.sh
 ```
