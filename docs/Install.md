@@ -67,6 +67,18 @@ sh hack/pre-setup-ktwin.sh
 sh hack/setup-scylla-db.sh
 ```
 
+4. Deploy Event Store ScyllaDB instance.
+
+```sh
+sh hack/scylla-manual-deploy.sh
+```
+
+4. Deploy Event Store ScyllaDB instance.
+
+```sh
+sh hack/scylla-manual-deploy.sh
+```
+
 5. Install Knative and Istio dependencies.
 
 ```sh
@@ -101,6 +113,47 @@ kubectl apply -Rf hack/ktwin/resources
 minikube start --driver=docker
 ```
 
+2. Load Docker image into cluster.
+
 ```sh
 sh hack/setup-minikube.sh
+```
+
+3. Create Namespace and Pre-Dependencies
+
+```sh
+sh hack/pre-setup-ktwin.sh
+```
+
+4. Deploy Event Store ScyllaDB instance.
+
+```sh
+sh hack/scylla-manual-deploy.sh
+``` 
+
+5. Install Knative and Istio dependencies.
+
+```sh
+sh hack/setup-knative-operator.sh
+```
+
+> Note: KTWIN uses Knative node selector features to deploy workloads to specific nodes based on node labels. The node selector feature is disabled by default in KTWIN and it can be enabled by [feature flag](https://knative.dev/docs/serving/configuration/feature-flags). You can apply with the following command in `knative-serving` namespace: `kubectl apply -f hack/knative-operator/config-features.yaml`
+
+6. Install Event Brokers.
+
+```sh
+sh hack/setup-brokers.sh
+```
+
+7. Install CDRs in Cluster and Run the Operator locally.
+
+```sh
+make install
+make run-local
+```
+
+8. Install Event Store and MQTT Dispatcher resources.
+
+```sh
+kubectl apply -Rf hack/ktwin/resources
 ```

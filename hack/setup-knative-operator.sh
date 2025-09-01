@@ -7,6 +7,8 @@ SCRIPT_PATH=$(dirname "$0")
 KNATIVE_VERSION=v1.10.0
 KNATIVE_OPERATOR_VERSION=v1.11.3
 
+kubectl apply -f https://github.com/knative/operator/releases/download/knative-v1.11.3/operator.yaml
+
 # Install Knative Operator
 kubectl apply -f https://github.com/knative/operator/releases/download/knative-${KNATIVE_OPERATOR_VERSION}/operator.yaml
 kubectl wait --for=condition=available --timeout=200s --all deployments
